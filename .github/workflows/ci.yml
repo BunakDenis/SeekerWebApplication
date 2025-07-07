@@ -1,3 +1,8 @@
+name: Create Docker Files and push images
+on:
+  push:
+    branches: [master]
+    
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
@@ -10,15 +15,18 @@ jobs:
         run: mvn -B test --file pom.xml
       - name: Build and push Telegram bot service image
         uses: docker/build-push-action@v4
+        env:
+          # Передаем секрет как переменную окружения для шага
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         with:
           context: ./telegram-bot-service
           file: ./telegram-bot-service/Dockerfile
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/telegram-bot-service:latest
+          tags: ghcr.io/bunakdenis/telegram-bot-service:latest
       - name: Build and push Main utils service image
         uses: docker/build-push-action@v4
         with:
           context: ./main-utils-service
           file: ./main-utils-service/Dockerfile
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/main-utils-service:latest
+          tags: ghcr.io/bunakdenis/main-utils-service:latest
