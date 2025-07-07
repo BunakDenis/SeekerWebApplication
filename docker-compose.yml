@@ -1,0 +1,36 @@
+version: '3.8'
+
+networks:
+  app-network:
+    driver: bridge
+
+services:
+  telegram-bot-service:
+    build: ./telegram-bot-service # Путь к папке с Dockerfile
+    environment:
+      TELEGRAM_BOT_USERNAME: ${TELEGRAM_BOT_NAME}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      API_MAIN_UTILS_SERVICE_URL: ${API_UTILS_SERVICE_URL}
+      #SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/mydatabase
+      #SPRING_DATASOURCE_USERNAME: myuser
+      #SPRING_DATASOURCE_PASSWORD: mypassword
+    # Другие настройки Spring Boot и JPA
+  networks:
+    - app-network
+       depends_on: # Указывает зависимость от других сервисов (для порядка старта)
+  #   database:
+  #     condition: service_healthy # Или service_started
+        utils-service:
+          condition: service_started
+  #   spell-check-service:
+  #     condition: service_started
+  # healthcheck: # Настройте healthcheck для сервиса бота
+
+  utils-service:
+    build: ./main-utils-service # Путь к папке с Dockerfile
+    environment:
+      EXTERNAL_AUDIO_API_URL: https://main-utils-service # URL внешнего API
+      # Другие настройки
+    networks:
+      - app-network
+    # healthcheck: # Настройте healthcheck для сервиса

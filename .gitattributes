@@ -1,0 +1,2 @@
+*.jar filter=lfs diff=lfs merge=lfs -text
+main-utils-service/src/main/resources/models/vosk-model-ru/** filter=lfs diff=lfs merge=lfs -text

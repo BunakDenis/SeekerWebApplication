@@ -1,0 +1,24 @@
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with: { java-version: 17 }
+      - name: Run tests
+        run: mvn -B test --file pom.xml
+      - name: Build and push Telegram bot service image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./telegram-bot-service
+          file: ./telegram-bot-service/Dockerfile
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/telegram-bot-service:latest
+      - name: Build and push Main utils service image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./main-utils-service
+          file: ./main-utils-service/Dockerfile
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/main-utils-service:latest
