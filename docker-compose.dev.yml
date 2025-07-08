@@ -6,10 +6,14 @@ networks:
 
 services:
   telegram-bot-service:
-    build: ./telegram-bot-service # Путь к папке с Dockerfile
+    build:
+      context: .
+      dockerfile: ./telegram-bot-service/Dockerfile
+      args:
+        SPRING_PROFILES_ACTIVE: dev
     environment:
-      TELEGRAM_BOT_USERNAME: ${TELEGRAM_BOT_NAME}
-      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      TELEGRAM_BOT_NAME: ${DEV_TELEGRAM_BOT_NAME}
+      TELEGRAM_BOT_TOKEN: ${DEV_TELEGRAM_BOT_TOKEN}
       API_MAIN_UTILS_SERVICE_URL: ${API_UTILS_SERVICE_URL}
       #SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/mydatabase
       #SPRING_DATASOURCE_USERNAME: myuser
@@ -27,7 +31,11 @@ services:
   # healthcheck: # Настройте healthcheck для сервиса бота
 
   utils-service:
-    build: ./main-utils-service # Путь к папке с Dockerfile
+    build:
+      context: .
+      dockerfile: ./main-utils-service/Dockerfile
+      args:
+        SPRING_PROFILES_ACTIVE: dev
     environment:
       EXTERNAL_AUDIO_API_URL: https://main-utils-service # URL внешнего API
       # Другие настройки
