@@ -29,7 +29,7 @@ jobs:
           load: false
           no-cache: false
           pull: true
-          github-token: ${{ secrets.GHCR_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push main-utils-service image
         uses: docker/build-push-action@v4
@@ -41,4 +41,4 @@ jobs:
           load: false
           no-cache: false
           pull: true
-          github-token: ${{ secrets.GHCR_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
