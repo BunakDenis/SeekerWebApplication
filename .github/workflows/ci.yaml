@@ -56,36 +56,58 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Install Railway CLI
-        run: npm install -g railway
+        run: npm install -g @railway/cli
 
       - name: Login to Railway
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-        run: railway login --apiKey $RAILWAY_TOKEN
+        run: railway auth login --token $RAILWAY_TOKEN
 
-      - name: Link Project
+      - name: Link to Railway Project
         env:
           RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
         run: railway link $RAILWAY_PROJECT_ID
 
-      - name: Deploy telegram-bot-service
+      - name: Deploy or Redeploy telegram-bot-service
         env:
-          RAILWAY_SERVICE_NAME: ${{ secrets.RAILWAY_SERVICE_NAME_TELEGRAM }}
+          SERVICE_NAME: ${{ secrets.RAILWAY_SERVICE_NAME_TELEGRAM }}
+          IMAGE_TAG: ghcr.io/${{ github.repository_owner }}/telegram-bot-service:latest
           SPRING_PROFILES_ACTIVE: prod
-          PROD_TELEGRAM_BOT_TOKEN: ${{ secrets.PROD_TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.PROD_TELEGRAM_BOT_TOKEN }}
         run: |
-          railway up --detach \
-            --service $RAILWAY_SERVICE_NAME \
-            --image ghcr.io/${{ github.repository_owner }}/telegram-bot-service:latest \
-            --env SPRING_PROFILES_ACTIVE=$SPRING_PROFILES_ACTIVE \
-            --env TELEGRAM_BOT_TOKEN=$PROD_TELEGRAM_BOT_TOKEN
+          echo "🔍 Checking current deployed image for $SERVICE_NAME..."
+          CURRENT_IMAGE=$(railway status --json | jq -r \
+            ".services[] | select(.name==\"$SERVICE_NAME\") | .deployments[0].meta.image")
 
-      - name: Deploy main-utils-service
+          if [ "$CURRENT_IMAGE" = "$IMAGE_TAG" ]; then
+            echo "♻️ Image already deployed. Running redeploy..."
+            railway redeploy --service $SERVICE_NAME
+          else
+            echo "🚀 New image detected. Running deploy..."
+            railway up --detach \
+              --service $SERVICE_NAME \
+              --image $IMAGE_TAG \
+              --env SPRING_PROFILES_ACTIVE=$SPRING_PROFILES_ACTIVE \
+              --env TELEGRAM_BOT_TOKEN=$TELEGRAM_BOT_TOKEN
+          fi
+
+      - name: Deploy or Redeploy main-utils-service
         env:
-          RAILWAY_SERVICE_NAME: ${{ secrets.RAILWAY_SERVICE_NAME_UTILS }}
+          SERVICE_NAME: ${{ secrets.RAILWAY_SERVICE_NAME_UTILS }}
+          IMAGE_TAG: ghcr.io/${{ github.repository_owner }}/main-utils-service:latest
           SPRING_PROFILES_ACTIVE: prod
         run: |
-          railway up --detach \
-            --service $RAILWAY_SERVICE_NAME \
-            --image ghcr.io/${{ github.repository_owner }}/main-utils-service:latest \
-            --env SPRING_PROFILES_ACTIVE=$SPRING_PROFILES_ACTIVE
+          echo "🔍 Checking current deployed image for $SERVICE_NAME..."
+          CURRENT_IMAGE=$(railway status --json | jq -r \
+            ".services[] | select(.name==\"$SERVICE_NAME\") | .deployments[0].meta.image")
+
+          if [ "$CURRENT_IMAGE" = "$IMAGE_TAG" ]; then
+            echo "♻️ Image already deployed. Running redeploy..."
+            railway redeploy --service $SERVICE_NAME
+          else
+            echo "🚀 New image detected. Running deploy..."
+            railway up --detach \
+              --service $SERVICE_NAME \
+              --image $IMAGE_TAG \
+              --env SPRING_PROFILES_ACTIVE=$SPRING_PROFILES_ACTIVE
+          fi
