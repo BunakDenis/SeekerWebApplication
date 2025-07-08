@@ -17,18 +17,21 @@ jobs:
         run: mvn -B test --file pom.xml
       - name: Build and push Telegram bot service image
         uses: docker/build-push-action@v4
-        env:
-          # Передаем секрет как переменную окружения для шага
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         with:
           context: ./telegram-bot-service
-          file: ./telegram-bot-service/Dockerfile
           push: true
           tags: ghcr.io/bunakdenis/telegram-bot-service:latest
+          load: false
+          no-cache: false
+          pull: false
+          github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and push Main utils service image
         uses: docker/build-push-action@v4
         with:
           context: ./main-utils-service
-          file: ./main-utils-service/Dockerfile
           push: true
           tags: ghcr.io/bunakdenis/main-utils-service:latest
+          load: false
+          no-cache: false
+          pull: false
+          github-token: ${{ secrets.GITHUB_TOKEN }}
