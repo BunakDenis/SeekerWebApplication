@@ -19,9 +19,6 @@ jobs:
       - name: Run tests
         run: mvn -B test --file pom.xml
 
-      - name: Login to GitHub Container Registry
-        run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u bunakdenis --password-stdin
-
       - name: Build and push telegram-bot-service image
         uses: docker/build-push-action@v4
         with:
@@ -33,9 +30,6 @@ jobs:
           no-cache: false
           pull: true
           github-token: ${{ secrets.CR_PAT }}
-
-      - name: Login to GitHub Container Registry
-        run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u BunakDenis --password-stdin
 
       - name: Build and push main-utils-service image
         uses: docker/build-push-action@v4
