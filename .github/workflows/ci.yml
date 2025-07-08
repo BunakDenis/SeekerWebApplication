@@ -2,7 +2,7 @@ name: Create Docker Files and push images
 on:
   push:
     branches: [master]
-    
+
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
@@ -15,20 +15,24 @@ jobs:
           distribution: 'temurin'
       - name: Run tests
         run: mvn -B test --file pom.xml
+
       - name: Build and push Telegram bot service image
         uses: docker/build-push-action@v4
         with:
-          context: .
+          context: ./telegram-bot-service
+          file: ./telegram-bot-service/Dockerfile
           push: true
           tags: ghcr.io/bunakdenis/telegram-bot-service:latest
           load: false
           no-cache: false
           pull: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build and push Main utils service image
         uses: docker/build-push-action@v4
         with:
-          context: .
+          context: ./main-utils-service
+          file: ./main-utils-service/Dockerfile
           push: true
           tags: ghcr.io/bunakdenis/main-utils-service:latest
           load: false
