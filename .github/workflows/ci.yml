@@ -16,7 +16,7 @@ jobs:
       - name: Run tests
         run: mvn -B test --file pom.xml
 
-      - name: Build and push Telegram bot service image
+      - name: Build and push telegram-bot-service image
         uses: docker/build-push-action@v4
         with:
           context: .
@@ -28,7 +28,7 @@ jobs:
           pull: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push Main utils service image
+      - name: Build and push main-utils-service image
         uses: docker/build-push-action@v4
         with:
           context: .

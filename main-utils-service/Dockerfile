@@ -4,6 +4,7 @@ WORKDIR /workspace
 # Копируем корневой pom и pom модуля
 COPY ./pom.xml ./
 COPY ./main-utils_service/pom.xml main-utils_service/
+COPY ./telegram-bot-service/pom.xml ./telegram-bot-service/
 # Заранее подтянем зависимости
 RUN mvn -B dependency:go-offline
 # Копируем исходники и собираем именно этот модуль (со всеми его зависимостями)
