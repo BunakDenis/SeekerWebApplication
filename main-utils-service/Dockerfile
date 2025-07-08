@@ -9,7 +9,7 @@ COPY ./telegram-bot-service/pom.xml ./telegram-bot-service/
 RUN mvn -B dependency:go-offline
 # Копируем исходники и собираем именно этот модуль (со всеми его зависимостями)
 COPY ./main-utils-service/src ./main-utils-service/src
-RUN mvn -pl main-utils_service -am -B clean package -DskipTests
+RUN mvn -pl main-utils-service -am -B clean package -DskipTests
 
 # Финальный этап: лёгкий образ с JRE, копируем собранный JAR
 FROM eclipse-temurin:17-jre
