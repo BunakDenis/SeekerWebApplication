@@ -49,50 +49,43 @@ jobs:
           no-cache: false
           pull: true
 
-deploy-railway:
-  needs: build-test-push
-  runs-on: ubuntu-latest
-  steps:
-    - uses: actions/checkout@v3
+  deploy-railway:
+    needs: build-deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
 
-    - name: Install Railway CLI
-      run: npm install -g railway
+      - name: Install Railway CLI
+        run: npm install -g railway
 
-    - name: Login to Railway
-      env:
-        RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-      run: railway login --apiKey $RAILWAY_TOKEN
-
-    - name: Link Project
-      env:
-        RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
-      run: railway link $RAILWAY_PROJECT_ID
-
-    - name: Deploy telegram-bot-service
+      - name: Login to Railway
         env:
-          # из GitHub Secrets
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: railway login --apiKey $RAILWAY_TOKEN
+
+      - name: Link Project
+        env:
+          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
+        run: railway link $RAILWAY_PROJECT_ID
+
+      - name: Deploy telegram-bot-service
+        env:
           RAILWAY_SERVICE_NAME: ${{ secrets.RAILWAY_SERVICE_NAME_TELEGRAM }}
           SPRING_PROFILES_ACTIVE: prod
           PROD_TELEGRAM_BOT_TOKEN: ${{ secrets.PROD_TELEGRAM_BOT_TOKEN }}
-          #PROD_DB_URL: ${{ secrets.PROD_DB_URL }}
-          #PROD_DB_USER: ${{ secrets.PROD_DB_USER }}
-          #PROD_DB_PASS: ${{ secrets.PROD_DB_PASS }}
         run: |
           railway up --detach \
-          --service $RAILWAY_SERVICE_NAME \
-          --image ghcr.io/${{ github.repository_owner }}/telegram-bot-service:latest \
-          --env SPRING_PROFILES_ACTIVE=$SPRING_PROFILES_ACTIVE \
-          --env TELEGRAM_BOT_TOKEN=$PROD_TELEGRAM_BOT_TOKEN
+            --service $RAILWAY_SERVICE_NAME \
+            --image ghcr.io/${{ github.repository_owner }}/telegram-bot-service:latest \
+            --env SPRING_PROFILES_ACTIVE=$SPRING_PROFILES_ACTIVE \
+            --env TELEGRAM_BOT_TOKEN=$PROD_TELEGRAM_BOT_TOKEN
 
-    - name: Deploy main-utils-service
-            env:
-              RAILWAY_SERVICE_NAME: ${{ secrets.RAILWAY_SERVICE_NAME_UTILS }}
-              SPRING_PROFILES_ACTIVE: prod
-              #PROD_DB_URL: ${{ secrets.PROD_DB_URL }}
-              #PROD_DB_USER: ${{ secrets.PROD_DB_USER }}
-              #PROD_DB_PASS: ${{ secrets.PROD_DB_PASS }}
-            run: |
-              railway up --detach \
-                --service $RAILWAY_SERVICE_NAME \
-                --image ghcr.io/${{ github.repository_owner }}/main-utils-service:latest \
-                --env SPRING_PROFILES_ACTIVE=$SPRING_PROFILES_ACTIVE \
+      - name: Deploy main-utils-service
+        env:
+          RAILWAY_SERVICE_NAME: ${{ secrets.RAILWAY_SERVICE_NAME_UTILS }}
+          SPRING_PROFILES_ACTIVE: prod
+        run: |
+          railway up --detach \
+            --service $RAILWAY_SERVICE_NAME \
+            --image ghcr.io/${{ github.repository_owner }}/main-utils-service:latest \
+            --env SPRING_PROFILES_ACTIVE=$SPRING_PROFILES_ACTIVE
