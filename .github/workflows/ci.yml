@@ -4,6 +4,7 @@ on:
     branches: [master]
 
 permissions:
+  contents: read
   packages: write
 
 jobs:
@@ -19,6 +20,13 @@ jobs:
       - name: Run tests
         run: mvn -B test --file pom.xml
 
+      - name: Log in to GHCR
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build and push telegram-bot-service image
         uses: docker/build-push-action@v4
         with:
@@ -29,7 +37,6 @@ jobs:
           load: false
           no-cache: false
           pull: true
-          github-token: ${{ secrets.GH_TOKEN }}
 
       - name: Build and push main-utils-service image
         uses: docker/build-push-action@v4
@@ -41,4 +48,3 @@ jobs:
           load: false
           no-cache: false
           pull: true
-          github-token: ${{ secrets.GH_TOKEN }}
