@@ -18,20 +18,20 @@ jobs:
       - name: Build and push Telegram bot service image
         uses: docker/build-push-action@v4
         with:
-          context: ./telegram-bot-service
+          context: .
           push: true
           tags: ghcr.io/bunakdenis/telegram-bot-service:latest
           load: false
           no-cache: false
-          pull: false
+          pull: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and push Main utils service image
         uses: docker/build-push-action@v4
         with:
-          context: ./main-utils-service
+          context: .
           push: true
           tags: ghcr.io/bunakdenis/main-utils-service:latest
           load: false
           no-cache: false
-          pull: false
+          pull: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
