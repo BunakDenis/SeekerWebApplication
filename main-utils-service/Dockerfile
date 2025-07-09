@@ -15,13 +15,13 @@ RUN mvn -pl main-utils-service -am -B clean package -DskipTests
 FROM eclipse-temurin:17-jre
 
 # Build-time аргументы
-ARG SPRING_PROFILES_ACTIVE
+#ARG SPRING_PROFILES_ACTIVE
 
 # Передадим внутрь контейнера
-ENV SPRING_PROFILES_ACTIVE=$SPRING_PROFILES_ACTIVE
+#ENV SPRING_PROFILES_ACTIVE=$SPRING_PROFILES_ACTIVE
 
 WORKDIR /app
 
 COPY --from=builder /workspace/main-utils-service/target/*.jar main_utils_service.jar
 
-ENTRYPOINT ["java", "-jar", "main_utils_service.jar", "--spring.profiles.active=${SPRING_PROFILES_ACTIVE}"]
+ENTRYPOINT ["java", "-jar", "main_utils_service.jar"]

@@ -15,13 +15,13 @@ RUN mvn -pl telegram-bot-service -am -B clean package -DskipTests
 FROM eclipse-temurin:17-jre
 
 # Build-time аргументы
-ARG SPRING_PROFILES_ACTIVE
+#ARG SPRING_PROFILES_ACTIVE
 
 # Передадим внутрь контейнера
-ENV SPRING_PROFILES_ACTIVE=$SPRING_PROFILES_ACTIVE
+#ENV SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
 
 WORKDIR /app
 
 COPY --from=builder /workspace/telegram-bot-service/target/*.jar telegram_bot_service.jar
 
-ENTRYPOINT ["java", "-jar", "telegram_bot_service.jar", "--spring.profiles.active=${SPRING_PROFILES_ACTIVE}"]
+ENTRYPOINT ["java", "-jar", "telegram_bot_service.jar"]
