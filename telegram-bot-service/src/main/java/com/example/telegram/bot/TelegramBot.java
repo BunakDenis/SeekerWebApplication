@@ -73,13 +73,14 @@ public class TelegramBot extends TelegramLongPollingBot {
 
         User user = update.getMessage().getFrom();
 
-        if (user.getUserName().equals("Sveticiya0909")) sender.sendMessage(update.getMessage().getChatId(),
+        log.debug("Входящее сообщение от Юзера - " + user);
+
+        if (user.getUserName().toLowerCase().equals("sveticiya0909")) sender.sendMessage(update.getMessage().getChatId(),
                 "Зайка, я сильно тебя люблю!");
 
         if (update.hasMessage()) {
 
             Message message = update.getMessage();
-            log.debug("incoming message - " + message);
 
             if (message.hasText()) {
                 String msgText = message.getText();
@@ -93,7 +94,6 @@ public class TelegramBot extends TelegramLongPollingBot {
                 }
 
             } else if (message.hasAudio() || message.hasVoice()) {
-                log.debug("message.hasAudio() && message.hasVoice()");
                 multimediaHandler.handleMultimedia(update);
             } else {
                 sender.sendMessage(update.getMessage().getChatId(), UNKNOWN_COMMAND_OR_QUERY);
