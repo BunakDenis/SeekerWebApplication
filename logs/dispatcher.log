@@ -3508,3 +3508,11 @@ java.io.IOException: FFmpeg завершился с ошибкой (код -22)
 09-07-2025 17:35:53 DEBUG TelegramBot:81 - inbox msg text - /start
 09-07-2025 17:35:53 DEBUG CommandsHandler:31 - handleCommands method
 09-07-2025 17:35:53 DEBUG CommandsHandler:37 - ChatId = 465963651, command = /start
+10-07-2025 01:07:12 DEBUG VoskAudioDecoder:41 - Загрузка декодера Vosk прошла успешно!
+10-07-2025 01:07:19 DEBUG VoskAudioDecoder:122 - Vosk model closed
+10-07-2025 01:11:05 DEBUG VoskAudioDecoder:41 - Загрузка декодера Vosk прошла успешно!
+10-07-2025 01:27:34 DEBUG VoskAudioDecoder:122 - Vosk model closed
+10-07-2025 01:31:09 DEBUG VoskAudioDecoder:41 - Загрузка декодера Vosk прошла успешно!
+10-07-2025 01:52:33 DEBUG VoskAudioDecoder:122 - Vosk model closed
+10-07-2025 01:56:30 DEBUG VoskAudioDecoder:41 - Загрузка декодера Vosk прошла успешно!
+10-07-2025 01:57:07 DEBUG VoskAudioDecoder:122 - Vosk model closed

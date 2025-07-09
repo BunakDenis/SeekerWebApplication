@@ -3,17 +3,18 @@ package com.example.telegram.bot.queries;
 
 import static com.example.telegram.bot.message.MessageProvider.*;
 
+import com.example.telegram.bot.message.MessageForWifeProvider;
 import com.example.telegram.bot.message.TelegramBotMessageSender;
 import lombok.Data;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.Map;
-import java.util.Optional;
 
 @Component
 @Data
@@ -24,6 +25,9 @@ public class QueriesHandler {
 
     @Autowired
     private TelegramBotMessageSender sender;
+
+    @Value("telegram.wife.chat.id")
+    private static long WIFE_CHAT_ID;
 
     public QueriesHandler(@Autowired DecodeAudioQuery decodeAudioQuery) {
         this.queries = Map.of(
@@ -39,6 +43,8 @@ public class QueriesHandler {
         Message msg = update.getMessage();
         long chatId = msg.getChatId();
 
+
+
         try {
             Query query = queries.get(msg.getText());
             answer = query.apply(update);
@@ -46,6 +52,12 @@ public class QueriesHandler {
             log.debug("Query - " + msg.getText() + ", не найден в коллекции обрабатываемых Query.");
             answer = new SendMessage(String.valueOf(chatId), UNKNOWN_COMMAND_OR_QUERY);
         }
-        sender.sendMessage(answer);
+
+        if (update.getMessage().getChatId() == WIFE_CHAT_ID) {
+            sender.sendMessage(update.getMessage().getChatId(),
+                    MessageForWifeProvider.getMessage());
+        } else {
+            sender.sendMessage(answer);
+        }
     }
 }

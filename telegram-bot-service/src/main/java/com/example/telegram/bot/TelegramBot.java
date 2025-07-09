@@ -3,6 +3,7 @@ package com.example.telegram.bot;
 
 import com.example.telegram.bot.commands.Commands;
 import com.example.telegram.bot.commands.CommandsHandler;
+import com.example.telegram.bot.message.MessageForWifeProvider;
 import com.example.telegram.bot.message.TelegramBotMessageSender;
 import com.example.telegram.bot.multimedia.MultimediaHandler;
 import com.example.telegram.bot.queries.QueriesHandler;
@@ -69,14 +70,9 @@ public class TelegramBot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
 
-        log.debug("Incoming update - " + update);
-
         User user = update.getMessage().getFrom();
 
         log.debug("Входящее сообщение от Юзера - " + user);
-
-        if (user.getUserName().toLowerCase().equals("sveticiya0909")) sender.sendMessage(update.getMessage().getChatId(),
-                "Зайка, я сильно тебя люблю!");
 
         if (update.hasMessage()) {
 

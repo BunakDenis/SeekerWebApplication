@@ -24,9 +24,22 @@ public class StartCommand implements Command {
     public SendMessage apply(Update update) {
         Message msg = update.getMessage();
         Long chatId = msg.getChatId();
+        String userFirstName = msg.getFrom().getFirstName();
+        String userLastName = msg.getFrom().getLastName();
+        StringBuilder greeting = new StringBuilder();
+
+        if (userFirstName != null) {
+            greeting.append(userFirstName);
+        } else if (userLastName != null) {
+            greeting.append(" ");
+            greeting.append(userLastName);
+            greeting.append("! ");
+        }
+
+        greeting.append(START_MSG);
 
         SendMessage answer = new SendMessage(String.valueOf(chatId),
-                msg.getFrom().getFirstName() + " " + msg.getFrom().getLastName() + "! " + START_MSG);
+                greeting.toString());
 
         // Создание reply-кнопки
         KeyboardRow row = new KeyboardRow();
