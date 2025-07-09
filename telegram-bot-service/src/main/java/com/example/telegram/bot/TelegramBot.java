@@ -28,10 +28,10 @@ import java.util.List;
 @Component
 public class TelegramBot extends TelegramLongPollingBot {
 
-    @Value("${TELEGRAM_BOT_NAME}")
+    @Value("${telegram.bot.name}")
     private String botName;
 
-    @Value("${TELEGRAM_BOT_TOKEN}")
+    @Value("${telegram.bot.token}")
     private String botToken;
 
     private final TelegramBotMessageSender sender;

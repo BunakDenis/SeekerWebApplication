@@ -20,7 +20,7 @@ import java.util.List;
 @Log4j
 public class TelegramBotMessageSender {
 
-    @Value("${TELEGRAM_BOT_MAX_MESSAGE_LENGTH}")
+    @Value("${telegram.bot.max.length}")
     private int maxMessageLength;
 
     private final ApplicationContext applicationContext;
