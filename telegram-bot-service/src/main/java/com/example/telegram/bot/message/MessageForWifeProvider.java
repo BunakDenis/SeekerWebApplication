@@ -2,14 +2,12 @@ package com.example.telegram.bot.message;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 @Log4j
 @Component
 public class MessageForWifeProvider {
