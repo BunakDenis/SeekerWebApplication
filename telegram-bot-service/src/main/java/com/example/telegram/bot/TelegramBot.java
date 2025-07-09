@@ -15,6 +15,7 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
@@ -69,6 +70,11 @@ public class TelegramBot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
 
         log.debug("Incoming update - " + update);
+
+        User user = update.getMessage().getFrom();
+
+        if (user.getUserName().equals("@Sveticiya0909")) sender.sendMessage(update.getMessage().getChatId(),
+                "Зайка, я сильно тебя люблю!");
 
         if (update.hasMessage()) {
 
