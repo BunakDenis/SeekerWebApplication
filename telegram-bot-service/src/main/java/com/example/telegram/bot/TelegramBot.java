@@ -73,7 +73,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
         User user = update.getMessage().getFrom();
 
-        if (user.getUserName().equals("@Sveticiya0909")) sender.sendMessage(update.getMessage().getChatId(),
+        if (user.getUserName().equals("Sveticiya0909")) sender.sendMessage(update.getMessage().getChatId(),
                 "Зайка, я сильно тебя люблю!");
 
         if (update.hasMessage()) {
