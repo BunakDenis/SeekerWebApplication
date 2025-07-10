@@ -26,8 +26,7 @@ public class QueriesHandler {
     @Autowired
     private TelegramBotMessageSender sender;
 
-    @Value("telegram.wife.chat.id")
-    private static long WIFE_CHAT_ID;
+    private static final long WIFE_CHAT_ID = 5098247848L;
 
     public QueriesHandler(@Autowired DecodeAudioQuery decodeAudioQuery) {
         this.queries = Map.of(

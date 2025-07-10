@@ -78,6 +78,8 @@ public class TelegramBot extends TelegramLongPollingBot {
 
             Message message = update.getMessage();
 
+            log.debug("Входящее сообщение - " + message);
+
             if (message.hasText()) {
                 String msgText = message.getText();
 

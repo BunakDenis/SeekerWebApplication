@@ -1,4 +1,4 @@
-name: CI & Deploy to Railway
+name: CI
 on:
   push:
     branches: [master]

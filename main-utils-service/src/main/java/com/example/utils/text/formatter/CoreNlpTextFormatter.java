@@ -5,9 +5,11 @@ import edu.stanford.nlp.pipeline.CoreDocument;
 import edu.stanford.nlp.pipeline.CoreSentence;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import lombok.extern.log4j.Log4j;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -18,14 +20,20 @@ import java.util.Properties;
 public class CoreNlpTextFormatter implements TextFormatter {
     private final StanfordCoreNLP pipeline;
     public CoreNlpTextFormatter() {
-        // Путь к JAR-файлу модели
-        File jarFile = new File("./src/main/resources/models/coreNLP/stanford-russian-corenlp-models.jar");
+        String modelPath = "models/coreNLP/stanford-russian-corenlp-models.jar";
         URL jarURL = null;
 
         try {
-            jarURL = jarFile.toURI().toURL();
+            ClassPathResource jarFile = new ClassPathResource(modelPath);
+
+            File modelFile = jarFile.getFile();
+
+            jarURL = modelFile.toURI().toURL();
+
         } catch (MalformedURLException e) {
             log.error("MalformedURLException - " + e.getMessage(), e);
+        } catch (IOException e) {
+            log.error("File by path " + modelPath + " not found ");
         }
 
         URLClassLoader classLoader = new URLClassLoader(new URL[]{jarURL}, Thread.currentThread().getContextClassLoader());
@@ -44,6 +52,8 @@ public class CoreNlpTextFormatter implements TextFormatter {
         props.setProperty("pipelineLanguage", "ru");
 
         this.pipeline = new StanfordCoreNLP(props);
+
+        log.debug("Core NLP init successfully!");
     }
 
     @Override

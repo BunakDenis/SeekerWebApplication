@@ -30,8 +30,8 @@ public class StartCommand implements Command {
 
         if (userFirstName != null) {
             greeting.append(userFirstName);
-        } else if (userLastName != null) {
             greeting.append(" ");
+        } else if (userLastName != null) {
             greeting.append(userLastName);
             greeting.append("! ");
         }

@@ -2,13 +2,11 @@ package com.example.utils.text.cheker;
 
 import dumonts.hunspell.Hunspell;
 import lombok.extern.log4j.Log4j;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -24,10 +22,18 @@ public class HunspellSpellChecker implements SpellChecker {
     public HunspellSpellChecker() {
 
         try {
-            Path affPath = extractResourceToTempFile("dictionaries/ru_RU.aff");
-            Path dicPath = extractResourceToTempFile("dictionaries/ru_RU.dic");
+            ClassPathResource resourceAff = new ClassPathResource("dictionaries/ru_RU.aff");
+            ClassPathResource resourceDic = new ClassPathResource("dictionaries/ru_RU.dic");
 
-            this.hunspell = new Hunspell(affPath, dicPath);
+            File modelFileAff = resourceAff.getFile();
+            File modelFileDic = resourceDic.getFile();
+
+            Path pathAffFile = Paths.get(modelFileAff.getAbsolutePath());
+            Path pathDicFile = Paths.get(modelFileDic.getAbsolutePath());
+
+            this.hunspell = new Hunspell(pathAffFile, pathDicFile);
+
+            log.debug("Hunspell init successfully!");
 
         } catch (IOException e) {
             throw new RuntimeException("Не удалось загрузить словари Hunspell", e);

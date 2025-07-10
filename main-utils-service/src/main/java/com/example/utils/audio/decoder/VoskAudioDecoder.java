@@ -28,17 +28,21 @@ public class VoskAudioDecoder implements AudioDecoder {
     @Autowired
     private VoskResult decodeResult;
 
-    // Инициализация модели при создании бина
     @PostConstruct
     public void init() {
         try {
+
             // Получаем путь к модели из classpath
             ClassPathResource resource = new ClassPathResource("models/vosk-model-ru");
+
             File modelFile = resource.getFile();
+
             String modelPath = modelFile.getAbsolutePath();
 
             this.model = new Model(modelPath);
+
             log.debug("Загрузка декодера Vosk прошла успешно!");
+
         } catch (IOException e) {
             log.error("Error creating Vosk Model - " + e.getMessage(), e);
         }
