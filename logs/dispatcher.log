@@ -3588,3 +3588,12 @@ java.io.IOException: Failed to create a model
 10-07-2025 20:29:46 DEBUG HunspellSpellChecker:33 - Hunspell инициализирован успешно!
 10-07-2025 20:29:55 DEBUG CoreNlpTextFormatter:61 - Core NLP инициализирован успешно!
 10-07-2025 20:30:28 DEBUG VoskAudioDecoder:166 - Vosk model closed
+10-07-2025 20:48:56 DEBUG VoskAudioDecoder:39 - Загрузка декодера Vosk прошла успешно!
+10-07-2025 20:48:57 DEBUG HunspellSpellChecker:33 - Hunspell инициализирован успешно!
+10-07-2025 20:49:06 DEBUG CoreNlpTextFormatter:61 - Core NLP инициализирован успешно!
+10-07-2025 20:51:33 DEBUG VoskAudioDecoder:173 - Vosk model closed
+10-07-2025 21:44:26 DEBUG VoskAudioDecoder:129 - Resource URL: file:/D:/Java/MyOwnProjects/testTelegramBot/main-utils-service/target/classes/models/vosk-model-ru
+10-07-2025 21:48:12 DEBUG VoskAudioDecoder:42 - Загрузка декодера Vosk прошла успешно!
+10-07-2025 21:48:13 DEBUG HunspellSpellChecker:33 - Hunspell инициализирован успешно!
+10-07-2025 21:48:21 DEBUG CoreNlpTextFormatter:61 - Core NLP инициализирован успешно!
+10-07-2025 21:49:30 DEBUG VoskAudioDecoder:201 - Vosk model closed

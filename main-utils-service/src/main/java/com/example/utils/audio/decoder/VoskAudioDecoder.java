@@ -12,11 +12,14 @@ import org.vosk.Recognizer;
 
 import javax.sound.sampled.*;
 import java.io.*;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.*;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.StringJoiner;
+import java.util.stream.Stream;
 
 @Component
 @Data
@@ -120,8 +123,10 @@ public class VoskAudioDecoder implements AudioDecoder {
     private Path extractDirectoryFromResources(String resourceDirPath) throws IOException {
         URL resourceUrl = getClass().getClassLoader().getResource(resourceDirPath);
         if (resourceUrl == null) {
-            throw new FileNotFoundException("Resource not found: " + resourceDirPath);
+            throw new FileNotFoundException("Resource not found in classpath: " + resourceDirPath);
         }
+
+        log.debug("Resource URL: " + resourceUrl);
 
         String protocol = resourceUrl.getProtocol();
         try {
@@ -136,33 +141,56 @@ public class VoskAudioDecoder implements AudioDecoder {
         // Если ресурс упакован в JAR
         if ("jar".equals(protocol) || resourceUrl.toString().startsWith("jar:")) {
             Path tempDir = Files.createTempDirectory("vosk_model_");
-            tempDir.toFile().deleteOnExit();
 
-            // Монтируем JAR как файловую систему
-            try (FileSystem fs = FileSystems.newFileSystem(resourceUrl.toURI(), Map.of())) {
-                Path jarDir = fs.getPath("/" + resourceDirPath);
-                // Копируем все файлы и папки
-                Files.walk(jarDir).forEach(source -> {
-                    try {
-                        Path relative = jarDir.relativize(source);
-                        Path target = tempDir.resolve(relative.toString());
-                        if (Files.isDirectory(source)) {
-                            Files.createDirectories(target);
-                        } else {
-                            Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
-                        }
-                    } catch (IOException ex) {
-                        throw new UncheckedIOException(ex);
-                    }
-                });
-            } catch (Exception ex) {
-                throw new IOException("Failed to extract Vosk model from JAR", ex);
+            try {
+                // Монтируем JAR как файловую систему
+                URI jarUri = URI.create("jar:" + resourceUrl);
+                try (FileSystem fs = FileSystems.newFileSystem(jarUri, Map.of())) {
+                    Path jarDir = fs.getPath(resourceDirPath);
+                    // Копируем все файлы и папки
+                    copyDirectory(jarDir, tempDir);
+                } catch (Exception ex) {
+                    throw new IOException("Failed to extract Vosk model from JAR", ex);
+                }
+
+                return tempDir;
+            } catch (IOException e) {
+                // Удаляем временную директорию в случае ошибки
+                deleteDirectory(tempDir);
+                throw e;
             }
-
-            return tempDir;
         }
 
         throw new IOException("Unsupported resource protocol: " + protocol);
+    }
+
+    private void copyDirectory(Path source, Path target) throws IOException {
+        try (Stream<Path> stream = Files.walk(source)) {
+            stream.forEach(sourcePath -> {
+                Path targetPath = target.resolve(source.relativize(sourcePath).toString());
+                try {
+                    if (Files.isDirectory(sourcePath)) {
+                        Files.createDirectories(targetPath);
+                    } else {
+                        Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+                    }
+                } catch (IOException e) {
+                    throw new UncheckedIOException("Failed to copy " + sourcePath + " to " + targetPath, e);
+                }
+            });
+        } catch (UncheckedIOException e) {
+            throw new IOException("Failed to copy directory: " + source, e);
+        }
+    }
+
+    private void deleteDirectory(Path directory) throws IOException {
+        if (Files.exists(directory)) {
+            try (Stream<Path> stream = Files.walk(directory)) {
+                stream.sorted(Comparator.reverseOrder())
+                        .map(Path::toFile)
+                        .forEach(File::delete);
+            }
+        }
     }
 
     // Закрытие модели при уничтожении бина
