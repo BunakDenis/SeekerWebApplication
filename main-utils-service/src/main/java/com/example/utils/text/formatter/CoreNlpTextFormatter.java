@@ -8,8 +8,7 @@ import lombok.extern.log4j.Log4j;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -21,39 +20,45 @@ public class CoreNlpTextFormatter implements TextFormatter {
     private final StanfordCoreNLP pipeline;
     public CoreNlpTextFormatter() {
         String modelPath = "models/coreNLP/stanford-russian-corenlp-models.jar";
-        URL jarURL = null;
+        URL jarURL;
 
         try {
-            ClassPathResource jarFile = new ClassPathResource(modelPath);
+            // Извлекаем JAR из classpath во временный файл
+            InputStream inputStream = getClass().getClassLoader().getResourceAsStream(modelPath);
 
-            File modelFile = jarFile.getFile();
+            if (inputStream == null) {
+                throw new FileNotFoundException("Не удалось найти модель в ресурсах: " + modelPath);
+            }
 
-            jarURL = modelFile.toURI().toURL();
+            // Создаём временный файл
+            File tempJarFile = File.createTempFile("coreNLP-model", ".jar");
+            tempJarFile.deleteOnExit();
 
-        } catch (MalformedURLException e) {
-            log.error("MalformedURLException - " + e.getMessage(), e);
+            try (OutputStream out = new FileOutputStream(tempJarFile)) {
+                inputStream.transferTo(out);
+            }
+
+            jarURL = tempJarFile.toURI().toURL();
+
         } catch (IOException e) {
-            log.error("File by path " + modelPath + " not found ");
+            log.error("Ошибка загрузки модели из ресурсов: " + modelPath, e);
+            throw new RuntimeException("Не удалось загрузить модель CoreNLP", e);
         }
 
+        // Загружаем JAR через classloader
         URLClassLoader classLoader = new URLClassLoader(new URL[]{jarURL}, Thread.currentThread().getContextClassLoader());
 
-        // Устанавливаем classloader для текущего потока
+        // Устанавливаем classloader
         Thread.currentThread().setContextClassLoader(classLoader);
 
-        // Настройка пайплайна
+        // Конфигурация пайплайна
         Properties props = new Properties();
         props.setProperty("annotators", "tokenize,ssplit");
-
-        /*
-        props.setProperty("tokenize.language", "ru");
-        */
-
         props.setProperty("pipelineLanguage", "ru");
 
         this.pipeline = new StanfordCoreNLP(props);
 
-        log.debug("Core NLP init successfully!");
+        log.debug("Core NLP инициализирован успешно");
     }
 
     @Override
