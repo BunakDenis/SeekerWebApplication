@@ -30,7 +30,7 @@ public class HunspellSpellChecker implements SpellChecker {
 
             this.hunspell = new Hunspell(pathAffFile, pathDicFile);
 
-            log.debug("Hunspell init successfully!");
+            log.debug("Hunspell инициализирован успешно!");
 
         } catch (IOException e) {
             throw new RuntimeException("Не удалось загрузить словари Hunspell", e);

@@ -58,7 +58,7 @@ public class CoreNlpTextFormatter implements TextFormatter {
 
         this.pipeline = new StanfordCoreNLP(props);
 
-        log.debug("Core NLP инициализирован успешно");
+        log.debug("Core NLP инициализирован успешно!");
     }
 
     @Override

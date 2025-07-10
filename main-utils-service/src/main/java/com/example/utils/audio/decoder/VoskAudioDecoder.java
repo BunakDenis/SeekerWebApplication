@@ -6,15 +6,16 @@ import jakarta.annotation.PreDestroy;
 import lombok.Data;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 import org.vosk.Model;
 import org.vosk.Recognizer;
 
 import javax.sound.sampled.*;
-import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.*;
+import java.util.Map;
 import java.util.StringJoiner;
 
 @Component
@@ -31,20 +32,14 @@ public class VoskAudioDecoder implements AudioDecoder {
     @PostConstruct
     public void init() {
         try {
+            Path modelPath = extractDirectoryFromResources("models/vosk-model-ru");
 
-            // Получаем путь к модели из classpath
-            ClassPathResource resource = new ClassPathResource("models/vosk-model-ru");
-
-            File modelFile = resource.getFile();
-
-            String modelPath = modelFile.getAbsolutePath();
-
-            this.model = new Model(modelPath);
+            this.model = new Model(modelPath.toString());
 
             log.debug("Загрузка декодера Vosk прошла успешно!");
-
         } catch (IOException e) {
-            log.error("Error creating Vosk Model - " + e.getMessage(), e);
+            log.error("Ошибка загрузки модели Vosk: " + e.getMessage(), e);
+            throw new RuntimeException("Не удалось загрузить модель Vosk", e);
         }
     }
 
@@ -116,6 +111,52 @@ public class VoskAudioDecoder implements AudioDecoder {
             log.error("Vosk decoding error - " + e.getMessage(), e);
         }
         return result.toString();
+    }
+
+    /**
+     * Извлекает содержимое каталога из classpath в temp-директорию.
+     */
+    private Path extractDirectoryFromResources(String resourceDirPath) throws IOException {
+        URL resourceUrl = getClass().getClassLoader().getResource(resourceDirPath);
+
+        if (resourceUrl == null) {
+            throw new FileNotFoundException("Resource not found: " + resourceDirPath);
+        }
+
+        if ("file".equals(resourceUrl.getProtocol())) {
+            try {
+                return Paths.get(resourceUrl.toURI());
+            } catch (URISyntaxException e) {
+                throw new IOException("Invalid URI for resource: " + resourceUrl, e);
+            }
+        }
+
+        if ("jar".equals(resourceUrl.getProtocol()) || resourceUrl.toString().startsWith("jar:")) {
+            Path tempDir = Files.createTempDirectory("vosk_model_");
+            tempDir.toFile().deleteOnExit();
+
+            try (FileSystem fs = FileSystems.newFileSystem(resourceUrl.toURI(), Map.of())) {
+                Path jarDir = fs.getPath("/" + resourceDirPath);
+                Files.walk(jarDir).forEach(sourcePath -> {
+                    try {
+                        Path destPath = tempDir.resolve(jarDir.relativize(sourcePath).toString());
+                        if (Files.isDirectory(sourcePath)) {
+                            Files.createDirectories(destPath);
+                        } else {
+                            Files.copy(sourcePath, destPath, StandardCopyOption.REPLACE_EXISTING);
+                        }
+                    } catch (IOException e) {
+                        throw new UncheckedIOException(e);
+                    }
+                });
+            } catch (Exception e) {
+                throw new IOException("Failed to extract Vosk model from JAR", e);
+            }
+
+            return tempDir;
+        }
+
+        throw new IOException("Unsupported resource protocol: " + resourceUrl.getProtocol());
     }
 
     // Закрытие модели при уничтожении бина
