@@ -114,49 +114,55 @@ public class VoskAudioDecoder implements AudioDecoder {
     }
 
     /**
-     * Извлекает содержимое каталога из classpath в temp-директорию.
+     * Извлекает директорию из classpath в локальный временный каталог.
+     * Работает и из IDE (protocol=file), и из fat‑JAR (protocol=jar).
      */
     private Path extractDirectoryFromResources(String resourceDirPath) throws IOException {
         URL resourceUrl = getClass().getClassLoader().getResource(resourceDirPath);
-
         if (resourceUrl == null) {
             throw new FileNotFoundException("Resource not found: " + resourceDirPath);
         }
 
-        if ("file".equals(resourceUrl.getProtocol())) {
-            try {
+        String protocol = resourceUrl.getProtocol();
+        try {
+            if ("file".equals(protocol)) {
+                // Прямой путь на диске
                 return Paths.get(resourceUrl.toURI());
-            } catch (URISyntaxException e) {
-                throw new IOException("Invalid URI for resource: " + resourceUrl, e);
             }
+        } catch (URISyntaxException e) {
+            throw new IOException("Invalid URI for resource: " + resourceUrl, e);
         }
 
-        if ("jar".equals(resourceUrl.getProtocol()) || resourceUrl.toString().startsWith("jar:")) {
+        // Если ресурс упакован в JAR
+        if ("jar".equals(protocol) || resourceUrl.toString().startsWith("jar:")) {
             Path tempDir = Files.createTempDirectory("vosk_model_");
             tempDir.toFile().deleteOnExit();
 
+            // Монтируем JAR как файловую систему
             try (FileSystem fs = FileSystems.newFileSystem(resourceUrl.toURI(), Map.of())) {
                 Path jarDir = fs.getPath("/" + resourceDirPath);
-                Files.walk(jarDir).forEach(sourcePath -> {
+                // Копируем все файлы и папки
+                Files.walk(jarDir).forEach(source -> {
                     try {
-                        Path destPath = tempDir.resolve(jarDir.relativize(sourcePath).toString());
-                        if (Files.isDirectory(sourcePath)) {
-                            Files.createDirectories(destPath);
+                        Path relative = jarDir.relativize(source);
+                        Path target = tempDir.resolve(relative.toString());
+                        if (Files.isDirectory(source)) {
+                            Files.createDirectories(target);
                         } else {
-                            Files.copy(sourcePath, destPath, StandardCopyOption.REPLACE_EXISTING);
+                            Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
                         }
-                    } catch (IOException e) {
-                        throw new UncheckedIOException(e);
+                    } catch (IOException ex) {
+                        throw new UncheckedIOException(ex);
                     }
                 });
-            } catch (Exception e) {
-                throw new IOException("Failed to extract Vosk model from JAR", e);
+            } catch (Exception ex) {
+                throw new IOException("Failed to extract Vosk model from JAR", ex);
             }
 
             return tempDir;
         }
 
-        throw new IOException("Unsupported resource protocol: " + resourceUrl.getProtocol());
+        throw new IOException("Unsupported resource protocol: " + protocol);
     }
 
     // Закрытие модели при уничтожении бина
