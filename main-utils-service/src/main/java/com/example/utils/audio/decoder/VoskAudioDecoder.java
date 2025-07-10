@@ -37,7 +37,7 @@ public class VoskAudioDecoder implements AudioDecoder {
 
             File modelFile = resource.getFile();
 
-            String modelPath = modelFile.getAbsolutePath();
+            String modelPath = modelFile.getCanonicalPath();
 
             this.model = new Model(modelPath);
 
