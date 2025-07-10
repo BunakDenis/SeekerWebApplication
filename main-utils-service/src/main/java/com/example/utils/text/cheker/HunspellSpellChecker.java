@@ -1,8 +1,10 @@
 package com.example.utils.text.cheker;
 
+import com.example.utils.file.FileService;
 import dumonts.hunspell.Hunspell;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 
@@ -14,22 +16,17 @@ import java.util.Arrays;
 import java.util.List;
 
 @Component
+@Data
 @Log4j
+@RequiredArgsConstructor
 public class HunspellSpellChecker implements SpellChecker {
 
     private final Hunspell hunspell;
 
     public HunspellSpellChecker() {
-
         try {
-            ClassPathResource resourceAff = new ClassPathResource("dictionaries/ru_RU.aff");
-            ClassPathResource resourceDic = new ClassPathResource("dictionaries/ru_RU.dic");
-
-            File modelFileAff = resourceAff.getFile();
-            File modelFileDic = resourceDic.getFile();
-
-            Path pathAffFile = Paths.get(modelFileAff.getAbsolutePath());
-            Path pathDicFile = Paths.get(modelFileDic.getAbsolutePath());
+            Path pathAffFile = extractResourceToTempFile("dictionaries/ru_RU.aff");
+            Path pathDicFile = extractResourceToTempFile("dictionaries/ru_RU.dic");
 
             this.hunspell = new Hunspell(pathAffFile, pathDicFile);
 
