@@ -3597,3 +3597,9 @@ java.io.IOException: Failed to create a model
 10-07-2025 21:48:13 DEBUG HunspellSpellChecker:33 - Hunspell инициализирован успешно!
 10-07-2025 21:48:21 DEBUG CoreNlpTextFormatter:61 - Core NLP инициализирован успешно!
 10-07-2025 21:49:30 DEBUG VoskAudioDecoder:201 - Vosk model closed
+12-07-2025 01:07:34 DEBUG VoskAudioDecoder:47 - Приложение запущено в IDE. Используем путь к модели: models/vosk-model-ru
+12-07-2025 01:10:51 DEBUG VoskAudioDecoder:52 - Загрузка декодера Vosk прошла успешно!
+12-07-2025 01:10:51 DEBUG HunspellSpellChecker:33 - Hunspell инициализирован успешно!
+12-07-2025 01:10:59 DEBUG CoreNlpTextFormatter:61 - Core NLP инициализирован успешно!
+12-07-2025 01:12:19 DEBUG VoskAudioDecoder:147 - Vosk model closed
+12-07-2025 01:24:17 DEBUG VoskAudioDecoder:51 - Приложение запущено в IDE. Используем путь к модели: models/vosk-model-ru

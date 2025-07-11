@@ -6,6 +6,7 @@ import jakarta.annotation.PreDestroy;
 import lombok.Data;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 import org.vosk.Model;
@@ -26,6 +27,9 @@ public class VoskAudioDecoder implements AudioDecoder {
     private Recognizer recognizer;
     @Autowired
     private VoskResult decodeResult;
+
+    @Value("${spring.profiles.active}")
+    private String springActiveProfile;
     private static final String MODEL_PATH_IN_CONTAINER = "/app/models/vosk-model-ru";
     private static final String MODEL_PATH_IN_IDE = "models/vosk-model-ru";
 
@@ -59,14 +63,7 @@ public class VoskAudioDecoder implements AudioDecoder {
 
     // Метод для определения, запущено ли приложение в Docker-контейнере
     private boolean isRunningInDocker() {
-        // Проверяем наличие файла /.dockerenv или переменной окружения DOCKER
-        File dockerEnvFile = new File("/.dockerenv");
-        boolean dockerEnvExists = dockerEnvFile.exists();
-
-        String dockerEnvVariable = System.getenv("DOCKER");
-        boolean dockerEnvVarPresent = dockerEnvVariable != null && !dockerEnvVariable.isEmpty();
-
-        return dockerEnvExists || dockerEnvVarPresent;
+        return springActiveProfile.equalsIgnoreCase("dev");
     }
 
     @Override

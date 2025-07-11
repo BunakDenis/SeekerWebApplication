@@ -14,9 +14,6 @@ public class MessageForWifeProvider {
 
     private static int msgCount;
 
-    @Value("telegram.wife.chat.id")
-    private static long WIFE_CHAT_ID;
-
     public static String getMessage() {
 
         String result = "";
