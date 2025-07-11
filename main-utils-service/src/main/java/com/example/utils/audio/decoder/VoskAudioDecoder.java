@@ -24,28 +24,49 @@ public class VoskAudioDecoder implements AudioDecoder {
 
     private Model model;
     private Recognizer recognizer;
-
     @Autowired
     private VoskResult decodeResult;
+    private static final String MODEL_PATH_IN_CONTAINER = "/app/models/vosk-model-ru";
+    private static final String MODEL_PATH_IN_IDE = "models/vosk-model-ru";
 
     @PostConstruct
     public void init() {
         try {
+            String modelPath = null;
 
-            // Получаем путь к модели из classpath
-            ClassPathResource resource = new ClassPathResource("models/vosk-model-ru");
+            // 1. Проверяем, запущено ли приложение в Docker-контейнере
+            boolean isRunningInDocker = isRunningInDocker();
 
-            File modelFile = resource.getFile();
+            if (isRunningInDocker) {
+                // 2. Если запущено в Docker, используем путь внутри контейнера
+                modelPath = MODEL_PATH_IN_CONTAINER;
+                log.debug("Приложение запущено в Docker. Используем путь к модели: " + modelPath);
+            } else {
+                // 3. Если запущено в IDE, используем относительный путь
+                modelPath = MODEL_PATH_IN_IDE;
+                log.debug("Приложение запущено в IDE. Используем путь к модели: " + modelPath);
+            }
 
-            String modelPath = modelFile.getCanonicalPath();
-
+            // 4. Загружаем модель
             this.model = new Model(modelPath);
-
             log.debug("Загрузка декодера Vosk прошла успешно!");
 
         } catch (IOException e) {
-            log.error("Error creating Vosk Model - " + e.getMessage(), e);
+            log.error("Ошибка загрузки модели Vosk: " + e.getMessage(), e);
+            throw new RuntimeException("Не удалось загрузить модель Vosk", e);
         }
+    }
+
+    // Метод для определения, запущено ли приложение в Docker-контейнере
+    private boolean isRunningInDocker() {
+        // Проверяем наличие файла /.dockerenv или переменной окружения DOCKER
+        File dockerEnvFile = new File("/.dockerenv");
+        boolean dockerEnvExists = dockerEnvFile.exists();
+
+        String dockerEnvVariable = System.getenv("DOCKER");
+        boolean dockerEnvVarPresent = dockerEnvVariable != null && !dockerEnvVariable.isEmpty();
+
+        return dockerEnvExists || dockerEnvVarPresent;
     }
 
     @Override
