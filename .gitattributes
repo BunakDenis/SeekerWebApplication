@@ -1,2 +1,3 @@
 *.jar filter=lfs diff=lfs merge=lfs -text
 main-utils-service/src/main/resources/models/coreNLP/** filter=lfs diff=lfs merge=lfs -text
+models/vosk-model-ru/** filter=lfs diff=lfs merge=lfs -text
