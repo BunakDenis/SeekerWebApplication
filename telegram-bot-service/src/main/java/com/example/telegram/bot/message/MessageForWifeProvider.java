@@ -36,6 +36,7 @@ public class MessageForWifeProvider {
                 break;
             default:
                 result = "Ты самый дорогой и в то же время самый бесценный диамант в этом мире!!";
+                msgCount = -1;
                 break;
         }
 

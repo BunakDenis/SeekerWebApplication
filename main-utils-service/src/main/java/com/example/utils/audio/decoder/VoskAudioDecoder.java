@@ -63,7 +63,8 @@ public class VoskAudioDecoder implements AudioDecoder {
 
     // Метод для определения, запущено ли приложение в Docker-контейнере
     private boolean isRunningInDocker() {
-        return springActiveProfile.equalsIgnoreCase("dev");
+        log.debug("Переменная springActiveProfile = " + springActiveProfile);
+        return !springActiveProfile.equalsIgnoreCase("dev");
     }
 
     @Override
