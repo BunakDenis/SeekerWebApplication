@@ -12,6 +12,9 @@ COPY models/vosk-model-ru/** /app/models/vosk-model-ru/
 # Проверяем, что файлы скопированы
 RUN ls -l /app/models
 
+# Проверяем, что файлы скопированы
+RUN ls -l /app/models/vosk-model-ru/
+
 # Изменяем права доступа к файлам модели
 RUN chmod -R 755 /app/models
 
