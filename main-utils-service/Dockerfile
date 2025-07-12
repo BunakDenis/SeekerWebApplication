@@ -9,6 +9,12 @@ COPY ./pom.xml ./
 # Копируем папку с моделью Vosk
 COPY models/** /app/models/
 
+# Проверяем, что файлы скопированы
+RUN ls -l /app/models
+
+# Изменяем права доступа к файлам модели
+RUN chmod -R 755 /app/models
+
 COPY ./main-utils-service/pom.xml main-utils-service/
 
 COPY ./telegram-bot-service/pom.xml ./telegram-bot-service/
