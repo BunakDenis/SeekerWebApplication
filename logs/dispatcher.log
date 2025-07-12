@@ -3607,3 +3607,5 @@ java.io.IOException: Failed to create a model
 12-07-2025 01:28:14 DEBUG HunspellSpellChecker:33 - Hunspell инициализирован успешно!
 12-07-2025 01:28:22 DEBUG CoreNlpTextFormatter:61 - Core NLP инициализирован успешно!
 12-07-2025 01:28:25 DEBUG VoskAudioDecoder:146 - Vosk model closed
+12-07-2025 13:29:54 DEBUG VoskAudioDecoder:66 - Переменная springActiveProfile = dev
+12-07-2025 13:29:54 DEBUG VoskAudioDecoder:51 - Приложение запущено в IDE. Используем путь к модели: models/vosk-model-ru

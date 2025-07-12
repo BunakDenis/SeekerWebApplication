@@ -7,7 +7,7 @@ WORKDIR /workspace
 COPY ./pom.xml ./
 
 # Копируем папку с моделью Vosk
-COPY models/vosk-model-ru/** /app/models/vosk-model-ru/
+COPY models/vosk-model-ru /app/models/vosk-model-ru
 
 # Проверяем, что файлы скопированы
 RUN ls -l /app/models

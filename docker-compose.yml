@@ -12,8 +12,8 @@ services:
       args:
         SPRING_PROFILES_ACTIVE: dev
     environment:
-      TELEGRAM_BOT_NAME: ${DEV_TELEGRAM_BOT_NAME}
-      TELEGRAM_BOT_TOKEN: ${DEV_TELEGRAM_BOT_TOKEN}
+      TELEGRAM_BOT_NAME: ${TELEGRAM_BOT_NAME}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
       API_MAIN_UTILS_SERVICE_URL: ${API_UTILS_SERVICE_URL}
       #SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/mydatabase
       #SPRING_DATASOURCE_USERNAME: myuser
@@ -24,13 +24,13 @@ services:
        depends_on: # Указывает зависимость от других сервисов (для порядка старта)
   #   database:
   #     condition: service_healthy # Или service_started
-        utils-service:
+        main-utils-service:
           condition: service_started
   #   spell-check-service:
   #     condition: service_started
   # healthcheck: # Настройте healthcheck для сервиса бота
 
-  utils-service:
+  main-utils-service:
     build:
       context: .
       dockerfile: ./main-utils-service/Dockerfile
