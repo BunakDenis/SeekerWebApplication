@@ -7,7 +7,7 @@ WORKDIR /workspace
 COPY ./pom.xml ./
 
 # Копируем папку с моделью Vosk
-COPY models /app/
+COPY models/** /app/models/
 
 COPY ./main-utils-service/pom.xml main-utils-service/
 
