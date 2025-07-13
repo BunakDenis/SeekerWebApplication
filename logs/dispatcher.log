@@ -3519,7 +3519,7 @@ java.io.IOException: FFmpeg завершился с ошибкой (код -22)
 10-07-2025 18:15:51 ERROR VoskAudioDecoder:42 - Error creating Vosk Model - Failed to create a model
 java.io.IOException: Failed to create a model
 	at org.vosk.Model.<init>(Model.java:14)
-	at com.example.utils.audio.decoder.VoskAudioDecoder.init(VoskAudioDecoder.java:39)
+	at com.example.tools.audio.decoder.VoskAudioDecoder.init(VoskAudioDecoder.java:39)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
@@ -3544,7 +3544,7 @@ java.io.IOException: Failed to create a model
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:323)
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1342)
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1331)
-	at com.example.utils.UtilsApplication.main(UtilsApplication.java:10)
+	at com.example.tools.ToolsApplication.main(UtilsApplication.java:10)
 10-07-2025 18:37:49 DEBUG VoskAudioDecoder:44 - Загрузка декодера Vosk прошла успешно!
 10-07-2025 18:37:50 DEBUG HunspellSpellChecker:36 - Hunspell init successfully!
 10-07-2025 18:37:57 DEBUG CoreNlpTextFormatter:56 - Core NLP init successfully!
@@ -3552,7 +3552,7 @@ java.io.IOException: Failed to create a model
 10-07-2025 19:54:39 ERROR VoskAudioDecoder:43 - Error creating Vosk Model - Failed to create a model
 java.io.IOException: Failed to create a model
 	at org.vosk.Model.<init>(Model.java:14)
-	at com.example.utils.audio.decoder.VoskAudioDecoder.init(VoskAudioDecoder.java:38)
+	at com.example.tools.audio.decoder.VoskAudioDecoder.init(VoskAudioDecoder.java:38)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
@@ -3577,7 +3577,7 @@ java.io.IOException: Failed to create a model
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:323)
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1342)
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1331)
-	at com.example.utils.UtilsApplication.main(UtilsApplication.java:10)
+	at com.example.tools.ToolsApplication.main(UtilsApplication.java:10)
 10-07-2025 19:54:40 DEBUG HunspellSpellChecker:33 - Hunspell инициализирован успешно!
 10-07-2025 19:54:48 DEBUG CoreNlpTextFormatter:61 - Core NLP инициализирован успешно!
 10-07-2025 20:07:16 DEBUG VoskAudioDecoder:39 - Загрузка декодера Vosk прошла успешно!

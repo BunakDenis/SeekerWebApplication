@@ -1,6 +1,8 @@
 package com.example.telegram.bot.multimedia;
 
+import com.example.telegram.api.clients.UsefulToolsClient;
 import com.example.telegram.bot.message.TelegramBotMessageSender;
+import com.example.telegram.dto.FileServiceResponse;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
@@ -15,8 +17,13 @@ import java.io.File;
 @RequiredArgsConstructor
 @Log4j
 public class MultimediaHandler {
+
     private final TelegramBotMessageSender sender;
+
+    private final UsefulToolsClient usefulToolsClient;
+
     //private final AudioTelegramFileLoader audioFileLoader;
+
     //private final VoiceTelegramFileLoader voiceFileLoader;
 
 

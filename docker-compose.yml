@@ -13,7 +13,7 @@ services:
       SPRING_PROFILE_ACTIVE: prod
       TELEGRAM_BOT_NAME: ${TELEGRAM_BOT_NAME}
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
-      API_MAIN_UTILS_SERVICE_URL: ${API_UTILS_SERVICE_URL}
+      API_MAIN_UTILS_SERVICE_URL: ${API_USEFUL_TOOLS_URL}
       #SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/mydatabase
       #SPRING_DATASOURCE_USERNAME: myuser
       #SPRING_DATASOURCE_PASSWORD: mypassword
@@ -23,20 +23,20 @@ services:
     depends_on: # Указывает зависимость от других сервисов (для порядка старта)
   #      database:
   #      condition: service_healthy # Или service_started
-      main-utils-service:
+      useful-tools:
           condition: service_started
   # healthcheck: # Настройте healthcheck для сервиса бота
 
-  main-utils-service:
+  useful-tools:
     build:
       context: .
-      dockerfile: ./main-utils-service/Dockerfile
+      dockerfile: ./useful-tools/Dockerfile
+    mem_limit: 12g
     env_file:
       - ./.env
     environment:
-      JAVA_TOOL_OPTIONS: -Xms256m -Xmx1024m -XX:+UseContainerSupport
       SPRING_PROFILE_ACTIVE: prod
-      EXTERNAL_AUDIO_API_URL: https://main-utils-service # URL внешнего API
+      EXTERNAL_AUDIO_API_URL: http://useful-tools # URL внешнего API
       # Другие настройки
     networks:
       - app-network

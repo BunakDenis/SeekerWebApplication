@@ -11,8 +11,9 @@
 
 	<modules>
 		<module>telegram-bot-service</module>
-		<module>main-utils-service</module>
-	</modules>
+		<module>useful-tools</module>
+        <module>utils-service</module>
+    </modules>
 
 	<properties>
 		<maven.compiler.source>11</maven.compiler.source>
@@ -39,6 +40,11 @@
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-starter-web</artifactId>
+				<version>${spring-boot.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-webflux</artifactId>
 				<version>${spring-boot.version}</version>
 			</dependency>
 			<dependency>
