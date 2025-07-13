@@ -45,6 +45,29 @@ public class VoskAudioDecoder implements AudioDecoder {
                 // 2. Если запущено в Docker, используем путь внутри контейнера
                 modelPath = MODEL_PATH_IN_CONTAINER;
                 log.debug("Приложение запущено в Docker. Используем путь к модели: " + modelPath);
+
+                File appDir = new File("/app");
+
+                log.debug("Создана ли директория app - " + appDir.exists());
+
+                String[] appDirFileList = appDir.list();
+
+                log.debug("Содержание папки app");
+                for (int i = 0; i < appDirFileList.length; i++) {
+                    log.debug(appDirFileList[i]);
+                }
+
+                //Проверка наличия папки с моделью
+                File modelDir = new File(modelPath);
+                log.debug("Попытка загрузки Vosk-модели из: " + modelDir.getAbsolutePath());
+                log.debug("— Существует? " + modelDir.exists());
+                log.debug("— Директория? " + modelDir.isDirectory());
+                String[] children = modelDir.list();
+                if (children != null) for (String c : children) {
+                    log.debug("— Содержит: " + c + " (size="
+                            + new File(modelDir, c).length() + " байт)");
+                }
+
             } else {
                 // 3. Если запущено в IDE, используем относительный путь
                 modelPath = MODEL_PATH_IN_IDE;
