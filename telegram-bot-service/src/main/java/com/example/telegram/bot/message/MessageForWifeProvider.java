@@ -1,12 +1,12 @@
 package com.example.telegram.bot.message;
 
-import lombok.AllArgsConstructor;
+
 import lombok.Data;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 
 @Data
-@Log4j
+@Log4j2
 @Component
 public class MessageForWifeProvider {
 

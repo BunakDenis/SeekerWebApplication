@@ -1,6 +1,6 @@
 package com.example.tools.text.cheker;
 
-import lombok.extern.log4j.Log4j;
+import lombok.extern.log4j.Log4j2;
 import org.languagetool.JLanguageTool;
 import org.languagetool.language.Russian;
 import org.languagetool.rules.RuleMatch;
@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.List;
 
 @Component
-@Log4j
+@Log4j2
 public class LanguageToolSpellChecker implements SpellChecker {
     private final JLanguageTool langTool;
 

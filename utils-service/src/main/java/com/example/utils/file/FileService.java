@@ -4,12 +4,12 @@ import com.example.utils.file.changer.FileExtensionChanger;
 import com.example.utils.file.changer.FileNameChanger;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.log4j.Log4j2;
 
 
 @Data
 @RequiredArgsConstructor
-@Log4j
+@Log4j2
 public class FileService {
 
     public String changeExtension(String filename, String newExtension) {

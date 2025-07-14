@@ -4,7 +4,7 @@ package com.example.tools.controller;
 import com.example.tools.controller.dto.response.FileServiceResponse;
 import com.example.utils.file.FileService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,7 +18,7 @@ import static com.example.tools.ToolsMessageProvider.*;
 @RestController
 @RequestMapping("api/v1/tools/fileService")
 @RequiredArgsConstructor
-@Log4j
+@Log4j2
 public class FileServiceController {
 
     private final FileService fileService;

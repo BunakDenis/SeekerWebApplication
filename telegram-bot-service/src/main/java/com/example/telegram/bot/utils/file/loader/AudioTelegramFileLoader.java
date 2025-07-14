@@ -3,7 +3,7 @@ package com.example.telegram.bot.utils.file.loader;
 import com.example.telegram.bot.TelegramBot;
 import com.example.telegram.bot.message.TelegramBotMessageSender;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.GetFile;
@@ -16,7 +16,7 @@ import java.io.InputStream;
 import java.net.URL;
 
 @Component
-@Log4j
+@Log4j2
 @RequiredArgsConstructor
 public class AudioTelegramFileLoader implements TelegramFileLoader {
 

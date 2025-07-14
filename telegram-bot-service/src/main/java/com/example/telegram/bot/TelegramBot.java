@@ -9,7 +9,7 @@ import com.example.telegram.bot.multimedia.MultimediaHandler;
 import com.example.telegram.bot.queries.QueriesHandler;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -26,7 +26,7 @@ import java.util.List;
 
 
 @RequiredArgsConstructor
-@Log4j
+@Log4j2
 @Component
 public class TelegramBot extends TelegramLongPollingBot {
 

@@ -3,7 +3,7 @@ package com.example.telegram.bot.message;
 import com.example.telegram.bot.TelegramBot;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.context.ApplicationContext;
@@ -17,7 +17,7 @@ import java.util.List;
 @Component
 @Data
 @RequiredArgsConstructor
-@Log4j
+@Log4j2
 public class TelegramBotMessageSender {
 
     @Value("${telegram.bot.max.length}")

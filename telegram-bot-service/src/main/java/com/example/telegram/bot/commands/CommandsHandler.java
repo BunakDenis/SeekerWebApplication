@@ -2,7 +2,9 @@ package com.example.telegram.bot.commands;
 
 import com.example.telegram.bot.message.TelegramBotMessageSender;
 import lombok.Data;
-import lombok.extern.log4j.Log4j;
+
+
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -14,7 +16,7 @@ import java.util.Map;
 
 @Component
 @Data
-@Log4j
+@Log4j2
 public class CommandsHandler {
 
     @Autowired
@@ -28,6 +30,7 @@ public class CommandsHandler {
     }
 
     public void handleCommands(Update update) {
+
         log.debug("handleCommands method");
 
         String messageText = update.getMessage().getText();

@@ -5,7 +5,7 @@ import com.example.telegram.bot.message.TelegramBotMessageSender;
 import com.example.telegram.dto.FileServiceResponse;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -15,7 +15,7 @@ import java.io.File;
 @Component
 @Data
 @RequiredArgsConstructor
-@Log4j
+@Log4j2
 public class MultimediaHandler {
 
     private final TelegramBotMessageSender sender;

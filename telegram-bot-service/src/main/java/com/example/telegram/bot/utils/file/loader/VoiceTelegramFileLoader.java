@@ -4,7 +4,7 @@ import com.example.telegram.bot.TelegramBot;
 import com.example.telegram.bot.message.TelegramBotMessageSender;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.GetFile;
@@ -19,7 +19,7 @@ import java.net.URL;
 @Component
 @Data
 @RequiredArgsConstructor
-@Log4j
+@Log4j2
 public class VoiceTelegramFileLoader implements TelegramFileLoader {
 
     private final ApplicationContext applicationContext;

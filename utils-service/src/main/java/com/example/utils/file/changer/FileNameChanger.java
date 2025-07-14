@@ -1,8 +1,8 @@
 package com.example.utils.file.changer;
 
-import lombok.extern.log4j.Log4j;
+import lombok.extern.log4j.Log4j2;
 
-@Log4j
+@Log4j2
 public class FileNameChanger {
 
     public static String addSuffix(String filename, String suffix) {

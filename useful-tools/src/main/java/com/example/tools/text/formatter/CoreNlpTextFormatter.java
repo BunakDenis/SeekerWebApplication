@@ -4,7 +4,7 @@ package com.example.tools.text.formatter;
 import edu.stanford.nlp.pipeline.CoreDocument;
 import edu.stanford.nlp.pipeline.CoreSentence;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
@@ -13,7 +13,7 @@ import java.net.URLClassLoader;
 import java.util.Properties;
 
 @Component
-@Log4j
+@Log4j2
 public class CoreNlpTextFormatter implements TextFormatter {
     private final StanfordCoreNLP pipeline;
     public CoreNlpTextFormatter() {

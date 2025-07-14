@@ -3,7 +3,7 @@ package com.example.tools.text.cheker;
 import dumonts.hunspell.Hunspell;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 
 
@@ -16,7 +16,7 @@ import java.util.List;
 
 @Component
 @Data
-@Log4j
+@Log4j2
 @RequiredArgsConstructor
 public class HunspellSpellChecker implements SpellChecker {
 

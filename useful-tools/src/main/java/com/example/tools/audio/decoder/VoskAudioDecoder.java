@@ -5,7 +5,7 @@ import com.example.utils.datetime.DateTimeService;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.Data;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.vosk.Model;
@@ -18,7 +18,7 @@ import java.util.StringJoiner;
 
 
 @Data
-@Log4j
+@Log4j2
 public class VoskAudioDecoder implements AudioDecoder {
     private Model model;
     private Recognizer recognizer;
