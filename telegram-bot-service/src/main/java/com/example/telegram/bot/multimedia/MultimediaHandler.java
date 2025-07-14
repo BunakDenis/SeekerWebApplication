@@ -36,6 +36,14 @@ public class MultimediaHandler {
         Message message = update.getMessage();
         long chatId = message.getChatId();
 
+        FileServiceResponse newFileName =
+                usefulToolsClient.changeFileExtensionBlocking(
+                        "test.txt",
+                        "exe"
+                );
+
+        System.out.println("newFileName = " + newFileName);
+
         //Проверка формата сообщения
         if (message.hasAudio()) {
 
