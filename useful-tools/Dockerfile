@@ -10,10 +10,9 @@ COPY ./utils-service/pom.xml ./utils-service/
 
 COPY ./telegram-bot-service/pom.xml ./telegram-bot-service/
 
-# Заранее подтянем зависимости
-#RUN mvn -B dependency:go-offline
-
 # Копируем исходники и собираем именно этот модуль (со всеми его зависимостями)
+COPY ./utils-service/src ./utils-service/src
+
 COPY ./useful-tools/src ./useful-tools/src
 
 RUN mvn -pl useful-tools -am -B clean package -DskipTests

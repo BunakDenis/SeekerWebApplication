@@ -20,12 +20,10 @@ import java.util.StringJoiner;
 @Data
 @Log4j
 public class VoskAudioDecoder implements AudioDecoder {
-
     private Model model;
     private Recognizer recognizer;
     @Autowired
     private VoskResult decodeResult;
-
     @Value("${spring.profiles.active}")
     private String springActiveProfile;
     private static final String MODEL_PATH_IN_CONTAINER = "/app/models/vosk-model-ru";

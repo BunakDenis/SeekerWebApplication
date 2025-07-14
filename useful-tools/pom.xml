@@ -47,7 +47,7 @@
         <dependency>
             <groupId>com.example</groupId>
             <artifactId>utils-service</artifactId>
-            <version>1.0.1</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -58,8 +58,8 @@
             <artifactId>lombok</artifactId>
         </dependency>
         <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
