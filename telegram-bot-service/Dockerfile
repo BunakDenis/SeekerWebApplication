@@ -8,12 +8,12 @@ COPY ./pom.xml ./
 
 COPY ./telegram-bot-service/pom.xml ./telegram-bot-service/
 
-COPY ./useful-tools/pom.xml useful-tools/
+COPY ./useful-tools/pom.xml ./useful-tools/
 
 COPY ./utils-service/pom.xml ./utils-service/
 
 # Заранее подтянем зависимости
-RUN mvn -B dependency:go-offline
+#RUN mvn -B dependency:go-offline
 
 # Копируем исходники и собираем именно этот модуль (со всеми его зависимостями)
 COPY ./telegram-bot-service/src ./telegram-bot-service/src

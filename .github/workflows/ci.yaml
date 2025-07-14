@@ -38,13 +38,13 @@ jobs:
           no-cache: false
           pull: true
 
-      - name: Build and push main-utils-service image
+      - name: Build and push useful-tools image
         uses: docker/build-push-action@v4
         with:
           context: .
-          file: ./main-utils-service/Dockerfile
+          file: ./useful-tools/Dockerfile
           push: true
-          tags: ghcr.io/bunakdenis/main-utils-service:latest
+          tags: ghcr.io/bunakdenis/useful-tools:latest
           load: false
           no-cache: false
           pull: true
