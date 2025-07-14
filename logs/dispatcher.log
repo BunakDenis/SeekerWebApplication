@@ -8005,3 +8005,33 @@ Caused by: java.net.UnknownHostException: Failed to resolve 'useful-tools' [A(1)
 14-07-2025 20:33:44 DEBUG DefaultLifecycleProcessor:476 - Stopping beans in phase -2147483647
 14-07-2025 20:33:44 DEBUG DefaultLifecycleProcessor:348 - Bean 'springBootLoggingLifecycle' completed its stop procedure
 14-07-2025 20:33:44 DEBUG ThreadPoolTaskExecutor:313 - Shutting down ExecutorService 'applicationTaskExecutor'
+14-07-2025 22:05:06 DEBUG TestLog4j:12 - DEBUG message
+14-07-2025 22:05:06 INFO  TestLog4j:13 - INFO message
+14-07-2025 22:05:06 ERROR TestLog4j:14 - ERROR message
+14-07-2025 22:05:06 DEBUG TestLog4j:16 - Debug
+14-07-2025 22:05:06 INFO  TestLog4j:17 - Info
+14-07-2025 22:24:09 DEBUG TestLog4j:12 - DEBUG message
+14-07-2025 22:24:09 INFO  TestLog4j:13 - INFO message
+14-07-2025 22:24:09 ERROR TestLog4j:14 - ERROR message
+14-07-2025 22:24:09 DEBUG TestLog4j:16 - Debug
+14-07-2025 22:24:09 INFO  TestLog4j:17 - Info
+14-07-2025 22:25:13 DEBUG TestLog4j:12 - DEBUG message
+14-07-2025 22:25:13 INFO  TestLog4j:13 - INFO message
+14-07-2025 22:25:13 ERROR TestLog4j:14 - ERROR message
+14-07-2025 22:25:13 DEBUG TestLog4j:16 - Debug
+14-07-2025 22:25:13 INFO  TestLog4j:17 - Info
+14-07-2025 22:27:29 DEBUG TestLog4j:12 - DEBUG message
+14-07-2025 22:27:29 INFO  TestLog4j:13 - INFO message
+14-07-2025 22:27:29 ERROR TestLog4j:14 - ERROR message
+14-07-2025 22:27:29 DEBUG TestLog4j:16 - Debug
+14-07-2025 22:27:29 INFO  TestLog4j:17 - Info
+14-07-2025 22:28:21 DEBUG TestLog4j:12 - DEBUG message
+14-07-2025 22:28:21 INFO  TestLog4j:13 - INFO message
+14-07-2025 22:28:21 ERROR TestLog4j:14 - ERROR message
+14-07-2025 22:28:21 DEBUG TestLog4j:16 - Debug
+14-07-2025 22:28:21 INFO  TestLog4j:17 - Info
+14-07-2025 22:29:02 DEBUG TestLog4j:12 - DEBUG message
+14-07-2025 22:29:02 INFO  TestLog4j:13 - INFO message
+14-07-2025 22:29:02 ERROR TestLog4j:14 - ERROR message
+14-07-2025 22:29:02 DEBUG TestLog4j:16 - Debug
+14-07-2025 22:29:02 INFO  TestLog4j:17 - Info
