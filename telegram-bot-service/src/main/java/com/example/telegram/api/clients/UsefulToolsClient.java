@@ -11,10 +11,10 @@ import reactor.core.publisher.Mono;
 @Service
 public class UsefulToolsClient {
 
-    @Value("${API_MAIN_UTILS_SERVICE_URL}")
+    @Value("${api.useful.tools.url}")
     private String baseUrl;
 
-    @Value("${USEFUL_TOOLS_FILE_SERVICE_ENDPOINT}")
+    @Value("${api.useful.tools.file.service.endpoint}")
     private String usefulToolsFileServiceEndpoint;
 
     private WebClient webClient;
