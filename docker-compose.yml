@@ -41,9 +41,9 @@ services:
     networks:
       - app-network
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://useful-tools:8080/actuator/health" ]
+      test: [ "CMD", "curl", "-f", "$${API_USEFUL_TOOLS_URL}:$${PORT}/actuator/health" ]
       interval: 30s
       timeout: 10s
       retries: 3
     ports:
-      - "8080:8080"
+      - ${PORT}:8080

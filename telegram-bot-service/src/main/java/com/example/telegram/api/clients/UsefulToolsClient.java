@@ -14,8 +14,11 @@ import reactor.core.publisher.Mono;
 @Log4j2
 public class UsefulToolsClient {
 
-    @Value("${api.useful.tools.url}${PORT}")
-    private String baseUrl;
+    @Value("${api.useful.tools.url}")
+    private String baseUrlWithoutPort;
+
+    @Value("${PORT}")
+    private String port;
 
     @Value("${api.useful.tools.file.service.endpoint}")
     private String usefulToolsFileServiceEndpoint;
@@ -24,8 +27,10 @@ public class UsefulToolsClient {
 
     @PostConstruct
     public void init() {
+        String baseURL = baseUrlWithoutPort + ":" + port;
+        log.debug("Устанавливаем baseUrl = " + baseURL);
         this.webClient = WebClient.builder()
-                .baseUrl(baseUrl) // Устанавливаем базовый URL
+                .baseUrl(baseURL)
                 .build();
     }
 
