@@ -47,6 +47,7 @@ public class QueriesHandler {
     public void handleQueries(Update update) {
         log.debug("handleQueries method");
         SendMessage answer;
+        SendMessage testAnswer;
 
         Message msg = UpdateService.getMessage(update);
         long chatId = msg.getChatId();
@@ -65,5 +66,14 @@ public class QueriesHandler {
         } else {
             sender.sendMessage(answer);
         }
+
+        if (msg.getText().equals(Queries.GET_ACTUAL_USEFUL_TOOLS_HEALS.getQuery())) {
+            UsefulToolsHealsQuery usefulToolsHealsQuery = new UsefulToolsHealsQuery(usefulToolsClient);
+
+            SendMessage answer2 = usefulToolsHealsQuery.applyWithoutPort(update);
+
+            sender.sendMessage(answer2);
+        }
+
     }
 }

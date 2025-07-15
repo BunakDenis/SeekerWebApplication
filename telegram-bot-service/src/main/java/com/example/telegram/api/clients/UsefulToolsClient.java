@@ -7,6 +7,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -31,6 +32,10 @@ public class UsefulToolsClient {
         log.debug("Устанавливаем baseUrl = " + baseURL);
         this.webClient = WebClient.builder()
                 .baseUrl(baseURL)
+                .filter(ExchangeFilterFunction.ofRequestProcessor(clientRequest -> {
+                    log.debug("Request URL: {}", clientRequest.url());
+                    return Mono.just(clientRequest);
+                }))
                 .build();
     }
 
@@ -100,7 +105,50 @@ public class UsefulToolsClient {
                     // Преобразуем тело ответа в наш DTO
                     .bodyToMono(ActuatorHealthResponse.class).block();
         } catch (Exception e) {
-            log.debug("Негативный ответ от useful tools service\n" + e.getMessage());
+            log.debug("Негативный ответ от useful tools service\n" + e.getMessage(), e);
+        }
+
+        return result;
+    }
+
+    public ActuatorHealthResponse getUsefulToolsHealsWithoutPort() {
+
+        log.debug("Метод getUsefulToolsHealsWithoutPort()");
+
+        WebClient newWebClient = WebClient.builder()
+                .baseUrl(baseUrlWithoutPort)
+                .filter(ExchangeFilterFunction.ofRequestProcessor(clientRequest -> {
+                    log.debug("Request URL: {}", clientRequest.url());
+                    return Mono.just(clientRequest);
+                }))
+                .build();
+
+        // Определяем путь к эндпоинту
+        String endpointPath = "/actuator/health";
+
+        ActuatorHealthResponse result = new ActuatorHealthResponse();
+
+        try {
+            result = newWebClient.get()
+                    // Строим URI с query параметрами
+                    .uri(uriBuilder -> uriBuilder.path(endpointPath)
+                            .queryParam("fileName", "txt")
+                            .build())
+                    // Указываем, что ожидаем JSON в ответ
+                    .accept(MediaType.APPLICATION_JSON)
+                    // Получаем ответ
+                    .retrieve()
+                    // Обработка ошибок HTTP статусов (опционально, но рекомендуется)
+                    // Например, если получили 4xx или 5xx
+                    .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+                            response -> response.bodyToMono(String.class) // Можно прочитать тело ошибки
+                                    .flatMap(errorBody -> Mono.error(new RuntimeException(
+                                            String.format("Error from MainUtilsService: Status %d, Body: %s",
+                                                    response.statusCode().value(), errorBody)))))
+                    // Преобразуем тело ответа в наш DTO
+                    .bodyToMono(ActuatorHealthResponse.class).block();
+        } catch (Exception e) {
+            log.debug("Негативный ответ от useful tools service\n" + e.getMessage(), e);
         }
 
         return result;
