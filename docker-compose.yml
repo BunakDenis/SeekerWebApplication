@@ -24,7 +24,7 @@ services:
   #      database:
   #      condition: service_healthy # Или service_started
       useful-tools:
-          condition: service_started
+        condition: service_healthy
   # healthcheck: # Настройте healthcheck для сервиса бота
 
   useful-tools:
@@ -40,4 +40,10 @@ services:
       # Другие настройки
     networks:
       - app-network
-    # healthcheck: # Настройте healthcheck для сервиса
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://useful-tools:8080/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    ports:
+      - "8080:8080"

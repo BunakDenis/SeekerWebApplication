@@ -1,7 +1,9 @@
 package com.example.telegram.api.clients;
 
+import com.example.telegram.dto.ActuatorHealthResponse;
 import com.example.telegram.dto.FileServiceResponse;
 import jakarta.annotation.PostConstruct;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -9,6 +11,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 @Service
+@Log4j2
 public class UsefulToolsClient {
 
     @Value("${api.useful.tools.url}")
@@ -65,4 +68,37 @@ public class UsefulToolsClient {
     public FileServiceResponse changeFileExtensionBlocking(String fileName, String newExtension) {
         return changeFileExtension(fileName, newExtension).block(); // Блокирует выполнение до получения ответа
     }
+
+    public ActuatorHealthResponse getUsefulToolsHeals() {
+        // Определяем путь к эндпоинту
+        String endpointPath = "/actuator/health";
+
+        ActuatorHealthResponse result = new ActuatorHealthResponse();
+
+        try {
+            result = webClient.get()
+                    // Строим URI с query параметрами
+                    .uri(uriBuilder -> uriBuilder.path(endpointPath)
+                            .queryParam("fileName", "txt")
+                            .build())
+                    // Указываем, что ожидаем JSON в ответ
+                    .accept(MediaType.APPLICATION_JSON)
+                    // Получаем ответ
+                    .retrieve()
+                    // Обработка ошибок HTTP статусов (опционально, но рекомендуется)
+                    // Например, если получили 4xx или 5xx
+                    .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+                            response -> response.bodyToMono(String.class) // Можно прочитать тело ошибки
+                                    .flatMap(errorBody -> Mono.error(new RuntimeException(
+                                            String.format("Error from MainUtilsService: Status %d, Body: %s",
+                                                    response.statusCode().value(), errorBody)))))
+                    // Преобразуем тело ответа в наш DTO
+                    .bodyToMono(ActuatorHealthResponse.class).block();
+        } catch (Exception e) {
+            log.debug("Негативный ответ от useful tools service\n" + e.getMessage());
+        }
+
+        return result;
+    }
+
 }
