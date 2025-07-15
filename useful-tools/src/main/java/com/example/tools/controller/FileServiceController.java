@@ -27,6 +27,8 @@ public class FileServiceController {
     public ResponseEntity<FileServiceResponse> changeFileExtension(@RequestParam("fileName") String fileName,
                                                                    @RequestParam("newExtension") String newExtension) {
 
+        log.debug("Входящий запрос с параметрами {}", fileName, newExtension);
+
         String result = fileService.changeExtension(fileName, newExtension);
 
         FileServiceResponse response = new FileServiceResponse().success(result, FILE_NAME_CHANGE_MSG, HttpStatus.OK);

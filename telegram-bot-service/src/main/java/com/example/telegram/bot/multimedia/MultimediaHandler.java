@@ -2,6 +2,7 @@ package com.example.telegram.bot.multimedia;
 
 import com.example.telegram.api.clients.UsefulToolsClient;
 import com.example.telegram.bot.message.TelegramBotMessageSender;
+import com.example.telegram.bot.utils.update.UpdateService;
 import com.example.telegram.dto.FileServiceResponse;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +34,7 @@ public class MultimediaHandler {
 
         File sourceFile = new File("");
 
-        Message message = update.getMessage();
+        Message message = UpdateService.getMessage(update);
         long chatId = message.getChatId();
 
         FileServiceResponse newFileName =
@@ -42,7 +43,7 @@ public class MultimediaHandler {
                         "exe"
                 );
 
-        System.out.println("newFileName = " + newFileName);
+        log.debug("newFileName = " + newFileName);
 
         //Проверка формата сообщения
         if (message.hasAudio()) {
