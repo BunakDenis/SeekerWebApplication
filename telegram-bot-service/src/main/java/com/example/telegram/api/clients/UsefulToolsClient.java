@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono;
 @Log4j2
 public class UsefulToolsClient {
 
-    @Value("${api.useful.tools.url}")
+    @Value("${api.useful.tools.url}${PORT}")
     private String baseUrl;
 
     @Value("${api.useful.tools.file.service.endpoint}")
