@@ -29,18 +29,4 @@ public class UsefulToolsHealsQuery implements Query {
 
         return result;
     }
-
-    public SendMessage applyWithoutPort(Update update) {
-        long chatId = UpdateService.getChatId(update);
-
-        ActuatorHealthResponse response = client.getUsefulToolsHealsWithoutPort();
-
-        SendMessage result = new SendMessage();
-
-        result.setChatId(chatId);
-
-        result.setText("Состояние useful tools service - " + response.getStatus());
-
-        return result;
-    }
 }
