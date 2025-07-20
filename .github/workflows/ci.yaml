@@ -26,25 +26,9 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build and push telegram-bot-service image
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          file: ./telegram-bot-service/Dockerfile
-          push: true
-          tags: ghcr.io/bunakdenis/telegram-bot-service:latest
-          load: false
-          no-cache: false
-          pull: true
-
-      - name: Build and push useful-tools image
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          file: ./useful-tools/Dockerfile
-          push: true
-          tags: ghcr.io/bunakdenis/useful-tools:latest
-          load: false
-          no-cache: false
-          pull: true
+      # Сборка и пуш образа telegram-bot-service
+      - name: Build & push telegram-bot-service image
+        run: mvn -pl telegram-bot-service -Dimage=ghcr.io/bunakdenis/telegram-bot-service:latest compile jib:build
+      # Сборка и пуш образа useful-tools
+      - name: Build & push useful-tools image
+        run: mvn -pl useful-tools -Dimage=ghcr.io/bunakdenis/useful-tools:latest compile jib:build
