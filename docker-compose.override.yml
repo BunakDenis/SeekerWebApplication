@@ -1,0 +1,46 @@
+version: "3.9"
+
+networks:
+  app-network:
+    driver: bridge
+
+services:
+
+  telegram-bot-service:
+    image: bunakdenis/telegram-bot-service:latest
+    volumes:
+      - ./telegram-bot-service/src:/app/src
+      - ./useful-tools/src:/app/useful-tools/src
+      - ./utils-service/src:/app/utils-service/src
+    env_file:
+      - ./.env
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      USER_PASSWORD: ${DEV_USER_PASSWORD}
+      TELEGRAM_BOT_NAME: ${DEV_TELEGRAM_BOT_NAME}
+      TELEGRAM_BOT_TOKEN: ${DEV_TELEGRAM_BOT_TOKEN}
+      API_USEFUL_TOOLS_URL: ${DEV_API_USEFUL_TOOLS_URL}
+      API_USEFUL_TOOLS_FILE_SERVICE_ENDPOINT: ${DEV_API_USEFUL_TOOLS_FILE_SERVICE_ENDPOINT}
+    networks:
+      - app-network
+
+  useful-tools:
+    image: bunakdenis/useful-tools:latest
+    volumes:
+      - ./useful-tools/src:/app/src
+      - ./telegram-bot-service/src:/app/telegram-bot-service/src
+      - ./utils-service/src:/app/utils-service
+    env_file:
+      - ./.env
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      USER_PASSWORD: ${DEV_USER_PASSWORD}
+    networks:
+      - app-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "$${DEV_API_USEFUL_TOOLS_URL}:$${PORT}/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    ports:
+      - ${PORT}:8080
