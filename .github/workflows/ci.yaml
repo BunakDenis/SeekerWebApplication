@@ -26,9 +26,11 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
       # Сборка и пуш образа telegram-bot-service
       - name: Build & push telegram-bot-service image
         run: mvn -pl telegram-bot-service -Dimage=ghcr.io/bunakdenis/telegram-bot-service:latest compile jib:build
+
       # Сборка и пуш образа useful-tools
       - name: Build & push useful-tools image
         run: mvn -pl useful-tools -Dimage=ghcr.io/bunakdenis/useful-tools:latest compile jib:build

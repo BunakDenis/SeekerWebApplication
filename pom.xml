@@ -10,9 +10,9 @@
 	<packaging>pom</packaging>
 
 	<modules>
+		<module>utils-service</module>
 		<module>telegram-bot-service</module>
 		<module>useful-tools</module>
-        <module>utils-service</module>
     </modules>
 
 	<properties>

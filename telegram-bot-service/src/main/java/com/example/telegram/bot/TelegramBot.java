@@ -82,8 +82,6 @@ public class TelegramBot extends TelegramLongPollingBot {
             if (message.hasText()) {
                 String msgText = message.getText();
 
-                log.debug("inbox msg text - " + msgText);
-
                 if (msgText.startsWith("/")) {
                     commandsHandler.handleCommands(update);
                 } else {
