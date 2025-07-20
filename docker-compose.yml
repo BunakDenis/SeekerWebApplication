@@ -1,47 +1,37 @@
+version: "3.9"
+
 networks:
   app-network:
     driver: bridge
 
 services:
+
   telegram-bot-service:
-    build:
-      context: .
-      dockerfile: ./telegram-bot-service/Dockerfile
+    image: bunakdenis/telegram-bot-service:latest
     env_file:
       - ./.env
     environment:
-      SPRING_PROFILE_ACTIVE: prod
-      TELEGRAM_BOT_NAME: ${TELEGRAM_BOT_NAME}
-      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
-      API_MAIN_UTILS_SERVICE_URL: ${API_USEFUL_TOOLS_URL}
-      #SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/mydatabase
-      #SPRING_DATASOURCE_USERNAME: myuser
-      #SPRING_DATASOURCE_PASSWORD: mypassword
-    # Другие настройки Spring Boot и JPA
+      SPRING_PROFILES_ACTIVE: prod
+      USER_PASSWORD: ${PROD_USER_PASSWORD}
+      TELEGRAM_BOT_NAME: ${PROD_TELEGRAM_BOT_NAME}
+      TELEGRAM_BOT_TOKEN: ${PROD_TELEGRAM_BOT_TOKEN}
+      API_USEFUL_TOOLS_URL: ${PROD_API_USEFUL_TOOLS_URL}
+      API_USEFUL_TOOLS_FILE_SERVICE_ENDPOINT: ${PROD_API_USEFUL_TOOLS_FILE_SERVICE_ENDPOINT}
     networks:
       - app-network
-    depends_on: # Указывает зависимость от других сервисов (для порядка старта)
-  #      database:
-  #      condition: service_healthy # Или service_started
-      useful-tools:
-        condition: service_healthy
-  # healthcheck: # Настройте healthcheck для сервиса бота
 
   useful-tools:
-    build:
-      context: .
-      dockerfile: ./useful-tools/Dockerfile
-    mem_limit: 12g
+    image: bunakdenis/useful-tools:latest
+  #mem_limit: 12g
     env_file:
       - ./.env
     environment:
-      SPRING_PROFILE_ACTIVE: prod
-      EXTERNAL_AUDIO_API_URL: http://useful-tools # URL внешнего API
-      # Другие настройки
+      SPRING_PROFILES_ACTIVE: prod
+      USER_PASSWORD: ${PROD_USER_PASSWORD}
     networks:
       - app-network
     healthcheck:
-      test: [ "CMD", "curl", "-f", "$${API_USEFUL_TOOLS_URL}:$${PORT}/actuator/health" ]
+      test: [ "CMD", "curl", "-f", "$${PROD_API_USEFUL_TOOLS_URL}:$${PORT}/actuator/health" ]
       interval: 30s
       timeout: 10s
       retries: 3

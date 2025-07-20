@@ -77,7 +77,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
             Message message = update.getMessage();
 
-            log.debug("Входящее сообщение - " + message);
+            log.debug("Входящее сообщение - " + message.getText());
 
             if (message.hasText()) {
                 String msgText = message.getText();
