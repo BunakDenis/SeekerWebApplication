@@ -26,6 +26,7 @@
 		<javax-mail.version>1.4</javax-mail.version>
 		<lombok.version>1.18.22</lombok.version>
 		<log4j.version>2.25.1</log4j.version>
+		<image>bunakdenis/${project.artifactId}:latest</image>
 	</properties>
 
 	<dependencyManagement>
@@ -78,6 +79,11 @@
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-starter-log4j2</artifactId>
+				<version>${spring-boot.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-devtools</artifactId>
 				<version>${spring-boot.version}</version>
 			</dependency>
 			<dependency>
@@ -139,6 +145,16 @@
 								<version>${lombok.version}</version>
 							</path>
 						</annotationProcessorPaths>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>com.google.cloud.tools</groupId>
+					<artifactId>jib-maven-plugin</artifactId>
+					<version>3.4.6</version>
+					<configuration>
+						<from>
+							<image>eclipse-temurin:17-jre</image>
+						</from>
 					</configuration>
 				</plugin>
 			</plugins>

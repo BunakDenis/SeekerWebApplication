@@ -91,7 +91,6 @@ public class UsefulToolsClient {
             result = webClient.get()
                     // Строим URI с query параметрами
                     .uri(uriBuilder -> uriBuilder.path(endpointPath)
-                            .queryParam("fileName", "txt")
                             .build())
                     // Указываем, что ожидаем JSON в ответ
                     .accept(MediaType.APPLICATION_JSON)
