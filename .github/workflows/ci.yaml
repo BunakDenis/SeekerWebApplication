@@ -17,8 +17,12 @@ jobs:
         with:
           java-version: 17
           distribution: 'temurin'
+
+      - name: Install all modules (populate local .m2 repo)
+        run: mvn -B clean install -DskipTests
+
       - name: Run tests
-        run: mvn -B test --file pom.xml
+        run: mvn -B test
 
       - name: Log in to GHCR
         uses: docker/login-action@v2
