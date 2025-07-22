@@ -71,7 +71,13 @@ public class TelegramBot extends TelegramLongPollingBot {
 
         User user = update.getMessage().getFrom();
 
-        log.debug("Входящее сообщение от Юзера - " + user);
+        log.debug("Входящее сообщение от Юзера - " + user.getFirstName() + " " + user.getLastName());
+
+        boolean isCallback = update.hasCallbackQuery();
+
+        log.debug("Это ответ на команду? = " + isCallback);
+
+        if (isCallback) log.debug("Прислан ответ на команду - " + update.getCallbackQuery());
 
         if (update.hasMessage()) {
 
@@ -89,6 +95,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                 }
 
             } else if (message.hasAudio() || message.hasVoice()) {
+                log.debug("Юзер прислал медиа файл");
                 multimediaHandler.handleMultimedia(update);
             } else {
                 sender.sendMessage(update.getMessage().getChatId(), UNKNOWN_COMMAND_OR_QUERY);

@@ -10,8 +10,6 @@ services:
     image: bunakdenis/telegram-bot-service:latest
     volumes:
       - ./telegram-bot-service/src:/app/src
-      - ./useful-tools/src:/app/useful-tools/src
-      - ./utils-service/src:/app/utils-service/src
     env_file:
       - ./.env
     environment:
@@ -28,7 +26,6 @@ services:
     image: bunakdenis/useful-tools:latest
     volumes:
       - ./useful-tools/src:/app/src
-      - ./telegram-bot-service/src:/app/telegram-bot-service/src
       - ./utils-service/src:/app/utils-service
     env_file:
       - ./.env

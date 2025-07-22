@@ -29,6 +29,8 @@ public class FileServiceController {
 
         log.debug("Входящий запрос с параметрами {}", fileName, newExtension);
 
+        System.out.println("fileName = " + fileName);
+
         String result = fileService.changeExtension(fileName, newExtension);
 
         FileServiceResponse response = new FileServiceResponse().success(result, FILE_NAME_CHANGE_MSG, HttpStatus.OK);
