@@ -3,6 +3,7 @@ package com.example.tools.audio;
 
 import com.example.utils.file.changer.FileExtensionChanger;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Log4j2
+@Component
 public class FfmpegService {
 
     private static String beguilingDrafterModelPath = "../models/ffmpeg/beguiling-drafter/bd.rnnn";

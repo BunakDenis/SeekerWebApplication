@@ -44,6 +44,12 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-starter</artifactId>
 				<version>${spring-boot.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.springframework.boot</groupId>
+						<artifactId>spring-boot-starter-logging</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
@@ -188,6 +194,11 @@
 						</to>
 						<container>
 							<creationTime>USE_CURRENT_TIMESTAMP</creationTime>
+							<labels>
+								<app.version>${project.version}</app.version>
+								<app.name>${project.artifactId}</app.name>
+								<maintainer>your.email@example.com</maintainer>
+							</labels>
 						</container>
 					</configuration>
 					<executions>

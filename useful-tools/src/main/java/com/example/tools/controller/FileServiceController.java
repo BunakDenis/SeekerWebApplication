@@ -3,6 +3,7 @@ package com.example.tools.controller;
 
 import com.example.tools.controller.dto.response.FileServiceResponse;
 import com.example.utils.file.FileService;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -27,9 +28,7 @@ public class FileServiceController {
     public ResponseEntity<FileServiceResponse> changeFileExtension(@RequestParam("fileName") String fileName,
                                                                    @RequestParam("newExtension") String newExtension) {
 
-        log.debug("Входящий запрос с параметрами {}", fileName, newExtension);
-
-        System.out.println("fileName = " + fileName);
+        log.debug("Входящий запрос с параметрами - fileName=" + fileName + ", newExtension=" + newExtension);
 
         String result = fileService.changeExtension(fileName, newExtension);
 
