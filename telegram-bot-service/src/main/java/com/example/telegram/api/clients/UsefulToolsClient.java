@@ -1,7 +1,7 @@
 package com.example.telegram.api.clients;
 
-import com.example.telegram.dto.ActuatorHealthResponse;
-import com.example.telegram.dto.FileServiceResponse;
+import com.example.telegram.dto.responce.ActuatorHealthResponse;
+import com.example.telegram.dto.responce.FileServiceResponse;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;

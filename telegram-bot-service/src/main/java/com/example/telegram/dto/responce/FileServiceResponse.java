@@ -1,4 +1,4 @@
-package com.example.telegram.dto;
+package com.example.telegram.dto.responce;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;

@@ -1,4 +1,4 @@
-package com.example.telegram.dto;
+package com.example.telegram.dto.responce;
 
 import lombok.Data;
 

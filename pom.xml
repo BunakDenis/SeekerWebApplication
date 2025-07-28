@@ -23,6 +23,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spring-boot.version>3.2.0</spring-boot.version>
 		<telegrambot.starter.version>6.1.0</telegrambot.starter.version>
+		<test.containers.version>1.21.3</test.containers.version>
 		<javax-mail.version>1.4</javax-mail.version>
 		<lombok.version>1.18.22</lombok.version>
 		<log4j.version>2.25.1</log4j.version>
@@ -94,6 +95,31 @@
 				<version>${spring-boot.version}</version>
 			</dependency>
 			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-test</artifactId>
+				<version>${spring-boot.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-testcontainers</artifactId>
+				<version>${spring-boot.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<!-- Test containers -->
+			<dependency>
+				<groupId>org.testcontainers</groupId>
+				<artifactId>testcontainers</artifactId>
+				<version>${test.containers.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.testcontainers</groupId>
+				<artifactId>junit-jupiter</artifactId>
+				<version>${test.containers.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
 				<groupId>org.projectlombok</groupId>
 				<artifactId>lombok</artifactId>
 				<version>${lombok.version}</version>
@@ -156,6 +182,11 @@
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>3.2.5</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
 					<version>${maven.compiler.plugin.version}</version>
 					<configuration>
@@ -197,7 +228,7 @@
 							<labels>
 								<app.version>${project.version}</app.version>
 								<app.name>${project.artifactId}</app.name>
-								<maintainer>your.email@example.com</maintainer>
+								<maintainer>xisi926@ukr.net</maintainer>
 							</labels>
 						</container>
 					</configuration>

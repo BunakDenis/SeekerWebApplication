@@ -2,7 +2,7 @@ package com.example.telegram.bot.queries;
 
 import com.example.telegram.api.clients.UsefulToolsClient;
 import com.example.telegram.bot.utils.update.UpdateService;
-import com.example.telegram.dto.ActuatorHealthResponse;
+import com.example.telegram.dto.responce.ActuatorHealthResponse;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;

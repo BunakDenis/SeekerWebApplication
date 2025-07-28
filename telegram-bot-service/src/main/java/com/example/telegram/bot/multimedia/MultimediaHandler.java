@@ -3,7 +3,7 @@ package com.example.telegram.bot.multimedia;
 import com.example.telegram.api.clients.UsefulToolsClient;
 import com.example.telegram.bot.message.TelegramBotMessageSender;
 import com.example.telegram.bot.utils.update.UpdateService;
-import com.example.telegram.dto.FileServiceResponse;
+import com.example.telegram.dto.responce.FileServiceResponse;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;

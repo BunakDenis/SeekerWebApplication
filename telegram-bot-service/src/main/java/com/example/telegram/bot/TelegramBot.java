@@ -6,6 +6,7 @@ import com.example.telegram.bot.commands.CommandsHandler;
 import com.example.telegram.bot.message.TelegramBotMessageSender;
 import com.example.telegram.bot.multimedia.MultimediaHandler;
 import com.example.telegram.bot.queries.QueriesHandler;
+import com.example.telegram.bot.utils.update.UpdateService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -22,6 +23,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import static com.example.telegram.bot.message.MessageProvider.*;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @RequiredArgsConstructor
@@ -73,11 +75,20 @@ public class TelegramBot extends TelegramLongPollingBot {
 
         log.debug("Входящее сообщение от Юзера - " + user.getFirstName() + " " + user.getLastName());
 
-        boolean isCallback = update.hasCallbackQuery();
+        if (update.hasMessage() && update.getMessage().hasText()) {
 
-        log.debug("Это ответ на команду? = " + isCallback);
+            try {
 
-        if (isCallback) log.debug("Прислан ответ на команду - " + update.getCallbackQuery());
+                Message replyToMessage = update.getMessage().getReplyToMessage();
+
+                if (replyToMessage.hasText()) log.debug("Ответ на сообщение - " + replyToMessage);
+
+            } catch (Exception e) {
+                log.debug("Текущее сообщение это не ответ на предыдущее! {}", e.getMessage());
+            }
+
+
+        }
 
         if (update.hasMessage()) {
 

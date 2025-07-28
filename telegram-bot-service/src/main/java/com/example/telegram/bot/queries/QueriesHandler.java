@@ -7,7 +7,6 @@ import com.example.telegram.api.clients.UsefulToolsClient;
 import com.example.telegram.bot.message.MessageForWifeProvider;
 import com.example.telegram.bot.message.TelegramBotMessageSender;
 import com.example.telegram.bot.utils.update.UpdateService;
-import com.example.telegram.dto.ActuatorHealthResponse;
 import lombok.Data;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +61,13 @@ public class QueriesHandler {
         if (update.getMessage().getChatId() == WIFE_CHAT_ID) {
             sender.sendMessage(update.getMessage().getChatId(),
                     MessageForWifeProvider.getMessage());
+        } else if (update.hasMessage() && update.getMessage().getReplyToMessage() != null) {
+            Message replyTo = update.getMessage().getReplyToMessage();
+
+            // Например, проверка, что отвечали на сообщение, которое отправил бот
+            if (replyTo.getFrom().getIsBot()) {
+                log.debug("Это ответ на сообщение бота - " + replyTo);
+            }
         } else {
             sender.sendMessage(answer);
         }
