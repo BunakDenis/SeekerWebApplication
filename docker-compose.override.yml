@@ -21,6 +21,8 @@ services:
       API_USEFUL_TOOLS_FILE_SERVICE_ENDPOINT: ${DEV_API_USEFUL_TOOLS_FILE_SERVICE_ENDPOINT}
     networks:
       - app-network
+    ports:
+      - ${TELEGRAM_BOT_PORT}:8081
 
   useful-tools:
     image: bunakdenis/useful-tools:latest
@@ -40,4 +42,4 @@ services:
       timeout: 10s
       retries: 3
     ports:
-      - ${PORT}:8080
+      - ${API_USEFUL_TOOLS_PORT}:8080

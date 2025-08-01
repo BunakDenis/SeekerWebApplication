@@ -18,7 +18,7 @@ public class UsefulToolsClient {
     @Value("${api.useful.tools.url}")
     private String baseUrlWithoutPort;
 
-    @Value("${PORT}")
+    @Value("${API_USEFUL_TOOLS_PORT}")
     private String port;
 
     @Value("${api.useful.tools.file.service.endpoint}")

@@ -37,6 +37,7 @@ class TestBotContainer {
             .withEnv("SPRING_PROFILES_ACTIVE", dotenv.get("SPRING_PROFILES_ACTIVE"))
             .withEnv("TELEGRAM_BOT_NAME", dotenv.get("DEV_TELEGRAM_BOT_NAME"))
             .withEnv("TELEGRAM_BOT_TOKEN", dotenv.get("DEV_TELEGRAM_BOT_TOKEN"))
+            .withEnv("API_USEFUL_TOOLS_PORT", dotenv.get("API_USEFUL_TOOLS_PORT"))
             .withEnv("API_USEFUL_TOOLS_URL", dotenv.get("DEV_API_USEFUL_TOOLS_URL"))
             .withEnv("API_USEFUL_TOOLS_FILE_SERVICE_ENDPOINT", dotenv.get("DEV_API_USEFUL_TOOLS_FILE_SERVICE_ENDPOINT"))
             .withEnv("PORT", dotenv.get("PORT"))
