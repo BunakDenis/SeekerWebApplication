@@ -33,7 +33,7 @@ public class EnvLoader {
         Map<String, String> env = System.getenv();
 
         for (String envName : env.keySet()) {
-            log.debug("Имя переменной среды: %s, Значение: %s%n", envName, env.get(envName));
+            log.info("Имя переменной среды: %s, Значение: %s%n", envName, env.get(envName));
         }
 
         String value = System.getenv(key); // Сначала проверяем системные переменные
