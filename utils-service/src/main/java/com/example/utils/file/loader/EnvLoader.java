@@ -3,6 +3,8 @@ package com.example.utils.file.loader;
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.extern.log4j.Log4j2;
 
+import java.util.Map;
+
 @Log4j2
 public class EnvLoader {
 
@@ -11,12 +13,14 @@ public class EnvLoader {
     private static Dotenv createDotenv() {
         // Проверяем, запущено ли в GitHub Actions
         if (System.getenv("GITHUB_ACTIONS") != null) {
+            log.info("GITHUB_ACTIONS = " + System.getenv("GITHUB_ACTIONS"));
             log.info("Запущено в GitHub Actions, загрузка .env пропущена");
             return null; // Не загружаем .env в GitHub Actions
         }
 
         // Иначе загружаем из .env
         log.info("Загрузка .env файла");
+
         return Dotenv.configure()
                 .directory("../.env")
                 .ignoreIfMalformed()
@@ -25,6 +29,13 @@ public class EnvLoader {
     }
 
     public static String get(String key) {
+
+        Map<String, String> env = System.getenv();
+
+        for (String envName : env.keySet()) {
+            log.debug("Имя переменной среды: %s, Значение: %s%n", envName, env.get(envName));
+        }
+
         String value = System.getenv(key); // Сначала проверяем системные переменные
 
         if (value == null && DOTENV != null) { // Если не найдено в системе и DOTENV загружен, используем .env
