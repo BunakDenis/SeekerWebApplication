@@ -54,6 +54,7 @@ jobs:
           echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}" >> $GITHUB_ENV
           echo "TELEGRAM_BOT_WEB_HOOK_PATH=${{ secrets.TELEGRAM_BOT_WEB_HOOK_PATH }}" >> $GITHUB_ENV
           echo "TELEGRAM_BOT_WEB_HOOK_URL=${{ secrets.TELEGRAM_BOT_WEB_HOOK_URL }}" >> $GITHUB_ENV
+          echo "DATA_PROVIDE_SERVICE_PORT=${{ secrets.DATA_PROVIDE_SERVICE_PORT }}" >> $GITHUB_ENV
           echo "DB_API_DOCKER_URL=${{ secrets.TELEGRAM_BOT_TOKEN }}" >> $GITHUB_ENV
           echo "DB_API_VERSION=${{ secrets.TELEGRAM_BOT_TOKEN }}" >> $GITHUB_ENV
           echo "DB_TELEGRAM_DATA_API_ENDPOINT=${{ secrets.TELEGRAM_BOT_TOKEN }}" >> $GITHUB_ENV

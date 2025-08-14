@@ -10,6 +10,7 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
 
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -42,7 +43,18 @@ class TestBotContainer {
             throw new IllegalStateException("TELEGRAM_BOT_SERVICE_IMAGE не определена");
         }
 
-        botContainer = new GenericContainer<>(TELEGRAM_BOT_SERVICE_IMAGE)
+        if (System.getenv("GITHUB_ACTIONS") != null) {
+            DockerImageName ghcrImage = DockerImageName.parse(TELEGRAM_BOT_SERVICE_IMAGE);
+
+            botContainer = new GenericContainer<>(ghcrImage);
+
+        } else {
+
+            botContainer = new GenericContainer<>(TELEGRAM_BOT_SERVICE_IMAGE);
+
+        }
+
+        botContainer
                 .withExposedPorts(Integer.parseInt(TELEGRAM_BOT_PORT))
                 .withEnv("SPRING_PROFILES_ACTIVE", SPRING_PROFILES_ACTIVE)
                 .withEnv("TRUTH_SEEKER_OFFICE_IP_ADDRESS", TRUTH_SEEKER_OFFICE_IP_ADDRESS)
