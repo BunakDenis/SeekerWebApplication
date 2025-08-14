@@ -41,6 +41,11 @@ jobs:
         id: build-push-useful-tools
         run: mvn -pl useful-tools -Dimage=ghcr.io/bunakdenis/useful-tools:latest compile jib:build
 
+      - name: Debug - List environment variables
+        run: |
+               echo "Список переменных окружения:"
+               env
+
       - name: Run tests
         run: mvn -B test
         if: always() # Запускать тесты всегда, даже если предыдущие шаги завершились неудачно

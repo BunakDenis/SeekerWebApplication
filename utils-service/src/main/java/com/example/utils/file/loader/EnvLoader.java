@@ -9,14 +9,14 @@ public class EnvLoader {
     public static final Dotenv DOTENV = createDotenv();
 
     private static Dotenv createDotenv() {
-        // Сначала пробуем загрузить переменные из окружения системы
-        if (System.getenv("TELEGRAM_BOT_SERVICE_IMAGE") != null) {
-            log.debug("Using system environment variables, .env loading skipped");
-            return null; // Не загружаем .env, если переменные есть в системе
+        // Проверяем, запущено ли в GitHub Actions
+        if (System.getenv("GITHUB_ACTIONS") != null) {
+            log.info("Запущено в GitHub Actions, загрузка .env пропущена");
+            return null; // Не загружаем .env в GitHub Actions
         }
 
-        // Если переменные в системе не найдены, загружаем из .env
-        log.debug("Loading .env file");
+        // Иначе загружаем из .env
+        log.info("Загрузка .env файла");
         return Dotenv.configure()
                 .directory("../.env")
                 .ignoreIfMalformed()
