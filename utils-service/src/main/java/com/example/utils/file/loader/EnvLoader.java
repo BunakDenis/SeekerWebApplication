@@ -13,8 +13,16 @@ public class EnvLoader {
     private static Dotenv createDotenv() {
         // Проверяем, запущено ли в GitHub Actions
         if (System.getenv("GITHUB_ACTIONS") != null) {
+
             log.info("GITHUB_ACTIONS = " + System.getenv("GITHUB_ACTIONS"));
             log.info("Запущено в GitHub Actions, загрузка .env пропущена");
+
+            Map<String, String> env = System.getenv();
+
+            for (String envName : env.keySet()) {
+                log.info("Имя переменной среды: " + envName + ", Значение: " + env.get(envName));
+            }
+
             return null; // Не загружаем .env в GitHub Actions
         }
 
@@ -29,12 +37,6 @@ public class EnvLoader {
     }
 
     public static String get(String key) {
-
-        Map<String, String> env = System.getenv();
-
-        for (String envName : env.keySet()) {
-            log.info("Имя переменной среды: %s, Значение: %s%n", envName, env.get(envName));
-        }
 
         String value = System.getenv(key); // Сначала проверяем системные переменные
 
