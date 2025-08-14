@@ -18,8 +18,8 @@ public class UsefulToolsClient {
     @Value("${api.useful.tools.url}")
     private String baseUrlWithoutPort;
 
-    @Value("${API_USEFUL_TOOLS_PORT}")
-    private String port;
+    //@Value("${API_USEFUL_TOOLS_PORT}")
+    private String port = "8080";
 
     @Value("${api.useful.tools.file.service.endpoint}")
     private String usefulToolsFileServiceEndpoint;
@@ -42,53 +42,12 @@ public class UsefulToolsClient {
                 .build();
     }
 
-    /**
-     * Отправляет запрос на изменение расширения файла в main-utils-service.
-     *
-     * @param fileName Имя файла.
-     * @param newExtension Новое расширение.
-     * @return Mono с ответом от сервиса. Используйте .block() если не работаете в реактивном контексте.
-     */
-    public Mono<FileServiceResponse> changeFileExtension(String fileName, String newExtension) {
-        // Определяем путь к эндпоинту
-        String endpointPath = usefulToolsFileServiceEndpoint + "changeFileExtension";
-
-        // Выполняем POST запрос
-        return webClient.post()
-                // Строим URI с query параметрами
-                .uri(uriBuilder -> uriBuilder.path(endpointPath)
-                        .queryParam("fileName", fileName)
-                        .queryParam("newExtension", newExtension)
-                        .build())
-                // Указываем тип контента (хотя для query params это не всегда критично)
-                .contentType(MediaType.APPLICATION_JSON) // Или другой, если ваш сервис ожидает
-                // Указываем, что ожидаем JSON в ответ
-                .accept(MediaType.APPLICATION_JSON)
-                // Получаем ответ
-                .retrieve()
-                // Обработка ошибок HTTP статусов (опционально, но рекомендуется)
-                // Например, если получили 4xx или 5xx
-                .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
-                        response -> response.bodyToMono(String.class) // Можно прочитать тело ошибки
-                                .flatMap(errorBody -> Mono.error(new RuntimeException(
-                                        String.format("Error from MainUtilsService: Status %d, Body: %s",
-                                                response.statusCode().value(), errorBody)))))
-                // Преобразуем тело ответа в наш DTO
-                .bodyToMono(FileServiceResponse.class);
-    }
-
-    public FileServiceResponse changeFileExtensionBlocking(String fileName, String newExtension) {
-        return changeFileExtension(fileName, newExtension).block(); // Блокирует выполнение до получения ответа
-    }
-
-    public ActuatorHealthResponse getUsefulToolsHeals() {
+    public Mono<ActuatorHealthResponse> getUsefulToolsHeals() {
         // Определяем путь к эндпоинту
         String endpointPath = "/actuator/health";
 
-        ActuatorHealthResponse result = new ActuatorHealthResponse();
-
         try {
-            result = webClient.get()
+            return webClient.get()
                     // Строим URI с query параметрами
                     .uri(uriBuilder -> uriBuilder.path(endpointPath)
                             .build())
@@ -104,12 +63,41 @@ public class UsefulToolsClient {
                                             String.format("Error from MainUtilsService: Status %d, Body: %s",
                                                     response.statusCode().value(), errorBody)))))
                     // Преобразуем тело ответа в наш DTO
-                    .bodyToMono(ActuatorHealthResponse.class).block();
+                    .bodyToMono(ActuatorHealthResponse.class)
+                    .log();
         } catch (Exception e) {
             log.debug("Негативный ответ от useful tools service\n" + e.getMessage(), e);
         }
 
-        return result;
+        return null;
+    }
+
+    public Mono<FileServiceResponse> decodeAudio() {
+        // Определяем путь к эндпоинту
+        String endpointPath = usefulToolsFileServiceEndpoint + "decode";
+
+        // Выполняем POST запрос
+        Mono<FileServiceResponse> fileServiceResponse = webClient.post()
+                // Строим URI с query параметрами
+                .uri(uriBuilder -> uriBuilder.path(endpointPath)
+                        .build())
+                .contentType(MediaType.APPLICATION_JSON)
+                // Указываем, что ожидаем JSON в ответ
+                .accept(MediaType.APPLICATION_JSON)
+                // Получаем ответ
+                .retrieve()
+                // Обработка ошибок HTTP статусов (опционально, но рекомендуется)
+                // Например, если получили 4xx или 5xx
+                .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+                        response -> response.bodyToMono(String.class) // Можно прочитать тело ошибки
+                                .flatMap(errorBody -> Mono.error(new RuntimeException(
+                                        String.format("Error from MainUtilsService: Status %d, Body: %s",
+                                                response.statusCode().value(), errorBody)))))
+                // Преобразуем тело ответа в наш DTO
+                .bodyToMono(FileServiceResponse.class)
+                .doOnNext(response -> log.debug("Получен ответ от useful-tools: " + response.toString()));
+
+        return fileServiceResponse;
     }
 
 }

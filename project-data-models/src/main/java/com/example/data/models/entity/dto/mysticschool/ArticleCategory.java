@@ -1,0 +1,20 @@
+package com.example.data.models.entity.dto.mysticschool;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class ArticleCategory {
+
+    private int id;
+
+    private String name;
+
+    private String description;
+
+}

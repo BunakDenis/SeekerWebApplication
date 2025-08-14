@@ -4,6 +4,13 @@
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>3.2.0</version>
+		<relativePath/>
+	</parent>
+
 	<groupId>com.example</groupId>
 	<artifactId>TruthSeekerOffice</artifactId>
 	<version>1.0.1</version>
@@ -11,17 +18,19 @@
 
 	<modules>
 		<module>utils-service</module>
-		<module>telegram-bot-service</module>
+		<module>project-data-models</module>
 		<module>useful-tools</module>
-    </modules>
+		<module>telegram-bot-service</module>
+        <module>data-provider-service</module>
+	</modules>
 
 	<properties>
+		<java.version>17</java.version>
 		<project.version>1.0.1</project.version>
-		<maven.compiler.source>11</maven.compiler.source>
-		<maven.compiler.target>11</maven.compiler.target>
 		<maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spring-boot.version>3.2.0</spring-boot.version>
+		<flyway.version>11.10.5</flyway.version>
 		<telegrambot.starter.version>6.1.0</telegrambot.starter.version>
 		<test.containers.version>1.21.3</test.containers.version>
 		<javax-mail.version>1.4</javax-mail.version>
@@ -33,77 +42,38 @@
 
 	<dependencyManagement>
 		<dependencies>
-			<!-- Spring Boot BOM (Bill of Materials) для управления версиями -->
-			<dependency>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-dependencies</artifactId>
-				<version>${spring-boot.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-starter</artifactId>
-				<version>${spring-boot.version}</version>
-				<exclusions>
-					<exclusion>
-						<groupId>org.springframework.boot</groupId>
-						<artifactId>spring-boot-starter-logging</artifactId>
-					</exclusion>
-				</exclusions>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-starter-web</artifactId>
-				<version>${spring-boot.version}</version>
-				<exclusions>
-					<exclusion>
-						<groupId>org.springframework.boot</groupId>
-						<artifactId>spring-boot-starter-logging</artifactId>
-					</exclusion>
-				</exclusions>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-starter-webflux</artifactId>
-				<version>${spring-boot.version}</version>
-				<exclusions>
-					<exclusion>
-						<groupId>org.springframework.boot</groupId>
-						<artifactId>spring-boot-starter-logging</artifactId>
-					</exclusion>
-				</exclusions>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-starter-actuator</artifactId>
-				<version>${spring-boot.version}</version>
-			</dependency>
+			<!-- https://mvnrepository.com/artifact/org.telegram/telegrambots-spring-boot-starter -->
 			<dependency>
 				<groupId>org.telegram</groupId>
 				<artifactId>telegrambots-spring-boot-starter</artifactId>
-				<version>${telegrambot.starter.version}</version>
+				<version>6.9.7.1</version>
+			</dependency>
+			<!-- Database -->
+			<dependency>
+				<groupId>org.modelmapper.extensions</groupId>
+				<artifactId>modelmapper-spring</artifactId>
+				<version>3.2.4</version>
 			</dependency>
 			<dependency>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-starter-log4j2</artifactId>
-				<version>${spring-boot.version}</version>
+				<groupId>org.flywaydb</groupId>
+				<artifactId>flyway-core</artifactId>
+				<version>${flyway.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-devtools</artifactId>
-				<version>${spring-boot.version}</version>
+				<groupId>org.flywaydb</groupId>
+				<artifactId>flyway-database-postgresql</artifactId>
+				<version>${flyway.version}</version>
+				<scope>runtime</scope>
 			</dependency>
 			<dependency>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-starter-test</artifactId>
-				<version>${spring-boot.version}</version>
-				<scope>test</scope>
+				<groupId>org.postgresql</groupId>
+				<artifactId>postgresql</artifactId>
+				<version>42.7.7</version>
 			</dependency>
 			<dependency>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-testcontainers</artifactId>
-				<version>${spring-boot.version}</version>
+				<groupId>org.testcontainers</groupId>
+				<artifactId>postgresql</artifactId>
+				<version>1.21.3</version>
 				<scope>test</scope>
 			</dependency>
 			<!-- Test containers -->
@@ -177,7 +147,6 @@
 				<plugin>
 					<groupId>org.springframework.boot</groupId>
 					<artifactId>spring-boot-maven-plugin</artifactId>
-					<version>${spring-boot.version}</version>
 					<executions>
 						<execution>
 							<goals>
@@ -196,8 +165,7 @@
 					<artifactId>maven-compiler-plugin</artifactId>
 					<version>${maven.compiler.plugin.version}</version>
 					<configuration>
-						<source>${maven.compiler.source}</source>
-						<target>${maven.compiler.target}</target>
+						<parameters>true</parameters>
 						<annotationProcessorPaths>
 							<path>
 								<groupId>org.projectlombok</groupId>
@@ -243,6 +211,23 @@
 							<goals>
 								<goal>dockerBuild</goal>
 							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-enforcer-plugin</artifactId>
+					<version>3.4.1</version>
+					<executions>
+						<execution>
+							<id>enforce-dependency-convergence</id>
+							<goals><goal>enforce</goal></goals>
+							<configuration>
+								<rules>
+									<DependencyConvergence/>
+								</rules>
+								<fail>true</fail>
+							</configuration>
 						</execution>
 					</executions>
 				</plugin>

@@ -4,12 +4,14 @@ import com.example.telegram.api.clients.UsefulToolsClient;
 import com.example.telegram.bot.message.TelegramBotMessageSender;
 import com.example.telegram.bot.utils.update.UpdateService;
 import com.example.telegram.dto.responce.FileServiceResponse;
+import com.example.utils.file.FileService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import reactor.core.publisher.Mono;
 
 import java.io.File;
 
@@ -23,98 +25,56 @@ public class MultimediaHandler {
 
     private final UsefulToolsClient usefulToolsClient;
 
+    private final FileService fileService;
+
     //private final AudioTelegramFileLoader audioFileLoader;
 
     //private final VoiceTelegramFileLoader voiceFileLoader;
 
 
     public void handleMultimedia(Update update) {
-
         log.debug("handleMultimedia method");
-
-        File sourceFile = new File("");
 
         Message message = UpdateService.getMessage(update);
         long chatId = message.getChatId();
 
-        FileServiceResponse newFileName =
-                usefulToolsClient.changeFileExtensionBlocking(
-                        "test.txt",
-                        "exe"
-                );
+        File audioFile = new File("");
 
-        log.debug("newFileName = " + newFileName);
+        String sourceFile = "test.txt";
 
-        //Проверка формата сообщения
-        if (message.hasAudio()) {
+        String newFile = fileService.changeExtension(sourceFile, "exe");
 
-            log.debug("Юзер загрузил аудио - " + message.getAudio());
+        log.debug("source file {}", sourceFile);
+        sender.sendMessage(chatId, "source file " + sourceFile);
 
-            //sourceFile = audioFileLoader.load(message);
+        log.debug("new file {}", newFile);
+        sender.sendMessage(chatId, "new file " + newFile);
 
-        } else if (message.hasVoice()) {
-
-            log.debug("Юзер загрузил запись с диктофона - " + message.getVoice());
-
-            //sourceFile = voiceFileLoader.load(message);
-        }
-/*
-        sender.sendMessage(chatId, "Ожидайте декодирования аудио");
-
-        File convertedAudioFile = new File("");
-
-        //Конвертируем аудио в формат wav для дальнейшего декодирования
-        try {
-            convertedAudioFile = FfmpegService.convertAudio(sourceFile.getAbsolutePath());
-        } catch (Exception e) {
-            log.error("Error converting audio file " + sourceFile.getName() + e.getMessage());
-        }
-
-        File cleanedAudioFile = new File(
-                convertedAudioFile.getParent()+ "/" +
-                        FileNameChanger.addSuffix(convertedAudioFile.getName(), "_clean")
-        );
-
-        //Чистим аудио файл от шумов, декодируем, проверяем орфографию и форматируем текст для отправки
-        try {
-            FfmpegService.denoiseAudio(convertedAudioFile, cleanedAudioFile);
-
-            String decodingText = decodeMultimedia(cleanedAudioFile);
-*/
-            /*
-            SendAudio audioMessage = new SendAudio();
-            audioMessage.setChatId(String.valueOf(chatId));
-            audioMessage.setCaption("Обработанное аудио");
-            audioMessage.setAudio(new InputFile(cleanedAudioFile));
-
-            sender.sendAudio(audioMessage);
-*/
-/*
-            String checkedText = spellChecker.check(decodingText);
-
-            log.debug(
-                    "Проверенный текст: \n" +
-                    checkedText
-                    );
-
-            String formattedText = formatter.format(checkedText);
-
-            sender.sendMessage(chatId, "Декодированный текст:");
-
-            sender.sendMessage(chatId, formattedText);
-
-        } catch (Exception e) {
-            log.error("Ошибка обработки файла - " + e.getMessage(), e);
-        }
-        */
     }
 
     private String decodeMultimedia(File audioFile) {
-        String result = "";
+        //String result = "";
+
+        usefulToolsClient.decodeAudio()
+                .flatMap(response -> {
+
+                    log.debug("Получен FileServiceResponse: " + response);
+
+                    return Mono.empty();
+
+                })
+                .doOnSuccess(result -> {
+                    log.debug("Успешное выполнение запроса на Useful tools service");
+                })
+                .onErrorResume(e -> {
+                    log.error("Ошибка при обработке multimedia: " + e.getMessage(), e);
+                    return Mono.empty();
+                });
+
 /*
         if (audioFile.exists()) result = audioDecoder.decode(audioFile.getAbsolutePath());
 */
-        return result;
+        return null;
     }
 
 }

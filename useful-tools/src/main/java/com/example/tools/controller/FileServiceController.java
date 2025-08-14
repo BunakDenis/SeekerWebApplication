@@ -1,6 +1,7 @@
 package com.example.tools.controller;
 
 
+import com.example.tools.audio.decoder.VoskAudioDecoder;
 import com.example.tools.controller.dto.response.FileServiceResponse;
 import com.example.utils.file.FileService;
 import jakarta.annotation.PostConstruct;
@@ -24,17 +25,45 @@ public class FileServiceController {
 
     private final FileService fileService;
 
+    //private final VoskAudioDecoder decoder;
+
     @PostMapping("/changeFileExtension")
-    public ResponseEntity<FileServiceResponse> changeFileExtension(@RequestParam("fileName") String fileName,
-                                                                   @RequestParam("newExtension") String newExtension) {
+    public ResponseEntity<FileServiceResponse> changeFileExtension
+            (@RequestParam("fileName") String fileName,
+             @RequestParam("newExtension") String newExtension) {
 
         log.debug("Входящий запрос с параметрами - fileName=" + fileName + ", newExtension=" + newExtension);
 
         String result = fileService.changeExtension(fileName, newExtension);
 
+        log.debug("Новое расширение - " + result);
+
         FileServiceResponse response = new FileServiceResponse().success(result, FILE_NAME_CHANGE_MSG, HttpStatus.OK);
+
+        log.debug("Исходящий запрос - " + response);
 
         return ResponseEntity.status(response.getHttpStatus()).body(response);
 
     }
+/*
+    @PostMapping("/decode")
+    public ResponseEntity<FileServiceResponse> decodeMediaFile() {
+        String audioPath = "./app/resources/temp/AUD-20230511-WA0001.mp3";
+
+        String decodedText = decoder.decode(audioPath);
+
+        FileServiceResponse response = new FileServiceResponse();
+
+        if (!decodedText.isEmpty()) {
+            response = new FileServiceResponse().success(decodedText, MULTIMEDIA_FILE_DECODE_MSG, HttpStatus.OK);
+        } else {
+            response = new FileServiceResponse().failed("Decoding failed", HttpStatus.BAD_REQUEST);
+        }
+
+        return ResponseEntity.status(response.getHttpStatus()).body(response);
+
+    }
+
+ */
+
 }

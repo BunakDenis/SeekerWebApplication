@@ -6,6 +6,8 @@ target/
 logs
 .env
 structure.txt
+commands.txt
+
 
 ### STS ###
 .apt_generated

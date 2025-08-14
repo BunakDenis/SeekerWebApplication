@@ -1,4 +1,3 @@
-version: "3.9"
 
 networks:
   app-network:
@@ -6,34 +5,68 @@ networks:
 
 services:
 
+  #data-provider-service:
+    #image: postgres:latest
+    #container_name: postgres-db
+    #volumes:
+      #- db_data:/var/lib/postgresql/data  # Монтируем том для хранения данных
+    #env_file:
+      #- ./.env
+    #environment:
+      #SPRING_PROFILES_ACTIVE: dev
+      #DB_NAME: ${DB_NAME}
+      #DB_USER_NAME: ${DB_USER_NAME}
+      #DB_USER_PASSWORD: ${DB_USER_PASSWORD}
+      #DATA_SERVICE_PORT: ${DATA_SERVICE_PORT}
+    #networks:
+      #- app-network
+    #ports:
+      #- ${DATA_SERVICE_PORT}:5432  # Перенаправляем порт 5432 (внутри контейнера) на 8080 (хост)
+    #healthcheck:
+      #test: [ "CMD", "curl", "-f", "$${API_USEFUL_TOOLS_URL}:$${DATA_SERVICE_PORT}/actuator/health" ]
+      #interval: 30s
+      #timeout: 10s
+      #retries: 3
+
   telegram-bot-service:
     image: bunakdenis/telegram-bot-service:latest
+    #volumes:
+      #- ./telegram-bot-service/src:/app/src
+      #- ./utils-service/src:/app/utils-service
     env_file:
       - ./.env
     environment:
-      SPRING_PROFILES_ACTIVE: prod
-      USER_PASSWORD: ${PROD_USER_PASSWORD}
-      TELEGRAM_BOT_NAME: ${PROD_TELEGRAM_BOT_NAME}
-      TELEGRAM_BOT_TOKEN: ${PROD_TELEGRAM_BOT_TOKEN}
-      API_USEFUL_TOOLS_URL: ${PROD_API_USEFUL_TOOLS_URL}
-      API_USEFUL_TOOLS_FILE_SERVICE_ENDPOINT: ${PROD_API_USEFUL_TOOLS_FILE_SERVICE_ENDPOINT}
+      SPRING_PROFILES_ACTIVE: dev
+      USER_PASSWORD: ${USER_PASSWORD}
+      TELEGRAM_BOT_NAME: ${TELEGRAM_BOT_NAME}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      API_USEFUL_TOOLS_URL: ${API_USEFUL_TOOLS_URL}
+      API_USEFUL_TOOLS_FILE_SERVICE_ENDPOINT: ${API_USEFUL_TOOLS_FILE_SERVICE_ENDPOINT}
     networks:
       - app-network
     ports:
-      - ${TELEGRAM_BOT_PORT}:8081
+      - ${TELEGRAM_BOT_PORT}:8080
 
   useful-tools:
     image: bunakdenis/useful-tools:latest
-  #mem_limit: 12g
+    deploy:
+      resources:
+        limits:
+          cpus: "4.0"
+          memory: 12g
+    #volumes:
+      #- ./useful-tools/src:/app/src
+      #- ./utils-service/src:/app/utils-service
+      #- ./models:/app/models
     env_file:
       - ./.env
     environment:
-      SPRING_PROFILES_ACTIVE: prod
-      USER_PASSWORD: ${PROD_USER_PASSWORD}
+      SPRING_PROFILES_ACTIVE: dev
+      USER_PASSWORD: ${USER_PASSWORD}
     networks:
       - app-network
     healthcheck:
-      test: [ "CMD", "curl", "-f", "$${PROD_API_USEFUL_TOOLS_URL}:$${PORT}/actuator/health" ]
+      test: [ "CMD", "curl", "-f", "$${API_USEFUL_TOOLS_URL}:$${API_USEFUL_TOOLS_PORT}/actuator/health" ]
       interval: 30s
       timeout: 10s
       retries: 3

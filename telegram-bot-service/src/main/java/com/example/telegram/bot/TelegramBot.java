@@ -1,6 +1,9 @@
 package com.example.telegram.bot;
 
 
+import com.example.telegram.bot.chat.states.ChatDialogService;
+import com.example.telegram.bot.chat.states.UiElements;
+import com.example.telegram.bot.chat.states.impl.CommandChatDialogServiceImpl;
 import com.example.telegram.bot.commands.Commands;
 import com.example.telegram.bot.commands.CommandsHandler;
 import com.example.telegram.bot.message.TelegramBotMessageSender;
@@ -8,11 +11,14 @@ import com.example.telegram.bot.multimedia.MultimediaHandler;
 import com.example.telegram.bot.queries.QueriesHandler;
 import com.example.telegram.bot.utils.update.UpdateService;
 import jakarta.annotation.PostConstruct;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.bots.TelegramWebhookBot;
+import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -25,17 +31,20 @@ import static com.example.telegram.bot.message.MessageProvider.*;
 import java.util.List;
 import java.util.Optional;
 
-
-@RequiredArgsConstructor
-@Log4j2
 @Component
-public class TelegramBot extends TelegramLongPollingBot {
+@Log4j2
+@RequiredArgsConstructor
+@Data
+public class TelegramBot extends TelegramWebhookBot {
 
     @Value("${telegram.bot.name}")
     private String botName;
 
     @Value("${telegram.bot.token}")
     private String botToken;
+
+    @Value("${telegram.bot.webhook-path}")
+    private String webhookPath;
 
     private final TelegramBotMessageSender sender;
 
@@ -45,6 +54,8 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     private final MultimediaHandler multimediaHandler;
 
+    private final CommandChatDialogServiceImpl dialogService;
+
     @Override
     public String getBotUsername() {
         return botName;
@@ -53,6 +64,11 @@ public class TelegramBot extends TelegramLongPollingBot {
     @Override
     public String getBotToken() {
         return botToken;
+    }
+
+    @Override
+    public String getBotPath() { // Для webhook
+        return webhookPath;
     }
 
     @PostConstruct
@@ -69,26 +85,12 @@ public class TelegramBot extends TelegramLongPollingBot {
     }
 
     @Override
-    public void onUpdateReceived(Update update) {
+    public BotApiMethod<?> onWebhookUpdateReceived(Update update) {
 
         User user = update.getMessage().getFrom();
 
         log.debug("Входящее сообщение от Юзера - " + user.getFirstName() + " " + user.getLastName());
-
-        if (update.hasMessage() && update.getMessage().hasText()) {
-
-            try {
-
-                Message replyToMessage = update.getMessage().getReplyToMessage();
-
-                if (replyToMessage.hasText()) log.debug("Ответ на сообщение - " + replyToMessage);
-
-            } catch (Exception e) {
-                log.debug("Текущее сообщение это не ответ на предыдущее! {}", e.getMessage());
-            }
-
-
-        }
+        log.debug("Id юзера - {}", user.getId());
 
         if (update.hasMessage()) {
 
@@ -99,8 +101,13 @@ public class TelegramBot extends TelegramLongPollingBot {
             if (message.hasText()) {
                 String msgText = message.getText();
 
-                if (msgText.startsWith("/")) {
-                    commandsHandler.handleCommands(update);
+                if (
+                        msgText.startsWith("/") || (dialogService.getCommand() != null)
+                ) {
+
+                    CommandChatDialogServiceImpl updatedDialogService = commandsHandler.handleCommands(update);
+
+
                 } else {
                     queriesHandler.handleQueries(update);
                 }
@@ -115,5 +122,8 @@ public class TelegramBot extends TelegramLongPollingBot {
         } else if (update.hasCallbackQuery()) {
             log.debug(update.getCallbackQuery().getData());
         }
+
+        return null;
     }
+
 }

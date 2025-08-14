@@ -9,6 +9,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import reactor.core.publisher.Mono;
 
 @Component
 @Data
@@ -21,9 +22,19 @@ public class UsefulToolsHealsQuery implements Query {
     public SendMessage apply(Update update) {
         long chatId = UpdateService.getChatId(update);
 
-        ActuatorHealthResponse response = client.getUsefulToolsHeals();
+        ActuatorHealthResponse response = new ActuatorHealthResponse();
 
-        log.debug(response);
+        client.getUsefulToolsHeals()
+                .flatMap(resp -> {
+                    // Асинхронная обработка response
+                    log.debug("Результат изменения расширения: " + resp.getStatus());
+                    return Mono.empty();
+                })
+                .onErrorResume(e -> {
+                    // Обработка ошибок
+                    log.error("Ошибка при изменении расширения файла: " + e.getMessage());
+                    return Mono.empty(); // Или вернуть другой Mono, чтобы продолжить выполнение
+                });
 
         SendMessage result = new SendMessage();
 

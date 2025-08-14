@@ -1,0 +1,6 @@
+Команда для запуска докер образа БД POSTGRES
+
+docker run --name my-postgres -p 8083:5432 -e POSTGRES_USER=Dbmystic -e POSTGRES_PASSWORD=Seeker2025 -e POSTGRES_DB=TruthSeekerOffice -d postgres:latest
+
+Команда для запуска докер образа браузера Tor
+docker run -d --name tor-proxy -p 9050:9050 -e LOCATION=DE dperson/torproxy
