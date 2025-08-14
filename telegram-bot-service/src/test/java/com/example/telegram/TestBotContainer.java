@@ -43,15 +43,16 @@ class TestBotContainer {
             throw new IllegalStateException("TELEGRAM_BOT_SERVICE_IMAGE не определена");
         }
 
+        logger.info("Загрузка образа {}", TELEGRAM_BOT_SERVICE_IMAGE);
+
         if (System.getenv("GITHUB_ACTIONS") != null) {
             DockerImageName ghcrImage = DockerImageName.parse(TELEGRAM_BOT_SERVICE_IMAGE);
 
+            logger.info(ghcrImage.toString());
+
             botContainer = new GenericContainer<>(ghcrImage);
-
         } else {
-
             botContainer = new GenericContainer<>(TELEGRAM_BOT_SERVICE_IMAGE);
-
         }
 
         botContainer
