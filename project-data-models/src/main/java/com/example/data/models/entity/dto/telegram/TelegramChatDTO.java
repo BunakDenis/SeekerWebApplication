@@ -13,9 +13,13 @@ import lombok.NoArgsConstructor;
 public class TelegramChatDTO {
 
     private Long id;
+
     private String uiElement;
+
     private String uiElementValue;
+
     private String chatState;
+
     private Long telegramUserId;
 
 }

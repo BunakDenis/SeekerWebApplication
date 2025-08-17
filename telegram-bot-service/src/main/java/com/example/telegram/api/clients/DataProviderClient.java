@@ -4,7 +4,6 @@ package com.example.telegram.api.clients;
 import com.example.data.models.entity.dto.telegram.TelegramChatDTO;
 import com.example.data.models.entity.dto.request.ApiRequest;
 import com.example.data.models.entity.dto.response.ApiResponse;
-import com.example.data.models.entity.dto.response.CheckUserResponse;
 import com.example.data.models.entity.dto.telegram.TelegramSessionDTO;
 import com.example.data.models.exception.ApiException;
 import com.example.telegram.bot.entity.TelegramChat;
