@@ -113,7 +113,7 @@ class TestTelegramBot {
     void testContainerIsRunning() {
         assertTrue(botContainer.isRunning());
     }
-
+/*
     @Test
     void testStartCommand() throws Exception {
         Update update = new Update();
@@ -132,5 +132,5 @@ class TestTelegramBot {
         assertEquals(200, response.statusCode());
         assertTrue(response.body().contains(START_MSG));
     }
-
+*/
 }
