@@ -17,12 +17,6 @@ public class EnvLoader {
             log.info("GITHUB_ACTIONS = " + System.getenv("GITHUB_ACTIONS"));
             log.info("Запущено в GitHub Actions, загрузка .env пропущена");
 
-            Map<String, String> env = System.getenv();
-
-            for (String envName : env.keySet()) {
-                log.info("Имя переменной среды: " + envName + ", Значение: " + env.get(envName));
-            }
-
             return null; // Не загружаем .env в GitHub Actions
         }
 

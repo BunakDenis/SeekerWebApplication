@@ -6,10 +6,17 @@ import com.example.data.models.entity.dto.telegram.TelegramChatDTO;
 import com.example.data.models.entity.dto.request.ApiRequest;
 import com.example.data.models.entity.dto.response.ApiResponse;
 import com.example.data.models.entity.dto.response.CheckUserResponse;
+import com.example.data.models.entity.dto.telegram.TelegramSessionDTO;
+import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
+import com.example.data.models.exception.ApiException;
 import com.example.database.api.client.MysticSchoolClient;
 import com.example.database.entity.TelegramChat;
+import com.example.database.entity.TelegramSession;
 import com.example.database.entity.TelegramUser;
+import com.example.database.entity.User;
+import com.example.database.exception.UserNotFoundException;
 import com.example.database.service.telegram.TelegramChatsService;
+import com.example.database.service.telegram.TelegramSessionService;
 import com.example.database.service.telegram.TelegramUserService;
 import com.example.database.service.telegram.UserService;
 import lombok.RequiredArgsConstructor;
@@ -32,8 +39,51 @@ public class TelegramDataController {
 
     private final TelegramUserService telegramUserService;
 
+    private final TelegramSessionService sessionService;
+
     private final MysticSchoolClient mysticSchoolClient;
 
+
+    @GetMapping("/user/check/auth/{id}")
+    public Mono<ResponseEntity<ApiResponse<CheckUserResponse>>> checkUserAuthentication(
+            @PathVariable("id") Long id
+    ) {
+
+        log.debug("Входящий запрос на проверку авторизации юзера с id {}", id);
+
+        return Mono.just(userService.getUserByTelegramUserId(id))
+                .flatMap(user -> mysticSchoolClient.checkUserAuthentication(user.getEmail()))
+                .map(mysticSchoolResponse -> {
+
+                    log.debug(mysticSchoolResponse);
+
+                    return ResponseEntity.status(HttpStatus.OK).body(
+                            new ApiResponse<>(HttpStatus.OK, HttpStatus.OK.toString(), mysticSchoolResponse)
+                    );
+                })
+                .defaultIfEmpty(
+                        ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                .body(new ApiResponse<>(HttpStatus.INTERNAL_SERVER_ERROR, "User not found"))
+                )  // Handle empty user
+                .onErrorResume(e -> { // Handle errors
+                    log.error("Error during user check", e);
+                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                            new ApiResponse<>(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage())
+                    ));
+                });
+    }
+
+    @GetMapping("/telegram/user/get/{id}")
+    public ResponseEntity<ApiResponse<TelegramUserDTO>> getTelegramUserById(
+            @PathVariable("id") Long id
+    ) {
+        log.debug("Запрос на получение TelegramUser по id {}", id);
+
+        ApiResponse<TelegramUserDTO> response = telegramUserService.getUserById(id);
+
+        return ResponseEntity.status(response.getStatus()).body(response);
+
+    }
 
     @GetMapping("/chat/get/{id}")
     public ResponseEntity<ApiResponse<TelegramChatDTO>> getChats(
@@ -58,11 +108,11 @@ public class TelegramDataController {
 
         TelegramChatDTO data = request.getData();
 
-        TelegramUser telegramUser = telegramUserService.getUserById(data.getTelegramUserId());
+        ApiResponse<TelegramUserDTO> telegramUserDTO = telegramUserService.getUserById(data.getTelegramUserId());
 
         TelegramChat chat = chatsService.toEntity(data);
 
-        chat.setTelegramUser(telegramUser);
+        chat.setTelegramUser(telegramUserService.toEntity(telegramUserDTO.getData()));
 
         ApiResponse<TelegramChatDTO> response = chatsService.create(chat);
 
@@ -71,33 +121,44 @@ public class TelegramDataController {
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 
-    @GetMapping("/user/check/auth/{id}")
-    public Mono<ResponseEntity<ApiResponse<CheckUserResponse>>> checkUserAuthentication(
+    @GetMapping(path = {"/session/get/{id}"})
+    public ResponseEntity<ApiResponse<TelegramSessionDTO>> getSessionById(
             @PathVariable("id") Long id
     ) {
+        log.debug("Запрос на получение TelegramSession по ID {}", id);
 
-        log.debug("Входящий запрос на проверку авторизации юзера с id {}", id);
+        ApiResponse<TelegramSessionDTO> response = sessionService.getSessionById(id);
 
-        return Mono.just(userService.getUserByTelegramUserId(id))
-                .flatMap(user -> mysticSchoolClient.checkUserAuthentication(user.getEmail()))
-                .map(mysticSchoolResponse -> { // Map the mysticSchoolResponse to CheckUserResponse
-                    CheckUserResponse checkUserResponse = CheckUserResponse.builder()
-                            .active(mysticSchoolResponse.isActive())
-                            .found(mysticSchoolResponse.isFound())
-                            .access_level(mysticSchoolResponse.getAccess_level())
-                            .build();
-
-                    return ResponseEntity.status(HttpStatus.OK).body(
-                            new ApiResponse<>(HttpStatus.OK, HttpStatus.OK.toString(), checkUserResponse)
-                    );
-                })
-                .defaultIfEmpty(ResponseEntity.status(HttpStatus.NOT_FOUND).build())  // Handle empty user
-                .onErrorResume(e -> { // Handle errors
-                    log.error("Error during user check", e);
-                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
-                });
+        return ResponseEntity.status(response.getStatus()).body(response);
     }
 
+    @PostMapping(path = {"/session/add", "/session/add"})
+    public ResponseEntity<ApiResponse<TelegramSessionDTO>> addSession(
+            @RequestBody ApiRequest<TelegramSessionDTO> request
+    ) {
+        log.debug("Запрос на сохранение TelegramSession {}", request);
+
+        ApiResponse<TelegramSessionDTO> response = sessionService.create(
+                sessionService.toEntity(request.getData())
+        );
+
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    @GetMapping(path = {"/session/get/telegramUserId/{telegramUserId}"})
+    public ResponseEntity<ApiResponse<TelegramSessionDTO>> getSessionByTelegramUserId(
+            @PathVariable(name = "telegramUserId") Long telegramUserId
+    ) {
+
+        log.debug("Запрос на получение TelegramSession по telegramUserId {}", telegramUserId);
+
+        ApiResponse<TelegramSessionDTO> response = sessionService.findByTelegramUserId(telegramUserId);
+
+        return ResponseEntity.status(response.getStatus()).body(response);
+
+    }
+
+    //Секция обработки запросов получения материалов с сайта Школы
     @GetMapping("/articles/category/")
     public Mono<ResponseEntity<ApiResponseWithDataList>> getArticleCategories(
             @RequestParam("id") int id
@@ -123,4 +184,5 @@ public class TelegramDataController {
                     return ResponseEntity.status(HttpStatus.OK).body(articleCategoryApiResponseWithDataList);
                 });
     }
+
 }

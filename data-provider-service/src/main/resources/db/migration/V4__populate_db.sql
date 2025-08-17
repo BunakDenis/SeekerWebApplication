@@ -1,5 +1,8 @@
--- Вставляем пользователей
-INSERT INTO users (email, is_active) VALUES ('xisi926@ukr.net', TRUE);
+-- Вставляем пользователя
+INSERT INTO users (email, role, is_active) VALUES ('xisi926@ukr.net', 'ADMIN', TRUE);
+
+-- Вставляем общего пользователя для туристов
+INSERT INTO users (email, role, is_active) VALUES ('tourist@gmail.com', 'GUEST', TRUE);
 
 -- Получаем ID пользователя, чтобы использовать его в других таблицах
 -- (Предполагается, что email уникален и используется для поиска)
@@ -11,7 +14,7 @@ BEGIN
     SELECT id INTO user_id FROM users WHERE email = 'xisi926@ukr.net';
 
     -- Вставляем данные о пользователе Telegram
-    INSERT INTO telegram_users (id, user_id, first_name, last_name, username) VALUES (465963651, user_id, 'Denis', 'Kachur', 'Freeman');
+    INSERT INTO telegram_users (id, user_id, first_name, last_name, username) VALUES (465963651, user_id, 'Денис', 'Бунак', 'dbunakns');
 
     -- Вставляем данные о чате Telegram
     INSERT INTO telegram_chats (id, telegram_user_id, ui_element, ui_element_value, chat_state)

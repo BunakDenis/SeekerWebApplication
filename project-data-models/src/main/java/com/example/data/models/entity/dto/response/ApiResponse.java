@@ -17,6 +17,8 @@ public class ApiResponse<T> {
 
     private T data;
 
+    private String debugMsg;
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDateTime timestamp;
 
@@ -24,7 +26,7 @@ public class ApiResponse<T> {
     @ToString.Exclude
     private HttpStatus status;
 
-    private ApiResponse() {
+    public ApiResponse() {
         this.timestamp = LocalDateTime.now();
     }
 
@@ -44,6 +46,14 @@ public class ApiResponse<T> {
         this.status = status;
         this.message = message;
         this.data = data;
+    }
+
+    public ApiResponse(HttpStatus status, String message, T data, String debugMsg) {
+        this();
+        this.status = status;
+        this.message = message;
+        this.data = data;
+        this.debugMsg = debugMsg;
     }
 
 }

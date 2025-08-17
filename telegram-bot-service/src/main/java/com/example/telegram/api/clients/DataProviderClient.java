@@ -5,6 +5,7 @@ import com.example.data.models.entity.dto.telegram.TelegramChatDTO;
 import com.example.data.models.entity.dto.request.ApiRequest;
 import com.example.data.models.entity.dto.response.ApiResponse;
 import com.example.data.models.entity.dto.response.CheckUserResponse;
+import com.example.data.models.entity.dto.telegram.TelegramSessionDTO;
 import com.example.data.models.exception.ApiException;
 import com.example.telegram.bot.entity.TelegramChat;
 import jakarta.annotation.PostConstruct;
@@ -30,11 +31,15 @@ public class DataProviderClient {
 
     private String apiChatEndpoint;
 
+    private String apiSessionEndPoint;
+
     private WebClient webClient;
 
     @PostConstruct
     public void init() {
         apiChatEndpoint = "/chat";
+
+        apiSessionEndPoint = "/session";
 
         String baseURL = dataProviderURL + apiVersion;
 
@@ -51,6 +56,28 @@ public class DataProviderClient {
                     return Mono.just(clientResponse);
                 }))
                 .build();
+    }
+
+    public Mono<ApiResponse> checkTelegramUserAuthentication(Long telegramUserId) {
+
+        String endpoint = "/user/check/auth/" + telegramUserId;
+
+        try {
+            return webClient.get()
+                    .uri(builder -> builder.path(endpoint).build())
+                    .accept(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+                            response -> response.bodyToMono(String.class) // Можно прочитать тело ошибки
+                                    .flatMap(errorBody -> {
+                                        log.debug("Получен ответ от Data provider service {}", errorBody);
+                                        return Mono.empty();
+                                    }))
+                    .bodyToMono(ApiResponse.class);
+        } catch (Exception e) {
+            log.debug("Ошибка отправки сообщения проверки аутентификации юзера" + e.getMessage());
+        }
+        return null;
     }
 
     public Mono<ApiResponse<TelegramChatDTO>> saveTelegramChat(TelegramChat chat) {
@@ -127,24 +154,22 @@ public class DataProviderClient {
         }
     }
 
-    public Mono<CheckUserResponse> checkTelegramUserAuthentication(Long telegramUserId) {
-
-        String endpoint = "/user/check/auth/" + telegramUserId;
+    public Mono<ApiResponse<TelegramSessionDTO>> getTelegramSessionByTelegramUserId(Long id) {
 
         try {
             return webClient.get()
-                    .uri(builder -> builder.path(endpoint).build())
+                    .uri(apiSessionEndPoint + "/get/telegramUserId/" + id)
                     .accept(MediaType.APPLICATION_JSON)
                     .retrieve()
                     .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
                             response -> response.bodyToMono(String.class) // Можно прочитать тело ошибки
                                     .flatMap(errorBody -> {
                                         log.debug("Получен ответ от Data provider service {}", errorBody);
-                                        return Mono.error(new ApiException(
-                                                String.format("Error from MainUtilsService: Status %d, Body: %s",
-                                                        response.statusCode().value(), errorBody)));
+                                        return Mono.empty();
                                     }))
-                    .bodyToMono(CheckUserResponse.class);
+                    .bodyToMono(new ParameterizedTypeReference<>() {
+                    });
+
         } catch (Exception e) {
             log.debug("Ошибка отправки сообщения проверки аутентификации юзера" + e.getMessage());
         }

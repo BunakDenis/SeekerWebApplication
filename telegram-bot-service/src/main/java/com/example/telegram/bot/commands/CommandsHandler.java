@@ -62,11 +62,11 @@ public class CommandsHandler {
 
         User telegramUser = UpdateService.getTelegramUser(update);
 
-        TelegramUser telegramUserForSave = telegramUserService.apiTelegramUserToEntity(telegramUser);
+        TelegramUser telegramUserForCheck = telegramUserService.apiTelegramUserToEntity(telegramUser);
 
         String email = "xisi926@ukr.net";
 
-        dataProviderClient.checkTelegramUserAuthentication(telegramUserForSave.getId())
+        dataProviderClient.checkTelegramUserAuthentication(telegramUserForCheck.getId())
                 .subscribe(resp -> {
                     log.debug(resp);
                 });
@@ -87,7 +87,7 @@ public class CommandsHandler {
                     .id(chatId)
                     .uiElement(UiElements.COMMAND.getUiElement())
                     .uiElementValue(command)
-                    .telegramUser(telegramUserForSave)
+                    .telegramUser(telegramUserForCheck)
                     .build();
 
             /*
@@ -104,25 +104,7 @@ public class CommandsHandler {
                 log.debug("All user " + telegramUser + " chats " + resp.getData());
             });
 */
-        } else if (dialogService != null && !dialogService.getDialogState().isEmpty()) {
-
-            log.debug("In dialog service statement");
-
-            String dialogCommand = dialogService.getUiElementValue();
-
-            log.debug("Dialog command - " + dialogCommand);
-
-            Command dialogCommandHandler = getCommandHandler(dialogCommand);
-
-            log.debug(dialogCommandHandler);
-
-            sender.sendMessage(dialogCommandHandler.apply(update));
-
-            updateDialogService(dialogCommandHandler);
-
-            log.debug("dialogCommandHandler after updating {}", dialogCommandHandler);
-
-        } else {
+        } else  {
             sender.sendMessage(new SendMessage(String.valueOf(chatId), UNKNOWN_COMMAND_OR_QUERY));
         }
 
@@ -131,30 +113,6 @@ public class CommandsHandler {
 
     private Command getCommandHandler(String command) {
         return commands.get(command);
-    }
-
-    private void setDialogCommandAndState(String command) {
-
-        if (command.equals(Commands.AUTHORIZE.getCommand())) {
-
-            dialogService.setCommand(command);
-            dialogService.setDialogState(DialogStates.ENTER_EMAIL.getDialogState());
-
-        } else if (command.equals(Commands.REGISTER.getCommand())) {
-
-            dialogService.setCommand(command);
-            dialogService.setDialogState(DialogStates.ENTER_EMAIL.getDialogState());
-
-        }
-    }
-
-    private void updateDialogService(Command dialogCommandHandler) {
-
-        ChatDialogService chatDialogService = dialogCommandHandler.getChatDialogService();
-
-        dialogService.setCommand(chatDialogService.getUiElementValue());
-
-        dialogService.setDialogState(chatDialogService.getState());
     }
 
 }

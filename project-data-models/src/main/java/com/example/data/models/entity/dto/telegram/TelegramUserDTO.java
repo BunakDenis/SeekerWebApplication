@@ -18,6 +18,6 @@ public class TelegramUserDTO {
 
     private String username;
 
-    //private List<TelegramSession> telegramSessions;
+    private TelegramSessionDTO telegramSession;
 
 }

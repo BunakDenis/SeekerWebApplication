@@ -13,6 +13,7 @@ import java.util.List;
 @Builder
 @Entity
 @Table(name = "sub_level_menus")
+@Cacheable
 public class SubLevelMenu {
 
     @Id

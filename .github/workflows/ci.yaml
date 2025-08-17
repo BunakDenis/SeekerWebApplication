@@ -63,10 +63,10 @@ jobs:
           echo "USEFUL_TOOLS_API_URL=${{ secrets.USEFUL_TOOLS_API_URL }}" >> $GITHUB_ENV
           echo "USER_PASSWORD=${{ secrets.USER_PASSWORD }}" >> $GITHUB_ENV
 
-      - name: Debug - List environment variables
-        run: |
-               echo "Список переменных окружения:"
-               env
+      #- name: Debug - List environment variables
+        #run: |
+               #echo "Список переменных окружения:"
+               #env
 
       - name: Run tests
         run: mvn -B test

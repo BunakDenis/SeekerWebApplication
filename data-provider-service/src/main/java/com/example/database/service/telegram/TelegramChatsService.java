@@ -4,6 +4,7 @@ import com.example.data.models.entity.dto.telegram.TelegramChatDTO;
 import com.example.data.models.entity.dto.response.ApiResponse;
 import com.example.data.models.entity.dto.response.ApiResponseWithDataList;
 import com.example.database.entity.TelegramChat;
+import com.example.database.entity.TelegramSession;
 import com.example.database.repo.telegram.TelegramChatRepo;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -12,6 +13,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.example.database.consts.RequestMessageProvider.SUCCESSES_MSG;
 
 @Service
 @RequiredArgsConstructor

@@ -20,18 +20,18 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(UserNotFoundException.class)
     protected ResponseEntity<ApiResponse> userNotFoundExceptionHandle(UserNotFoundException e) {
-        ApiResponse resp = new ApiResponse(HttpStatus.BAD_REQUEST, e.getMessage());
+        ApiResponse resp = new ApiResponse(HttpStatus.BAD_REQUEST, e.getMessage(), null);
 
-        log.debug("UserNotFoundException {}", resp, e);
+        log.debug("UserNotFoundException {}", resp);
 
         return ResponseEntity.status(resp.getStatus()).body(resp);
     }
 
     @ExceptionHandler(ApiException.class)
     protected ResponseEntity<ApiResponse> apiExceptionHandle(ApiException e) {
-        ApiResponse resp = new ApiResponse<>(HttpStatus.BAD_REQUEST, e.getMessage());
+        ApiResponse resp = new ApiResponse<>(HttpStatus.BAD_REQUEST, e.getMessage(), null);
 
-        log.debug("ApiException {}" + resp, e);
+        log.debug("ApiException {}" + resp);
 
         return ResponseEntity.status(resp.getStatus()).body(resp);
 

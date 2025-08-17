@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 @Builder
 @Entity
 @Table(name = "telegram_sessions")
+@Cacheable
 public class TelegramSession {
 
     @Id
@@ -25,7 +26,8 @@ public class TelegramSession {
     @Column(name = "expiration_time")
     private LocalDateTime expirationTime;
 
-    @ManyToOne(targetEntity = TelegramUser.class)
+    @OneToOne
+    @JoinColumn(name = "telegram_user_id", referencedColumnName = "id", nullable = false)
     @ToString.Exclude
     private TelegramUser telegramUser;
 

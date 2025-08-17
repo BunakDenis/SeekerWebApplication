@@ -38,7 +38,8 @@ public class TelegramUser {
     @OneToMany(mappedBy = "telegramUser", fetch = FetchType.EAGER)
     private List<TelegramChat> telegramChats;
 
-    @OneToMany(mappedBy = "telegramUser", fetch = FetchType.EAGER)
-    private List<TelegramSession> telegramSessions;
+    @OneToOne(mappedBy = "telegramUser", cascade = CascadeType.REFRESH, fetch = FetchType.EAGER, optional = false)
+    @ToString.Exclude
+    private TelegramSession telegramSession;
 
 }

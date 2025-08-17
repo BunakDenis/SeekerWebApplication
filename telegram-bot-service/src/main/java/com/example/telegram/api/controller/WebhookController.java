@@ -30,7 +30,7 @@ public class WebhookController {
     public BotApiMethod<?> onUpdateReceived(@RequestBody Update update) {
 
         log.debug("Входящий update с телеграм бота через webHook");
-        log.debug(update.getUpdateId());
+        log.debug("update id = {}", update.getUpdateId());
 
         return telegramBot.onWebhookUpdateReceived(update);
     }

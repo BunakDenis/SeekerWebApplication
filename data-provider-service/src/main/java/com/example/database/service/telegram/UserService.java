@@ -25,14 +25,14 @@ public class UserService {
         throw new UserNotFoundException("User with id " + id + " is not found");
     }
 
-    public User getUserByTelegramUserId(Long id) {
+    public User getUserByTelegramUserId(Long id) throws UserNotFoundException {
         User user = repo.getUserByTelegramUserId(id);
 
         if (!Objects.isNull(user)) {
             return user;
         }
 
-        throw new  UserNotFoundException("User with telegram user id " + id + "is not found");
+        throw new  UserNotFoundException("User with telegram user id " + id + " is not found");
 
     }
 

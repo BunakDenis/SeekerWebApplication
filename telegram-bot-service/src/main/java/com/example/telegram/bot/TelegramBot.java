@@ -1,6 +1,9 @@
 package com.example.telegram.bot;
 
 
+import com.example.data.models.entity.dto.response.CheckUserResponse;
+import com.example.data.models.exception.ApiException;
+import com.example.telegram.api.clients.DataProviderClient;
 import com.example.telegram.bot.chat.states.ChatDialogService;
 import com.example.telegram.bot.chat.states.UiElements;
 import com.example.telegram.bot.chat.states.impl.CommandChatDialogServiceImpl;
@@ -14,6 +17,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -25,14 +29,16 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import reactor.core.publisher.Mono;
 
 import static com.example.telegram.bot.message.MessageProvider.*;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Component
-@Log4j2
+@Slf4j
 @RequiredArgsConstructor
 @Data
 public class TelegramBot extends TelegramWebhookBot {
@@ -45,6 +51,8 @@ public class TelegramBot extends TelegramWebhookBot {
 
     @Value("${telegram.bot.webhook-path}")
     private String webhookPath;
+
+    private final DataProviderClient dataProviderClient;
 
     private final TelegramBotMessageSender sender;
 
@@ -87,40 +95,52 @@ public class TelegramBot extends TelegramWebhookBot {
     @Override
     public BotApiMethod<?> onWebhookUpdateReceived(Update update) {
 
-        User user = update.getMessage().getFrom();
+        if (Objects.nonNull(update)) {
 
-        log.debug("Входящее сообщение от Юзера - " + user.getFirstName() + " " + user.getLastName());
-        log.debug("Id юзера - {}", user.getId());
+            //Проверка авторизации юзера
+            User user = update.getMessage().getFrom();
 
-        if (update.hasMessage()) {
+            log.debug("Входящее сообщение от Юзера - " + user.getFirstName() + " " + user.getLastName());
+            log.debug("Id юзера - {}", user.getId());
 
-            Message message = update.getMessage();
+            dataProviderClient.checkTelegramUserAuthentication(user.getId())
+                    .flatMap(resp -> {
 
-            log.debug("Входящее сообщение - " + message.getText());
+                        log.debug("Положительный ответ от dataProviderClient {}", resp);
 
-            if (message.hasText()) {
-                String msgText = message.getText();
+                        if (update.hasMessage()) {
 
-                if (
-                        msgText.startsWith("/") || (dialogService.getCommand() != null)
-                ) {
+                            Message message = update.getMessage();
 
-                    CommandChatDialogServiceImpl updatedDialogService = commandsHandler.handleCommands(update);
+                            log.debug("Входящее сообщение - " + message.getText());
 
+                            if (message.hasText()) {
+                                String msgText = message.getText();
 
-                } else {
-                    queriesHandler.handleQueries(update);
-                }
+                                if (
+                                        msgText.equals("/start") || (dialogService.getCommand() != null)
+                                ) {
+                                    commandsHandler.handleCommands(update);
+                                } else if (msgText.startsWith("/")){
+                                    CommandChatDialogServiceImpl updatedDialogService = commandsHandler.handleCommands(update);
+                                } else {
+                                    queriesHandler.handleQueries(update);
+                                }
 
-            } else if (message.hasAudio() || message.hasVoice()) {
-                log.debug("Юзер прислал медиа файл");
-                multimediaHandler.handleMultimedia(update);
-            } else {
-                sender.sendMessage(update.getMessage().getChatId(), UNKNOWN_COMMAND_OR_QUERY);
-            }
+                            } else if (message.hasAudio() || message.hasVoice()) {
+                                log.debug("Юзер прислал медиа файл");
+                                multimediaHandler.handleMultimedia(update);
+                            } else {
+                                sender.sendMessage(update.getMessage().getChatId(), UNKNOWN_COMMAND_OR_QUERY);
+                            }
 
-        } else if (update.hasCallbackQuery()) {
-            log.debug(update.getCallbackQuery().getData());
+                        } else if (update.hasCallbackQuery()) {
+                            log.debug(update.getCallbackQuery().getData());
+                        }
+
+                        return Mono.empty();
+                    })
+                    .subscribe();
         }
 
         return null;

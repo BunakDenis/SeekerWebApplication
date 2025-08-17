@@ -14,6 +14,7 @@ import java.util.List;
 @Builder
 @Entity
 @Table(name = "top_level_menus")
+@Cacheable
 public class TopLevelMenu {
 
     @Id

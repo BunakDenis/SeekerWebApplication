@@ -10,6 +10,7 @@ import lombok.*;
 @Builder
 @Entity
 @Table(name = "leaf_level_menus")
+@Cacheable
 public class LeafLevelMenu {
 
     @Id

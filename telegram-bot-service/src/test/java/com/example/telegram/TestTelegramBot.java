@@ -2,10 +2,14 @@ package com.example.telegram;
 
 
 import com.example.utils.file.loader.EnvLoader;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.telegram.telegrambots.meta.api.objects.Chat;
+import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.Update;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.junit.jupiter.Container;
@@ -13,13 +17,22 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+
+import static com.example.telegram.constanst.TelegramBotConstants.*;
+import static com.example.telegram.bot.message.MessageProvider.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Testcontainers
-class TestBotContainer {
+class TestTelegramBot {
 
     private static Dotenv dotenv = EnvLoader.DOTENV;
-    private static final Logger logger = LoggerFactory.getLogger(TestBotContainer.class);
+    private static final Logger logger = LoggerFactory.getLogger(TestTelegramBot.class);
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     private static final String TELEGRAM_BOT_SERVICE_IMAGE = EnvLoader.get("TELEGRAM_BOT_SERVICE_IMAGE");
     private static final String TELEGRAM_BOT_PORT = EnvLoader.get("TELEGRAM_BOT_PORT");
@@ -72,8 +85,52 @@ class TestBotContainer {
                 .withLogConsumer(new Slf4jLogConsumer(logger));
     }
 
+    private String getWebhookUrl() {
+        return "http://" + botContainer.getHost() + ":" +
+                botContainer.getMappedPort(Integer.parseInt(TELEGRAM_BOT_PORT)) +
+                TELEGRAM_BOT_WEB_HOOK_PATH;
+    }
+
+    private HttpResponse<String> sendUpdate(Update update) throws Exception {
+
+        logger.info("Web hook URL {}", getWebhookUrl());
+
+        String jsonUpdate = objectMapper.writeValueAsString(update);
+
+        logger.info("Отправка update телеграм боту {}", jsonUpdate);
+
+        HttpClient client = HttpClient.newHttpClient();
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(getWebhookUrl()))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(jsonUpdate))
+                .build();
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
     @Test
     void testContainerIsRunning() {
         assertTrue(botContainer.isRunning());
     }
+
+    @Test
+    void testStartCommand() throws Exception {
+        Update update = new Update();
+        Message message = new Message();
+        message.setText("/start");
+        message.setChat(new Chat(123456789L, "private"));
+        message.setFrom(USER_FOR_TESTS);
+        update.setMessage(message);
+
+        HttpResponse<String> response = sendUpdate(update);
+
+        logger.info("Код ответа от сервера телеграм бота {}", response.statusCode());
+
+        logger.info(response.body());
+
+        assertEquals(200, response.statusCode());
+        assertTrue(response.body().contains(START_MSG));
+    }
+
 }
