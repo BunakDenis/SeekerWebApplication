@@ -17,7 +17,7 @@ public class ApiResponseWithDataList<T> {
 
     private List<T> data;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss", timezone = "${default.time.zone.utc}")
     private LocalDateTime timestamp;
 
     @JsonIgnore

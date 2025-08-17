@@ -19,4 +19,6 @@ public class TelegramSessionDTO {
 
     private LocalDateTime expirationTime;
 
+    private TelegramUserDTO telegramUserDTO;
+
 }

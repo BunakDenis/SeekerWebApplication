@@ -2,6 +2,8 @@ package com.example.data.models.entity.dto.telegram;
 
 import lombok.*;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,6 +19,8 @@ public class TelegramUserDTO {
     private String lastName;
 
     private String username;
+
+    private List<TelegramChatDTO> telegramChats;
 
     private TelegramSessionDTO telegramSession;
 

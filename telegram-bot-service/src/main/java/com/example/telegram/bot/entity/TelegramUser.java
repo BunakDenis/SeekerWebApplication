@@ -16,7 +16,6 @@ public class TelegramUser {
     private Long id;
 
     @ToString.Exclude
-    @JsonIgnore
     private User user;
 
     private boolean isActive;
@@ -28,11 +27,9 @@ public class TelegramUser {
     private String username;
 
     @ToString.Exclude
-    @JsonIgnore
     private List<TelegramChat> telegramChats;
 
     @ToString.Exclude
-    @JsonIgnore
-    private List<TelegramSession> telegramSessions;
+    private TelegramSession telegramSession;
 
 }

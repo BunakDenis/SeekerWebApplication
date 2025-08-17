@@ -17,10 +17,11 @@ public class User {
 
     private String email;
 
+    private String role;
+
     private Boolean isActive;
 
     @ToString.Exclude
-    @JsonIgnore
     private List<TelegramUser> telegramUsers;
 
 }

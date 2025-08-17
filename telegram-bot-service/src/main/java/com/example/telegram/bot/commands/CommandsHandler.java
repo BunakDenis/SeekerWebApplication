@@ -12,6 +12,7 @@ import com.example.telegram.bot.commands.impl.StartCommandImpl;
 import com.example.telegram.bot.entity.TelegramChat;
 import com.example.telegram.bot.entity.TelegramUser;
 import com.example.telegram.bot.message.TelegramBotMessageSender;
+import com.example.telegram.bot.service.ModelMapperService;
 import com.example.telegram.bot.service.TelegramUserService;
 import com.example.telegram.bot.utils.update.UpdateService;
 import lombok.Data;
@@ -37,12 +38,12 @@ public class CommandsHandler {
 
     @Autowired
     private DataProviderClient dataProviderClient;
-
     @Autowired
     private CommandChatDialogServiceImpl dialogService;
-
     @Autowired
-    TelegramUserService telegramUserService;
+    private TelegramUserService telegramUserService;
+    @Autowired
+    private ModelMapperService mapperService;
 
     public CommandsHandler(
             @Autowired StartCommandImpl startCommand,
@@ -62,7 +63,7 @@ public class CommandsHandler {
 
         User telegramUser = UpdateService.getTelegramUser(update);
 
-        TelegramUser telegramUserForCheck = telegramUserService.apiTelegramUserToEntity(telegramUser);
+        TelegramUser telegramUserForCheck = mapperService.apiTelegramUserToEntity(telegramUser);
 
         String email = "xisi926@ukr.net";
 

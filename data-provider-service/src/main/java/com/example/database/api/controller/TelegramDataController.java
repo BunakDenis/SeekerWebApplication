@@ -1,5 +1,6 @@
 package com.example.database.api.controller;
 
+import com.example.data.models.entity.dto.UserDTO;
 import com.example.data.models.entity.dto.mysticschool.ArticleCategory;
 import com.example.data.models.entity.dto.response.ApiResponseWithDataList;
 import com.example.data.models.entity.dto.telegram.TelegramChatDTO;
@@ -10,6 +11,7 @@ import com.example.data.models.entity.dto.telegram.TelegramSessionDTO;
 import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
 import com.example.database.api.client.MysticSchoolClient;
 import com.example.database.entity.TelegramChat;
+import com.example.database.entity.User;
 import com.example.database.service.telegram.TelegramChatsService;
 import com.example.database.service.telegram.TelegramSessionService;
 import com.example.database.service.telegram.TelegramUserService;
@@ -38,6 +40,17 @@ public class TelegramDataController {
 
     private final MysticSchoolClient mysticSchoolClient;
 
+    @GetMapping("/user/get/telegram_user_id/{id}")
+    public ResponseEntity<ApiResponse<UserDTO>> getUserByTelegramUserId(
+            @PathVariable("id") Long id
+    ) {
+
+        log.debug("Запрос на получение User по telegramUserId {}", id);
+
+        ApiResponse<UserDTO> response = userService.getUserByTelegramUserId(id);
+
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
 
     @GetMapping("/user/check/auth/{id}")
     public Mono<ResponseEntity<ApiResponse<CheckUserResponse>>> checkUserAuthentication(
@@ -47,7 +60,10 @@ public class TelegramDataController {
         log.debug("Входящий запрос на проверку авторизации юзера с id {}", id);
 
         return Mono.just(userService.getUserByTelegramUserId(id))
-                .flatMap(user -> mysticSchoolClient.checkUserAuthentication(user.getEmail()))
+                .flatMap(response -> {
+                    User user = userService.toEntity(response.getData());
+                    return mysticSchoolClient.checkUserAuthentication(user.getEmail());
+                })
                 .map(mysticSchoolResponse -> {
 
                     log.debug(mysticSchoolResponse);
@@ -103,7 +119,7 @@ public class TelegramDataController {
 
         TelegramChatDTO data = request.getData();
 
-        ApiResponse<TelegramUserDTO> telegramUserDTO = telegramUserService.getUserById(data.getTelegramUserId());
+        ApiResponse<TelegramUserDTO> telegramUserDTO = telegramUserService.getUserById(data.getTelegramUserDTO().getId());
 
         TelegramChat chat = chatsService.toEntity(data);
 

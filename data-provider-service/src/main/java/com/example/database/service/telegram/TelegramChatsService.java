@@ -3,8 +3,10 @@ package com.example.database.service.telegram;
 import com.example.data.models.entity.dto.telegram.TelegramChatDTO;
 import com.example.data.models.entity.dto.response.ApiResponse;
 import com.example.data.models.entity.dto.response.ApiResponseWithDataList;
+import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
 import com.example.database.entity.TelegramChat;
 import com.example.database.entity.TelegramSession;
+import com.example.database.entity.TelegramUser;
 import com.example.database.repo.telegram.TelegramChatRepo;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -27,11 +29,21 @@ public class TelegramChatsService {
     public ApiResponse<TelegramChatDTO> create(TelegramChat chat) {
         TelegramChat savedChat = chatRepo.save(chat);
 
+        TelegramUser telegramUser = savedChat.getTelegramUser();
+
+        TelegramUserDTO telegramUserDTO = TelegramUserDTO.builder()
+                .id(telegramUser.getId())
+                .firstName(telegramUser.getFirstName())
+                .lastName(telegramUser.getLastName())
+                .username(telegramUser.getUsername())
+                .isActive(telegramUser.isActive())
+                .build();
+
         TelegramChatDTO result = TelegramChatDTO.builder()
                 .id(savedChat.getId())
                 .uiElement(savedChat.getUiElement())
                 .chatState(savedChat.getChatState())
-                .telegramUserId(savedChat.getTelegramUser().getId())
+                .telegramUserDTO(telegramUserDTO)
                 .build();
 
         return new ApiResponse(HttpStatus.OK, HttpStatus.OK.toString(), result);

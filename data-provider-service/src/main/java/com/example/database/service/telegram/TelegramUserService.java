@@ -65,12 +65,6 @@ public class TelegramUserService {
                 .lastName(user.getLastName())
                 .username(user.getUsername())
                 .isActive(user.isActive())
-                .telegramSession(
-                        new TelegramSessionDTO(
-                                telegramSession.getId(), telegramSession.getSessionData(),
-                                telegramSession.isActive(), telegramSession.getExpirationTime()
-                        )
-                )
                 .build();
     }
 
