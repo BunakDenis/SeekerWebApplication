@@ -47,8 +47,6 @@ public class TelegramUserService {
 
         return TelegramUser.builder()
                 .id(dto.getId())
-                .firstName(dto.getFirstName())
-                .lastName(dto.getLastName())
                 .username(dto.getUsername())
                 .isActive(dto.isActive())
                 .telegramSession(session)
@@ -61,8 +59,6 @@ public class TelegramUserService {
 
         return TelegramUserDTO.builder()
                 .id(user.getId())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
                 .username(user.getUsername())
                 .isActive(user.isActive())
                 .build();

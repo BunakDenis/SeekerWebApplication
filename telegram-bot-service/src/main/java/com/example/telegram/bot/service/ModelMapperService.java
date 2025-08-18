@@ -1,15 +1,12 @@
 package com.example.telegram.bot.service;
 
 import com.example.data.models.entity.dto.UserDTO;
+import com.example.data.models.entity.dto.UserDetailsDTO;
 import com.example.data.models.entity.dto.telegram.TelegramChatDTO;
 import com.example.data.models.entity.dto.telegram.TelegramSessionDTO;
 import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
-import com.example.telegram.bot.entity.TelegramChat;
-import com.example.telegram.bot.entity.TelegramSession;
-import com.example.telegram.bot.entity.TelegramUser;
-import com.example.telegram.bot.entity.User;
+import com.example.telegram.bot.entity.*;
 import lombok.Data;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -20,26 +17,34 @@ import java.util.Objects;
 @Data
 public class ModelMapperService {
 
-
     public User userDtoToEntity(UserDTO dto) {
 
         List<TelegramUser> telegramUsers = new ArrayList<>();
+        UserDetails userDetails = new UserDetails();
+
         List<TelegramUserDTO> telegramUsersDTO = dto.getTelegramUsers();
 
         if (!telegramUsersDTO.isEmpty()) telegramUsersDTO.forEach(user -> telegramUsers.add(telegramUserDTOtoEntity(user)));
+
+        if (Objects.nonNull(dto.getUserDetails()))
+            userDetails = userDetailsDTOToEntity(dto.getUserDetails());
 
         return User.builder()
                 .id(dto.getId())
                 .email(dto.getEmail())
                 .role(dto.getRole())
                 .isActive(dto.getIsActive())
+                .userDetails(userDetails)
                 .telegramUsers(telegramUsers)
                 .build();
     }
-
     public UserDTO userToDTO(User user) {
 
         List<TelegramUserDTO> telegramUserDTOList = new ArrayList<>();
+        UserDetailsDTO userDetailsDTO = new UserDetailsDTO();
+
+        if (Objects.nonNull(user.getUserDetails()))
+            userDetailsDTO = userDetailsToDTO(user.getUserDetails());
 
         if (!user.getTelegramUsers().isEmpty()) user.getTelegramUsers().forEach(tu -> telegramUserDTOList.add(telegramUserToDto(tu)));
 
@@ -48,7 +53,39 @@ public class ModelMapperService {
                 .email(user.getEmail())
                 .role(user.getRole())
                 .isActive(user.getIsActive())
+                .userDetails(userDetailsDTO)
                 .telegramUsers(telegramUserDTOList)
+                .build();
+    }
+    public UserDetails userDetailsDTOToEntity(UserDetailsDTO dto) {
+
+        return UserDetails.builder()
+                .id(dto.getId())
+                .firstName(dto.getFirstName())
+                .lastname(dto.getLastname())
+                .birthday(dto.getBirthday())
+                .phoneNumber(dto.getPhoneNumber())
+                .gender(dto.getGender())
+                .location(dto.getLocation())
+                .avatarLink(dto.getAvatarLink())
+                .dateStartStudyingSchool(dto.getDateStartStudyingSchool())
+                .curator(dto.getCurator())
+                .build();
+
+    }
+    public UserDetailsDTO userDetailsToDTO(UserDetails userDetails) {
+
+        return UserDetailsDTO.builder()
+                .id(userDetails.getId())
+                .firstName(userDetails.getFirstName())
+                .lastname(userDetails.getLastname())
+                .birthday(userDetails.getBirthday())
+                .phoneNumber(userDetails.getPhoneNumber())
+                .gender(userDetails.getGender())
+                .location(userDetails.getLocation())
+                .avatarLink(userDetails.getAvatarLink())
+                .dateStartStudyingSchool(userDetails.getDateStartStudyingSchool())
+                .curator(userDetails.getCurator())
                 .build();
     }
     public TelegramUser telegramUserDTOtoEntity(TelegramUserDTO dto) {
@@ -62,8 +99,6 @@ public class ModelMapperService {
 
         return TelegramUser.builder()
                 .id(dto.getId())
-                .firstName(dto.getFirstName())
-                .lastName(dto.getLastName())
                 .username(dto.getUsername())
                 .telegramSession(session)
                 .telegramChats(telegramChatList)
@@ -80,8 +115,6 @@ public class ModelMapperService {
     public TelegramUser apiTelegramUserToEntity(org.telegram.telegrambots.meta.api.objects.User user) {
         return TelegramUser.builder()
                 .id(user.getId())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
                 .isActive(true)
                 .build();
     }
@@ -99,14 +132,11 @@ public class ModelMapperService {
 
         return TelegramUserDTO.builder()
                 .id(user.getId())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
                 .username(user.getUsername())
                 .telegramSession(telegramSessionDTO)
                 .telegramChats(telegramChatDTOList)
                 .build();
     }
-
     public TelegramUserDTO apiTelegramUserEntityToDto(User userEntityTG) {
         return null;
     }
@@ -171,5 +201,4 @@ public class ModelMapperService {
                 .telegramUserDTO(telegramUserDTO)
                 .build();
     }
-
 }

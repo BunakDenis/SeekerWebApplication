@@ -12,13 +12,9 @@ public class TelegramUserDTO {
 
     private Long id;
 
-    private boolean isActive;
-
-    private String firstName;
-
-    private String lastName;
-
     private String username;
+
+    private boolean isActive;
 
     private List<TelegramChatDTO> telegramChats;
 

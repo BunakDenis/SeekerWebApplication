@@ -21,6 +21,12 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true)
+    private String username;
+
+    @Column
+    private String password;
+
     @Column(unique = true, nullable = false)
     private String email;
 
@@ -29,6 +35,9 @@ public class User {
 
     @Column(nullable = false)
     private Boolean isActive;
+
+    @OneToOne(mappedBy = "user", fetch = FetchType.EAGER)
+    private UserDetails userDetails;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private List<TelegramUser> telegramUsers;

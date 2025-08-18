@@ -1,15 +1,15 @@
 package com.example.telegram.bot.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Builder;
-import lombok.Data;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.List;
 
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @ToString
 public class User {
 
@@ -21,7 +21,8 @@ public class User {
 
     private Boolean isActive;
 
-    @ToString.Exclude
+    private UserDetails userDetails;
+
     private List<TelegramUser> telegramUsers;
 
 }

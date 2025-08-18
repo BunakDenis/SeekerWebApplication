@@ -15,16 +15,12 @@ public class TelegramUser {
 
     private Long id;
 
-    @ToString.Exclude
-    private User user;
+    private String username;
 
     private boolean isActive;
 
-    private String firstName;
-
-    private String lastName;
-
-    private String username;
+    @ToString.Exclude
+    private User user;
 
     @ToString.Exclude
     private List<TelegramChat> telegramChats;

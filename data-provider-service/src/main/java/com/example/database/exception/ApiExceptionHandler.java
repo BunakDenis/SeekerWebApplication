@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.reactive.result.method.annotation.ResponseEntityExceptionHandler;
 
+import java.util.NoSuchElementException;
+
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
 @Log4j2
@@ -23,6 +25,14 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         ApiResponse resp = new ApiResponse(HttpStatus.BAD_REQUEST, e.getMessage(), null);
 
         log.debug("UserNotFoundException {}", resp);
+
+        return ResponseEntity.status(resp.getStatus()).body(resp);
+    }
+
+    @ExceptionHandler(NoSuchElementException.class)
+    protected ResponseEntity<ApiResponse> noSuchElementExceptionHandle(NoSuchElementException e) {
+
+        ApiResponse resp = new ApiResponse<>(HttpStatus.BAD_REQUEST, e.getMessage(), null);
 
         return ResponseEntity.status(resp.getStatus()).body(resp);
     }

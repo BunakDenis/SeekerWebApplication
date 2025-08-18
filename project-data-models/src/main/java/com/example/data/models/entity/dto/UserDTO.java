@@ -22,6 +22,8 @@ public class UserDTO {
 
     private Boolean isActive;
 
+    private UserDetailsDTO userDetails;
+
     private List<TelegramUserDTO> telegramUsers;
 
 }

@@ -1,3 +1,11 @@
+-- Обновляем внешний ключ в таблице user_details
+ALTER TABLE user_details
+DROP CONSTRAINT IF EXISTS user_details_user_id_fkey;
+
+ALTER TABLE user_details
+ADD CONSTRAINT user_details_user_id_fkey
+FOREIGN KEY (user_id) REFERENCES users(id) ON UPDATE CASCADE;
+
 -- Обновляем внешний ключ в таблице telegram_users
 ALTER TABLE telegram_users
 DROP CONSTRAINT IF EXISTS telegram_users_user_id_fkey;

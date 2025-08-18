@@ -33,8 +33,6 @@ public class TelegramChatsService {
 
         TelegramUserDTO telegramUserDTO = TelegramUserDTO.builder()
                 .id(telegramUser.getId())
-                .firstName(telegramUser.getFirstName())
-                .lastName(telegramUser.getLastName())
                 .username(telegramUser.getUsername())
                 .isActive(telegramUser.isActive())
                 .build();

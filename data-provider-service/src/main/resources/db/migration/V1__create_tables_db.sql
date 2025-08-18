@@ -1,19 +1,33 @@
 -- Пользователи системы
 CREATE TABLE IF NOT EXISTS users (
     id BIGSERIAL PRIMARY KEY,
+    username VARCHAR(255) UNIQUE,
+    password VARCHAR(255),
     email VARCHAR(255) UNIQUE NOT NULL,
     role VARCHAR(255) NOT NULL,
     is_active BOOLEAN NOT NULL DEFAULT TRUE
 );
 
--- Информация о пользователе Telegram
-CREATE TABLE IF NOT EXISTS telegram_users (
-    id BIGINT PRIMARY KEY, -- Telegram user id
-    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+CREATE TABLE IF NOT EXISTS user_details (
+    id BIGSERIAL PRIMARY KEY,
     user_id BIGINT REFERENCES users(id) NOT NULL,
     first_name VARCHAR(255),
     last_name VARCHAR(255),
-    username VARCHAR(255)
+    birthday TIMESTAMP WITH TIME ZONE,
+    phone_number VARCHAR(50),
+    gender VARCHAR(50),
+    avatar_link VARCHAR(255),
+    location VARCHAR(255),
+    date_start_studying_school TIMESTAMP WITH TIME ZONE,
+    curator VARCHAR(255)
+);
+
+-- Информация о пользователе Telegram
+CREATE TABLE IF NOT EXISTS telegram_users (
+    id BIGINT PRIMARY KEY, -- Telegram user id
+    username VARCHAR(255),
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    user_id BIGINT REFERENCES users(id) NOT NULL
 );
 
 -- Информация о чате Telegram
