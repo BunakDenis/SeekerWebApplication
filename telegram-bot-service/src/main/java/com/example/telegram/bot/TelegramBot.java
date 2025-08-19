@@ -19,6 +19,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.bots.TelegramWebhookBot;
@@ -96,6 +98,13 @@ public class TelegramBot extends TelegramWebhookBot {
     public BotApiMethod<?> onWebhookUpdateReceived(Update update) {
 
         if (Objects.nonNull(update)) {
+
+            ReactiveSecurityContextHolder.getContext()
+                    .flatMap(auth -> {
+                        log.info("Данные про авторизацию юзера {}", auth);
+                        return Mono.empty();
+                    })
+                    .subscribe();
 
             //Проверка авторизации юзера
             User user = update.getMessage().getFrom();

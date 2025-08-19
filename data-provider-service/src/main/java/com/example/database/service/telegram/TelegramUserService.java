@@ -21,47 +21,19 @@ public class TelegramUserService {
 
     private final TelegramUserRepo repo;
 
+    private final ModelMapperService mapperService;
+
     public ApiResponse<TelegramUserDTO> getUserById(Long id) {
 
         TelegramUser user = repo.getTelegramUserById(id);
 
-        TelegramUserDTO dto = toDto(user);
+        TelegramUserDTO dto = mapperService.toDTO(user, TelegramUserDTO.class);
 
         if (Objects.nonNull(user)) {
             return new ApiResponse(HttpStatus.OK, SUCCESSES_MSG, dto);
         }
 
         return new ApiResponse<>(HttpStatus.BAD_REQUEST, NOT_FOUND_MSG);
-    }
-
-    public TelegramUser toEntity(TelegramUserDTO dto) {
-
-        TelegramSessionDTO telegramSession = dto.getTelegramSession();
-
-        TelegramSession session = TelegramSession.builder()
-                .id(telegramSession.getId())
-                .isActive(telegramSession.isActive())
-                .expirationTime(telegramSession.getExpirationTime())
-                .sessionData(telegramSession.getSessionData())
-                .build();
-
-        return TelegramUser.builder()
-                .id(dto.getId())
-                .username(dto.getUsername())
-                .isActive(dto.isActive())
-                .telegramSession(session)
-                .build();
-    }
-
-    public TelegramUserDTO toDto(TelegramUser user) {
-
-        TelegramSession telegramSession = user.getTelegramSession();
-
-        return TelegramUserDTO.builder()
-                .id(user.getId())
-                .username(user.getUsername())
-                .isActive(user.isActive())
-                .build();
     }
 
 }

@@ -5,7 +5,6 @@ import com.example.data.models.entity.dto.telegram.TelegramSessionDTO;
 import com.example.database.entity.TelegramSession;
 import com.example.database.repo.telegram.TelegramSessionRepo;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -20,14 +19,14 @@ public class TelegramSessionService {
 
     private final TelegramSessionRepo repo;
 
-    private final ModelMapper modelMapper;
+    private final ModelMapperService mapperService;
 
     public ApiResponse<TelegramSessionDTO> getSessionById(Long id) {
         Optional<TelegramSession> session = repo.findById(id);
 
         if (session.isPresent()) {
 
-            TelegramSessionDTO dto = toDTO(session.get());
+            TelegramSessionDTO dto = mapperService.toDTO(session.get(), TelegramSessionDTO.class);
 
             return new ApiResponse<>(HttpStatus.OK, SUCCESSES_MSG, dto);
         }
@@ -37,7 +36,7 @@ public class TelegramSessionService {
     public ApiResponse<TelegramSessionDTO> create(TelegramSession session) {
         TelegramSession save = repo.save(session);
 
-        TelegramSessionDTO telegramSessionDTO = toDTO(save);
+        TelegramSessionDTO telegramSessionDTO = mapperService.toDTO(save, TelegramSessionDTO.class);
 
         return new ApiResponse<>(HttpStatus.OK, SUCCESSES_MSG, telegramSessionDTO);
     }
@@ -50,7 +49,7 @@ public class TelegramSessionService {
 
         TelegramSession session = repo.getTelegramSessionByTelegramUserId(telegramUserId);
 
-        TelegramSessionDTO dto = toDTO(session);
+        TelegramSessionDTO dto = mapperService.toDTO(session, TelegramSessionDTO.class);
 
         return new ApiResponse<>(HttpStatus.OK, SUCCESSES_MSG, dto);
 
@@ -60,14 +59,6 @@ public class TelegramSessionService {
         repo.delete(session);
 
         return new ApiResponse<>(HttpStatus.OK, SUCCESSES_MSG);
-    }
-
-    public TelegramSession toEntity(TelegramSessionDTO dto) {
-        return modelMapper.map(dto, TelegramSession.class);
-    }
-
-    public TelegramSessionDTO toDTO(TelegramSession session) {
-        return modelMapper.map(session, TelegramSessionDTO.class);
     }
 
 }

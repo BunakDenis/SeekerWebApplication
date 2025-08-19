@@ -16,7 +16,12 @@
         <dependency>
             <groupId>com.example</groupId>
             <artifactId>project-data-models</artifactId>
-            <version>1.0.1</version>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>utils-service</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

@@ -5,8 +5,8 @@ target/
 !**/src/test/**/target/
 logs
 .env
+cmd_commands.txt
 structure.txt
-commands.txt
 
 
 ### STS ###

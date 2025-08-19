@@ -69,16 +69,10 @@ public class TelegramUserAuthFilter implements WebFilter {
                                 .build());
                     }
 
-                    return userService.getUserByTelegramUserId(telegramUserId)
+                    return userService.getUserByTelegramUserIdWithUserDetails(telegramUserId)
                             .flatMap(resp -> {
 
-                                ReactiveSecurityContextHolder.getContext()
-                                        .map(SecurityContext::getAuthentication)
-                                        .subscribe(auth -> log.info("Данные про авторизацию юзера {}", auth));
-
-                                User user = mapperService.userDtoToEntity(resp.getData());
-
-                                log.debug("Данные о текущем пользователе {}", user);
+                                User user = userService.toEntity(resp);
 
                                 Authentication auth = new UsernamePasswordAuthenticationToken(
                                         user.getId(),

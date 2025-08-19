@@ -11,11 +11,9 @@ import com.example.data.models.entity.dto.telegram.TelegramSessionDTO;
 import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
 import com.example.database.api.client.MysticSchoolClient;
 import com.example.database.entity.TelegramChat;
+import com.example.database.entity.TelegramSession;
 import com.example.database.entity.User;
-import com.example.database.service.telegram.TelegramChatsService;
-import com.example.database.service.telegram.TelegramSessionService;
-import com.example.database.service.telegram.TelegramUserService;
-import com.example.database.service.telegram.UserService;
+import com.example.database.service.telegram.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -40,6 +38,20 @@ public class TelegramDataController {
 
     private final MysticSchoolClient mysticSchoolClient;
 
+    private final ModelMapperService mapperService;
+
+    @GetMapping("/user/get/{id}")
+    public ResponseEntity<ApiResponse<UserDTO>> getUser(
+            @PathVariable("id") Long id
+    ) {
+
+        log.debug("Запрос на получение User по telegramUserId {}", id);
+
+        ApiResponse<UserDTO> response = userService.getUser(id);
+
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
     @GetMapping("/user/get/telegram_user_id/{id}")
     public ResponseEntity<ApiResponse<UserDTO>> getUserByTelegramUserId(
             @PathVariable("id") Long id
@@ -48,6 +60,42 @@ public class TelegramDataController {
         log.debug("Запрос на получение User по telegramUserId {}", id);
 
         ApiResponse<UserDTO> response = userService.getUserByTelegramUserId(id);
+
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    @GetMapping("/user/user_details/get/telegram_user_id/{id}")
+    public ResponseEntity<ApiResponse<UserDTO>> getUserByTelegramUserIdWithUserDetails(
+            @PathVariable("id") Long id
+    ) {
+
+        log.debug("Запрос на получение User по telegramUserId {}", id);
+
+        ApiResponse<UserDTO> response = userService.getUserByTelegramUserIdWithUserDetails(id);
+
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    @GetMapping("/user/telegram_user/get/telegram_user_id/{id}")
+    public ResponseEntity<ApiResponse<UserDTO>> getUserByTelegramUserIdWithTelegramUser(
+            @PathVariable("id") Long id
+    ) {
+
+        log.debug("Запрос на получение User по telegramUserId {}", id);
+
+        ApiResponse<UserDTO> response = userService.getUserByTelegramUserIdWithTelegramUser(id);
+
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    @GetMapping("/user/full/get/telegram_user_id/{id}")
+    public ResponseEntity<ApiResponse<UserDTO>> getUserByTelegramUserIdFull(
+            @PathVariable("id") Long id
+    ) {
+
+        log.debug("Запрос на получение User по telegramUserId {}", id);
+
+        ApiResponse<UserDTO> response = userService.getUserByTelegramUserIdFull(id);
 
         return ResponseEntity.status(response.getStatus()).body(response);
     }
@@ -61,7 +109,7 @@ public class TelegramDataController {
 
         return Mono.just(userService.getUserByTelegramUserId(id))
                 .flatMap(response -> {
-                    User user = userService.toEntity(response.getData());
+                    User user = mapperService.toEntity(response.getData(), User.class);
                     return mysticSchoolClient.checkUserAuthentication(user.getEmail());
                 })
                 .map(mysticSchoolResponse -> {
@@ -119,11 +167,7 @@ public class TelegramDataController {
 
         TelegramChatDTO data = request.getData();
 
-        ApiResponse<TelegramUserDTO> telegramUserDTO = telegramUserService.getUserById(data.getTelegramUserDTO().getId());
-
-        TelegramChat chat = chatsService.toEntity(data);
-
-        chat.setTelegramUser(telegramUserService.toEntity(telegramUserDTO.getData()));
+        TelegramChat chat = mapperService.toEntity(data, TelegramChat.class);
 
         ApiResponse<TelegramChatDTO> response = chatsService.create(chat);
 
@@ -150,7 +194,7 @@ public class TelegramDataController {
         log.debug("Запрос на сохранение TelegramSession {}", request);
 
         ApiResponse<TelegramSessionDTO> response = sessionService.create(
-                sessionService.toEntity(request.getData())
+                mapperService.toEntity(request.getData(), TelegramSession.class)
         );
 
         return ResponseEntity.status(response.getStatus()).body(response);

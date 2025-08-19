@@ -7,6 +7,8 @@ import com.example.data.models.entity.dto.telegram.TelegramSessionDTO;
 import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
 import com.example.telegram.bot.entity.*;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -15,8 +17,31 @@ import java.util.Objects;
 
 @Service
 @Data
+@RequiredArgsConstructor
 public class ModelMapperService {
 
+    private final ModelMapper mapper;
+
+    public <T, K> T toEntity (K dto, Class<T> entity) {
+        return mapper.map(dto, entity);
+    }
+
+    public <T, K> K toDTO (T entity, Class<K> dto) {
+        return mapper.map(entity, dto);
+    }
+
+    public TelegramUser apiTelegramUserToEntity(org.telegram.telegrambots.meta.api.objects.User user) {
+        return TelegramUser.builder()
+                .id(user.getId())
+                .isActive(true)
+                .build();
+    }
+
+    public TelegramUserDTO apiTelegramUserEntityToDto(User userEntityTG) {
+        return null;
+    }
+
+/*
     public User userDtoToEntity(UserDTO dto) {
 
         List<TelegramUser> telegramUsers = new ArrayList<>();
@@ -200,5 +225,5 @@ public class ModelMapperService {
                 .isActive(session.isActive())
                 .telegramUserDTO(telegramUserDTO)
                 .build();
-    }
+    */
 }

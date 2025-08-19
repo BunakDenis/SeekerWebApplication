@@ -16,8 +16,4 @@ public class TelegramUserDTO {
 
     private boolean isActive;
 
-    private List<TelegramChatDTO> telegramChats;
-
-    private TelegramSessionDTO telegramSession;
-
 }

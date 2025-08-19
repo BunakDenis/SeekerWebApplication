@@ -65,13 +65,6 @@ public class CommandsHandler {
 
         TelegramUser telegramUserForCheck = mapperService.apiTelegramUserToEntity(telegramUser);
 
-        String email = "xisi926@ukr.net";
-
-        dataProviderClient.checkTelegramUserAuthentication(telegramUserForCheck.getId())
-                .subscribe(resp -> {
-                    log.debug(resp);
-                });
-
         String messageText = update.getMessage().getText();
         String command = messageText.split(" ")[0];
         long chatId = update.getMessage().getChatId();

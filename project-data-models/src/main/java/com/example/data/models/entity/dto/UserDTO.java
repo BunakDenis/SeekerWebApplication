@@ -1,12 +1,9 @@
 package com.example.data.models.entity.dto;
 
-import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -21,9 +18,5 @@ public class UserDTO {
     private String role;
 
     private Boolean isActive;
-
-    private UserDetailsDTO userDetails;
-
-    private List<TelegramUserDTO> telegramUsers;
 
 }

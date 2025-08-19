@@ -20,6 +20,4 @@ public class TelegramChatDTO {
 
     private String chatState;
 
-    private TelegramUserDTO telegramUserDTO;
-
 }

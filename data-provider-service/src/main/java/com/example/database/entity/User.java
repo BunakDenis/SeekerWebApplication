@@ -36,10 +36,10 @@ public class User {
     @Column(nullable = false)
     private Boolean isActive;
 
-    @OneToOne(mappedBy = "user", fetch = FetchType.EAGER)
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
     private UserDetails userDetails;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<TelegramUser> telegramUsers;
 
 }

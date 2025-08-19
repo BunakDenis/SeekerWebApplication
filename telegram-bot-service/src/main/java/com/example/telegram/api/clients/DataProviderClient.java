@@ -70,9 +70,97 @@ public class DataProviderClient {
                 .build();
     }
 
+    public Mono<ApiResponse<UserDTO>> getUser(Long id) {
+
+        String endpoint = "/user/get/" + id;
+
+        try {
+            return webClient.get()
+                    .uri(endpoint)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+                            response -> response.bodyToMono(String.class) // Можно прочитать тело ошибки
+                                    .flatMap(errorBody -> {
+                                        log.debug("Получен ответ от Data provider service {}", errorBody);
+                                        return Mono.empty();
+                                    }))
+                    .bodyToMono(new ParameterizedTypeReference<>() {
+                    });
+        } catch (Exception e) {
+            log.debug("Ошибка отправки сообщения получения TelegramUser {}", e.getMessage());
+        }
+        return null;
+    }
     public Mono<ApiResponse<UserDTO>> getUserByTelegramUserId(Long id) {
 
         String endpoint = "/user/get/telegram_user_id/" + id;
+
+        try {
+            return webClient.get()
+                    .uri(endpoint)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+                            response -> response.bodyToMono(String.class) // Можно прочитать тело ошибки
+                                    .flatMap(errorBody -> {
+                                        log.debug("Получен ответ от Data provider service {}", errorBody);
+                                        return Mono.empty();
+                                    }))
+                    .bodyToMono(new ParameterizedTypeReference<>() {
+                    });
+        } catch (Exception e) {
+            log.debug("Ошибка отправки сообщения получения TelegramUser {}", e.getMessage());
+        }
+        return null;
+    }
+    public Mono<ApiResponse<UserDTO>> getUserByTelegramUserIdWithUserDetails(Long id) {
+
+        String endpoint = "/user/user_details/get/telegram_user_id/" + id;
+
+        try {
+            return webClient.get()
+                    .uri(endpoint)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+                            response -> response.bodyToMono(String.class) // Можно прочитать тело ошибки
+                                    .flatMap(errorBody -> {
+                                        log.debug("Получен ответ от Data provider service {}", errorBody);
+                                        return Mono.empty();
+                                    }))
+                    .bodyToMono(new ParameterizedTypeReference<>() {
+                    });
+        } catch (Exception e) {
+            log.debug("Ошибка отправки сообщения получения TelegramUser {}", e.getMessage());
+        }
+        return null;
+    }
+    public Mono<ApiResponse<UserDTO>> getUserByTelegramUserIdWithTelegramUser(Long id) {
+
+        String endpoint = "/user/telegram_user/get/telegram_user_id/" + id;
+
+        try {
+            return webClient.get()
+                    .uri(endpoint)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+                            response -> response.bodyToMono(String.class) // Можно прочитать тело ошибки
+                                    .flatMap(errorBody -> {
+                                        log.debug("Получен ответ от Data provider service {}", errorBody);
+                                        return Mono.empty();
+                                    }))
+                    .bodyToMono(new ParameterizedTypeReference<>() {
+                    });
+        } catch (Exception e) {
+            log.debug("Ошибка отправки сообщения получения TelegramUser {}", e.getMessage());
+        }
+        return null;
+    }
+    public Mono<ApiResponse<UserDTO>> getUserByTelegramUserIdFull(Long id) {
+
+        String endpoint = "/user/full/get/telegram_user_id/" + id;
 
         try {
             return webClient.get()
@@ -141,7 +229,7 @@ public class DataProviderClient {
 
     public Mono<ApiResponse<TelegramChatDTO>> saveTelegramChat(TelegramChat chat) {
 
-        TelegramChatDTO dto = mapperService.telegramChatToDTO(chat);
+        TelegramChatDTO dto = mapperService.toDTO(chat, TelegramChatDTO.class);
 
         log.debug("Отправляю запрос к Data provide service для записи {}", dto);
         log.debug("Отправка на endpoint " + apiChatEndpoint + "/add/");
