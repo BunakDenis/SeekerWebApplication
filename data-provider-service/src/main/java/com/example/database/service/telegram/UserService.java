@@ -31,13 +31,32 @@ public class UserService {
     private final ModelMapperService mapper;
 
 
-    public ApiResponse<UserDTO> getUser(Long id) {
+    public ApiResponse<UserDTO> getUserById(Long id) {
         Optional<User> userOptional = repo.findById(id);
 
         if (userOptional.isPresent()) {
             return new ApiResponse<>(HttpStatus.OK, SUCCESSES_MSG, mapper.toDTO(userOptional.get(), UserDTO.class));
         }
         throw new UserNotFoundException("User with id " + id + " is not found");
+    }
+
+    public ApiResponse<UserDTO> getUserByUsername(String username) {
+        Optional<User> userOptional = repo.findByUsername(username);
+
+        if (userOptional.isPresent()) {
+            return new ApiResponse<>(HttpStatus.OK, SUCCESSES_MSG, mapper.toDTO(userOptional.get(), UserDTO.class));
+        }
+        throw new UserNotFoundException("User with username " + username + " is not found");
+    }
+
+    public ApiResponse<UserDTO> getUserByEmail(String email) {
+
+        Optional<User> userOptional = repo.findByUsername(email);
+
+        if (userOptional.isPresent()) {
+            return new ApiResponse<>(HttpStatus.OK, SUCCESSES_MSG, mapper.toDTO(userOptional.get(), UserDTO.class));
+        }
+        throw new UserNotFoundException("User with email " + email + " is not found");
     }
 
     public ApiResponse<UserDTO> getUserByTelegramUserId(Long id) throws UserNotFoundException {

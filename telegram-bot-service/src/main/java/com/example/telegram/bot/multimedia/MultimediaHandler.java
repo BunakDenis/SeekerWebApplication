@@ -2,8 +2,7 @@ package com.example.telegram.bot.multimedia;
 
 import com.example.telegram.api.clients.UsefulToolsClient;
 import com.example.telegram.bot.message.TelegramBotMessageSender;
-import com.example.telegram.bot.utils.update.UpdateService;
-import com.example.telegram.dto.responce.FileServiceResponse;
+import com.example.telegram.bot.utils.update.UpdateUtilsService;
 import com.example.utils.file.FileService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +34,7 @@ public class MultimediaHandler {
     public void handleMultimedia(Update update) {
         log.debug("handleMultimedia method");
 
-        Message message = UpdateService.getMessage(update);
+        Message message = UpdateUtilsService.getMessage(update);
         long chatId = message.getChatId();
 
         File audioFile = new File("");

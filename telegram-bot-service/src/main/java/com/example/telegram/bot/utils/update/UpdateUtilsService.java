@@ -8,7 +8,7 @@ import org.telegram.telegrambots.meta.api.objects.User;
 
 @Service
 @Data
-public class UpdateService {
+public class UpdateUtilsService {
 
     public static User getTelegramUser(Update update) {
         return update.getMessage().getFrom();

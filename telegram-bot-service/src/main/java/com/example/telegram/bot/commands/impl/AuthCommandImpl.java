@@ -5,7 +5,7 @@ import com.example.telegram.bot.chat.states.DialogStates;
 import com.example.telegram.bot.chat.states.impl.CommandChatDialogServiceImpl;
 import com.example.telegram.bot.commands.Command;
 import com.example.telegram.bot.commands.Commands;
-import com.example.telegram.bot.utils.update.UpdateService;
+import com.example.telegram.bot.utils.update.UpdateUtilsService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -29,10 +29,10 @@ public class AuthCommandImpl implements Command {
 
         log.debug("CommandChatDialogServiceImpl метод apply");
 
-        String msgText = UpdateService.getMessageText(update);
+        String msgText = UpdateUtilsService.getMessageText(update);
         SendMessage result = new SendMessage();
 
-        result.setChatId(UpdateService.getChatId(update));
+        result.setChatId(UpdateUtilsService.getChatId(update));
 
         if (Commands.AUTHORIZE.getCommand().equals(msgText)) {
 

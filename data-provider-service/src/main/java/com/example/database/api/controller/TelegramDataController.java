@@ -16,6 +16,7 @@ import com.example.database.entity.User;
 import com.example.database.service.telegram.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +26,7 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
-@Log4j2
+@Slf4j
 public class TelegramDataController {
 
     private final UserService userService;
@@ -40,14 +41,38 @@ public class TelegramDataController {
 
     private final ModelMapperService mapperService;
 
-    @GetMapping("/user/get/{id}")
+    @GetMapping("/user/get/id/{id}")
     public ResponseEntity<ApiResponse<UserDTO>> getUser(
             @PathVariable("id") Long id
     ) {
 
-        log.debug("Запрос на получение User по telegramUserId {}", id);
+        log.debug("Запрос на получение User по {}", id);
 
-        ApiResponse<UserDTO> response = userService.getUser(id);
+        ApiResponse<UserDTO> response = userService.getUserById(id);
+
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    @GetMapping("/user/get/username/{username}")
+    public ResponseEntity<ApiResponse<UserDTO>> getUserByUsername(
+            @PathVariable("username") String username
+    ) {
+
+        log.debug("Запрос на получение User по username {}", username);
+
+        ApiResponse<UserDTO> response = userService.getUserByUsername(username);
+
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    @GetMapping("/user/get/email/{email}")
+    public ResponseEntity<ApiResponse<UserDTO>> getUserByEmail(
+            @PathVariable("email") String email
+    ) {
+
+        log.debug("Запрос на получение User по email {}", email);
+
+        ApiResponse<UserDTO> response = userService.getUserByEmail(email);
 
         return ResponseEntity.status(response.getStatus()).body(response);
     }
@@ -114,7 +139,7 @@ public class TelegramDataController {
                 })
                 .map(mysticSchoolResponse -> {
 
-                    log.debug(mysticSchoolResponse);
+                    log.debug(mysticSchoolResponse.toString());
 
                     return ResponseEntity.status(HttpStatus.OK).body(
                             new ApiResponse<>(HttpStatus.OK, HttpStatus.OK.toString(), mysticSchoolResponse)

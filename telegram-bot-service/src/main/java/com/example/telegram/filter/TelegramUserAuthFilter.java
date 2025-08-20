@@ -1,11 +1,8 @@
 package com.example.telegram.filter;
 
 
-import com.example.data.models.entity.dto.UserDTO;
-import com.example.data.models.entity.dto.telegram.TelegramSessionDTO;
-import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
-import com.example.telegram.bot.entity.TelegramUser;
 import com.example.telegram.bot.entity.User;
+import com.example.telegram.bot.service.AuthService;
 import com.example.telegram.bot.service.ModelMapperService;
 import com.example.telegram.bot.service.TelegramUserService;
 import com.example.telegram.bot.service.UserService;
@@ -16,26 +13,22 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpRequestDecorator;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.context.Context;
 
 
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Component
@@ -47,12 +40,17 @@ public class TelegramUserAuthFilter implements WebFilter {
 
     private final UserService userService;
 
+    private final AuthService authService;
+
     private final ObjectMapper objectMapper;
 
     private final ModelMapperService mapperService;
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
+
+        log.debug("TelegramUserAuthFilter");
+
         ServerHttpRequest request = exchange.getRequest();
 
         return DataBufferUtils.join(request.getBody())
@@ -69,24 +67,46 @@ public class TelegramUserAuthFilter implements WebFilter {
                                 .build());
                     }
 
-                    return userService.getUserByTelegramUserIdWithUserDetails(telegramUserId)
+                    return userService.getUserByTelegramUserId(telegramUserId)
                             .flatMap(resp -> {
 
-                                User user = userService.toEntity(resp);
+                                if (Objects.nonNull(resp)) {
+                                    User user = mapperService.toEntity(resp.getData(), User.class);
 
-                                Authentication auth = new UsernamePasswordAuthenticationToken(
-                                        user.getId(),
-                                        user.getEmail(),
-                                        Collections.singleton(new SimpleGrantedAuthority(user.getRole()))
-                                );
+                                    log.debug("User {}", user);
 
-                                // sessionId в хедер
-                                String sessionId = String.valueOf(12345L);
+                                    return userService.findByUsername(user.getUsername());
+                                } else {
+                                    return Mono.just(org.springframework.security.core.userdetails.User.builder().build());
+                                }
 
-                                return chain.filter(exchange.mutate()
-                                                .request(decorateRequest(exchange, body, sessionId))
-                                                .build())
-                                        .contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth));
+                            })
+                            .flatMap(userDetails -> {
+
+                                if (Objects.nonNull(userDetails)) {
+                                    Authentication auth = new UsernamePasswordAuthenticationToken(
+                                            userDetails,                  // <-- principal = UserDetails
+                                            null,
+                                            userDetails.getAuthorities()
+                                    );
+
+                                    log.debug("Authentication = {}", auth);
+
+                                    // sessionId в хедер
+                                    String sessionId = String.valueOf(12345L);
+
+                                    authService.authenticate(userDetails);
+
+                                    log.debug("TelegramUserAuthFilter end.");
+
+                                    return chain.filter(exchange.mutate()
+                                                    .request(decorateRequest(exchange, body, sessionId))
+                                                    .build())
+                                            .contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth));
+                                }
+
+                                return chain.filter(exchange);
+
                             });
                 });
     }

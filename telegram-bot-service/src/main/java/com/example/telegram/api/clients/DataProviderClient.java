@@ -9,15 +9,11 @@ import com.example.data.models.entity.dto.telegram.TelegramSessionDTO;
 import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
 import com.example.data.models.exception.ApiException;
 import com.example.telegram.bot.entity.TelegramChat;
-import com.example.telegram.bot.entity.User;
 import com.example.telegram.bot.service.ModelMapperService;
-import com.example.telegram.bot.service.TelegramChatService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -25,8 +21,6 @@ import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import reactor.core.publisher.Mono;
-
-import java.util.ArrayList;
 
 @Service
 @RequiredArgsConstructor
@@ -70,9 +64,9 @@ public class DataProviderClient {
                 .build();
     }
 
-    public Mono<ApiResponse<UserDTO>> getUser(Long id) {
+    public Mono<ApiResponse<UserDTO>> getUserById(Long id) {
 
-        String endpoint = "/user/get/" + id;
+        String endpoint = "/user/get/id/" + id;
 
         try {
             return webClient.get()
@@ -88,7 +82,51 @@ public class DataProviderClient {
                     .bodyToMono(new ParameterizedTypeReference<>() {
                     });
         } catch (Exception e) {
-            log.debug("Ошибка отправки сообщения получения TelegramUser {}", e.getMessage());
+            log.debug("Ошибка отправки сообщения получения User {}", e.getMessage());
+        }
+        return null;
+    }
+    public Mono<ApiResponse<UserDTO>> getUserByUsername(String username) {
+
+        String endpoint = "/user/get/username/" + username;
+
+        try {
+            return webClient.get()
+                    .uri(endpoint)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+                            response -> response.bodyToMono(String.class) // Можно прочитать тело ошибки
+                                    .flatMap(errorBody -> {
+                                        log.debug("Получен ответ от Data provider service {}", errorBody);
+                                        return Mono.empty();
+                                    }))
+                    .bodyToMono(new ParameterizedTypeReference<>() {
+                    });
+        } catch (Exception e) {
+            log.debug("Ошибка отправки сообщения получения User {}", e.getMessage());
+        }
+        return null;
+    }
+    public Mono<ApiResponse<UserDTO>> getUserByEmail(String email) {
+
+        String endpoint = "/user/get/email/" + email;
+
+        try {
+            return webClient.get()
+                    .uri(endpoint)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+                            response -> response.bodyToMono(String.class) // Можно прочитать тело ошибки
+                                    .flatMap(errorBody -> {
+                                        log.debug("Получен ответ от Data provider service {}", errorBody);
+                                        return Mono.empty();
+                                    }))
+                    .bodyToMono(new ParameterizedTypeReference<>() {
+                    });
+        } catch (Exception e) {
+            log.debug("Ошибка отправки сообщения получения User {}", e.getMessage());
         }
         return null;
     }

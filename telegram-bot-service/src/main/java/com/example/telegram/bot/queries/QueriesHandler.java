@@ -6,7 +6,7 @@ import static com.example.telegram.bot.message.MessageProvider.*;
 import com.example.telegram.api.clients.UsefulToolsClient;
 import com.example.telegram.bot.message.MessageForWifeProvider;
 import com.example.telegram.bot.message.TelegramBotMessageSender;
-import com.example.telegram.bot.utils.update.UpdateService;
+import com.example.telegram.bot.utils.update.UpdateUtilsService;
 import lombok.Data;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +47,7 @@ public class QueriesHandler {
         log.debug("handleQueries method");
         SendMessage answer;
 
-        Message msg = UpdateService.getMessage(update);
+        Message msg = UpdateUtilsService.getMessage(update);
         long chatId = msg.getChatId();
 
             try {

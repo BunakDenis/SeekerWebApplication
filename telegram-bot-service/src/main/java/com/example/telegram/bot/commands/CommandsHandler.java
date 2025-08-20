@@ -2,8 +2,6 @@ package com.example.telegram.bot.commands;
 
 
 import com.example.telegram.api.clients.DataProviderClient;
-import com.example.telegram.bot.chat.states.ChatDialogService;
-import com.example.telegram.bot.chat.states.DialogStates;
 import com.example.telegram.bot.chat.states.UiElements;
 import com.example.telegram.bot.chat.states.impl.CommandChatDialogServiceImpl;
 import com.example.telegram.bot.commands.impl.AuthCommandImpl;
@@ -14,7 +12,7 @@ import com.example.telegram.bot.entity.TelegramUser;
 import com.example.telegram.bot.message.TelegramBotMessageSender;
 import com.example.telegram.bot.service.ModelMapperService;
 import com.example.telegram.bot.service.TelegramUserService;
-import com.example.telegram.bot.utils.update.UpdateService;
+import com.example.telegram.bot.utils.update.UpdateUtilsService;
 import lombok.Data;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +59,7 @@ public class CommandsHandler {
 
         log.debug("handleCommands method");
 
-        User telegramUser = UpdateService.getTelegramUser(update);
+        User telegramUser = UpdateUtilsService.getTelegramUser(update);
 
         TelegramUser telegramUserForCheck = mapperService.apiTelegramUserToEntity(telegramUser);
 

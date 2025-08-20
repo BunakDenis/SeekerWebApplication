@@ -5,9 +5,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Optional;
+
 public interface UserRepo extends JpaRepository<User, Long> {
 
     @Query("SELECT u FROM User u JOIN TelegramUser tu ON u.id = tu.user.id WHERE tu.id = :telegramUserId")
     User getUserByTelegramUserId(@Param("telegramUserId") Long telegramUserId);
 
+    Optional<User> findByUsername(String username);
+
+    Optional<User> findByEmail(String email);
 }

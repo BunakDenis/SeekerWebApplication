@@ -4,13 +4,16 @@ import com.example.data.models.entity.dto.UserDTO;
 import com.example.data.models.entity.dto.UserDetailsDTO;
 import com.example.data.models.entity.dto.response.ApiResponse;
 import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
+import com.example.data.models.enums.UserRoles;
 import com.example.telegram.api.clients.DataProviderClient;
 import com.example.telegram.bot.entity.TelegramUser;
 import com.example.telegram.bot.entity.User;
 import com.example.telegram.bot.entity.UserDetails;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.*;
-import org.modelmapper.ModelMapper;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -21,11 +24,12 @@ import java.util.Objects;
 import static com.example.data.models.enums.ResponseIncludeDataKeys.TELEGRAM_USER;
 import static com.example.data.models.enums.ResponseIncludeDataKeys.USER_DETAILS;
 
+@Service
 @Data
 @RequiredArgsConstructor
 @Builder
-@Service
-public class UserService {
+@Slf4j
+public class UserService implements ReactiveUserDetailsService {
 
     private final DataProviderClient dataProviderClient;
 
@@ -33,8 +37,22 @@ public class UserService {
 
     private final ObjectMapper objectMapper;
 
-    public Mono<ApiResponse<UserDTO>> getUser(Long id) {
-        return dataProviderClient.getUser(id);
+    public Mono<ApiResponse<UserDTO>> getUserById(Long id) {
+        return dataProviderClient.getUserById(id);
+    }
+
+    public Mono<ApiResponse<UserDTO>> getUserByUsername(String username) {
+        return dataProviderClient.getUserByUsername(username);
+    }
+
+    public Mono<User> getUserByEmail(String email) {
+        return dataProviderClient.getUserByEmail(email)
+                .flatMap(resp -> {
+                    if (resp.getStatus().equals(HttpStatus.OK)) {
+                        return Mono.just(mapperService.toEntity(resp.getData(), User.class));
+                    }
+                    return Mono.just(User.builder().build());
+                });
     }
 
     public Mono<ApiResponse<UserDTO>> getUserByTelegramUserId(Long id) {
@@ -94,5 +112,42 @@ public class UserService {
 
         return result;
     }
+
+    @Override
+    public Mono<org.springframework.security.core.userdetails.UserDetails> findByUsername(String username) {
+        return getUserByUsername(username)
+                .flatMap(resp -> {
+
+                    if (Objects.nonNull(resp)) {
+
+                        User user = mapperService.toEntity(resp.getData(), User.class);
+
+                        log.debug("Класс UserService, метод findByUsername, user = {}", user);
+
+                        return Mono.just(
+                                org.springframework.security.core.userdetails.User.builder()
+                                        .username(user.getUsername())
+                                        .password("")
+                                        .roles(user.getRole())
+                                        .build()
+                        );
+                    }
+
+                    return Mono.just(org.springframework.security.core.userdetails.User.builder()
+                            .username("user")
+                            .password("")
+                            .roles(UserRoles.TOURIST.getRole())
+                            .build());
+                });
+    }
+
+    public org.springframework.security.core.userdetails.UserDetails createCurrentUser() {
+        return org.springframework.security.core.userdetails.User.builder()
+                .username("user")
+                .password("")
+                .roles(UserRoles.TOURIST.getRole())
+                .build();
+    }
+
 
 }

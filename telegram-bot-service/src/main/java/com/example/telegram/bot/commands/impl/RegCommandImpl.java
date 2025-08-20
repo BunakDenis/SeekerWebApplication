@@ -2,7 +2,7 @@ package com.example.telegram.bot.commands.impl;
 
 import com.example.telegram.bot.chat.states.ChatDialogService;
 import com.example.telegram.bot.commands.Command;
-import com.example.telegram.bot.utils.update.UpdateService;
+import com.example.telegram.bot.utils.update.UpdateUtilsService;
 import lombok.Data;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
@@ -18,7 +18,7 @@ public class RegCommandImpl implements Command {
     public SendMessage apply(Update update) {
         SendMessage result = new SendMessage();
 
-        result.setChatId(UpdateService.getChatId(update));
+        result.setChatId(UpdateUtilsService.getChatId(update));
         result.setText("Процедура регистрации находится в разработке");
 
         return result;
