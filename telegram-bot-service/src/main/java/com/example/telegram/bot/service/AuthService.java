@@ -57,38 +57,6 @@ public class AuthService {
     }
 
     /**
-     * Возвращает текущего пользователя (principal) из Reactive SecurityContext.
-     * Попытается привести principal к типу org.springframework.security.core.userdetails.UserDetails.
-     */
-    public Mono<org.springframework.security.core.userdetails.UserDetails> getCurrentUser() {
-
-        log.debug("Начало метода getCurrentUser");
-
-        Mono<UserDetails> result = ReactiveSecurityContextHolder.getContext()
-                .map(context -> {
-                    log.debug("Security Context = {}", context);
-                    return context.getAuthentication();
-                })
-                .filter(Objects::nonNull)
-                .map(auth -> {
-                    log.debug("Метод getCurrentUser {}", auth);
-                    return auth.getPrincipal();
-                })
-                .flatMap(principal -> {
-                    log.debug("Метод getCurrentUser {}", principal);
-                    // Если principal — строка (email) или другой тип, можно попытаться получить через детали:
-                    if (principal instanceof UserDetails) {
-                        return Mono.just((UserDetails) principal);
-                    }
-                    return Mono.just(userService.createCurrentUser());
-                });
-
-        log.debug("Конец метода getCurrentUser");
-
-        return result;
-    }
-
-    /**
      * Удобная проверка - авторизован ли кто-то сейчас.
      */
     public Mono<Boolean> isAuthenticated() {

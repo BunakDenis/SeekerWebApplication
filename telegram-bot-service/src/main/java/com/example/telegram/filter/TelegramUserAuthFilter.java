@@ -19,6 +19,8 @@ import org.springframework.http.server.reactive.ServerHttpRequestDecorator;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
@@ -91,21 +93,27 @@ public class TelegramUserAuthFilter implements WebFilter {
                                     );
 
                                     log.debug("Authentication = {}", auth);
-
-                                    // sessionId в хедер
-                                    String sessionId = String.valueOf(12345L);
-
-                                    authService.authenticate(userDetails);
-
-                                    log.debug("TelegramUserAuthFilter end.");
-
-                                    return chain.filter(exchange.mutate()
-                                                    .request(decorateRequest(exchange, body, sessionId))
-                                                    .build())
-                                            .contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth));
+                                    return Mono.just(auth);
+                                } else {
+                                    return Mono.empty();
                                 }
+                            })
+                            .filter(Objects::nonNull)
+                            .flatMap(auth -> {
 
-                                return chain.filter(exchange);
+                                // sessionId в хедер
+                                String sessionId = String.valueOf(12345L);
+
+                                SecurityContext emptyContext = SecurityContextHolder.createEmptyContext();
+
+                                emptyContext.setAuthentication(auth);
+
+                                log.debug("TelegramUserAuthFilter end.");
+
+                                return chain.filter(exchange.mutate()
+                                                .request(decorateRequest(exchange, body, sessionId))
+                                                .build())
+                                        .contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth));
 
                             });
                 });
