@@ -1,0 +1,271 @@
+package com.example.telegram;
+
+import com.example.data.models.consts.RequestMessageProvider;
+import com.example.data.models.entity.dto.UserDTO;
+import com.example.data.models.entity.dto.response.ApiResponse;
+import com.example.telegram.bot.commands.Commands;
+import com.example.telegram.bot.message.MessageProvider;
+import com.example.telegram.bot.message.TelegramBotMessageSender;
+import com.example.telegram.bot.service.ModelMapperService;
+import com.example.utils.file.loader.EnvLoader;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import io.github.cdimascio.dotenv.Dotenv;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
+import org.mockserver.client.MockServerClient;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.web.reactive.server.WebTestClient;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
+import org.testcontainers.containers.MockServerContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
+
+import java.util.List;
+
+import static com.example.telegram.constanst.TelegramBotConstants.*;
+import static org.awaitility.Awaitility.await;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockserver.model.HttpRequest.request;
+import static org.mockserver.model.HttpResponse.response;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        properties = "spring.main.web-application-type=reactive")
+@AutoConfigureWebTestClient
+@EnableReactiveMethodSecurity
+@Testcontainers
+@Slf4j
+public class TestSpring {
+
+    @Autowired
+    private WebTestClient client;
+
+    private static Dotenv dotenv;
+
+    private static ObjectMapper objectMapper;
+
+    private static ModelMapperService mapperService;
+
+    @MockBean
+    private TelegramBotMessageSender telegramBotMessageSender;
+
+    @Container
+    static MockServerContainer mockServerContainer =
+            new MockServerContainer(DockerImageName.parse("mockserver/mockserver:5.15.0"));
+
+    static MockServerClient mockServerClient;
+
+    static {
+        dotenv = EnvLoader.DOTENV;
+        mapperService = new ModelMapperService(new ModelMapper());
+    }
+
+    @DynamicPropertySource
+    static void overrideProperties(DynamicPropertyRegistry registry) {
+        mockServerClient = new MockServerClient(
+                mockServerContainer.getHost(),
+                mockServerContainer.getServerPort()
+        );
+
+        log.debug("MockServerContainer endpoint = {}", mockServerContainer.getEndpoint());
+
+        registry.add("data.provide.api.url", mockServerContainer::getEndpoint);
+    }
+
+    @BeforeAll
+    public static void init() {
+        log.debug("init");
+
+        objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    }
+
+    @Test
+    public void testUnknownCommand() throws JsonProcessingException {
+        //Given
+        Update update = new Update();
+        Message message = createTelegramMessage("fff");
+        update.setMessage(message);
+
+        String expectedMsgText = MessageProvider.UNKNOWN_COMMAND_OR_QUERY;
+
+        String requestBody = objectMapper.writeValueAsString(update);
+
+        ApiResponse<UserDTO> userDTOApiResponse = new ApiResponse<>(
+                HttpStatus.OK,
+                RequestMessageProvider.SUCCESSES_MSG,
+                mapperService.toDTO(USER_FOR_TESTS, UserDTO.class)
+        );
+
+        //When
+        mockServerClient
+                .when(request()
+                        .withMethod("GET")
+                        .withPath("/api/v1/user/get/telegram_user_id/" + TELEGRAM_API_USER_FOR_TESTS.getId()))
+                .respond(response()
+                        .withStatusCode(200)
+                        .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
+                        .withBody(objectMapper.writeValueAsString(userDTOApiResponse)));
+
+        mockServerClient
+                .when(request()
+                        .withMethod("GET")
+                        .withPath("/api/v1/user/get/username/" + USER_FOR_TESTS.getUsername()))
+                .respond(response()
+                        .withStatusCode(200)
+                        .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
+                        .withBody(objectMapper.writeValueAsString(userDTOApiResponse)));
+
+        WebTestClient.ResponseSpec exchange = client.post()
+                .uri("/api/bot/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(requestBody)
+                .exchange();
+
+        exchange.expectStatus().is2xxSuccessful();
+
+        ArgumentCaptor<SendMessage> captor = ArgumentCaptor.forClass(SendMessage.class);
+
+        Mockito.verify(telegramBotMessageSender,Mockito.timeout(5000L)).sendMessage(captor.capture());
+
+        SendMessage actual = captor.getValue();
+
+        //Then
+        assertEquals(expectedMsgText, actual.getText());
+    }
+
+    @Test
+    public void testStartCommand() throws Exception {
+
+        log.debug("testStartCommand");
+
+        //Given
+        Update update = new Update();
+        Message message = createTelegramMessage(Commands.START.getCommand());
+        update.setMessage(message);
+
+        String expectedMsgText = message.getFrom().getFirstName() + " " + message.getFrom().getLastName() + "! " +
+                MessageProvider.START_MSG;
+
+        String requestBody = objectMapper.writeValueAsString(update);
+
+        ApiResponse<UserDTO> userDTOApiResponse = new ApiResponse<>(
+                HttpStatus.OK,
+                RequestMessageProvider.SUCCESSES_MSG,
+                mapperService.toDTO(USER_FOR_TESTS, UserDTO.class)
+        );
+
+        //When
+        mockServerClient
+                .when(request()
+                        .withMethod("GET")
+                        .withPath("/api/v1/user/get/telegram_user_id/" + TELEGRAM_API_USER_FOR_TESTS.getId()))
+                .respond(response()
+                        .withStatusCode(200)
+                        .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
+                        .withBody(objectMapper.writeValueAsString(userDTOApiResponse)));
+
+        mockServerClient
+                .when(request()
+                        .withMethod("GET")
+                        .withPath("/api/v1/user/get/username/" + USER_FOR_TESTS.getUsername()))
+                .respond(response()
+                        .withStatusCode(200)
+                        .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
+                        .withBody(objectMapper.writeValueAsString(userDTOApiResponse)));
+
+
+        WebTestClient.ResponseSpec exchange = client.post()
+                .uri("/api/bot/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(requestBody)
+                .exchange();
+
+        ArgumentCaptor<SendMessage> captor = ArgumentCaptor.forClass(SendMessage.class);
+
+        Mockito.verify(telegramBotMessageSender,Mockito.timeout(5000L)).sendMessage(captor.capture());
+
+        SendMessage actual = captor.getValue();
+
+        assertTrue(actual.getReplyMarkup() instanceof ReplyKeyboardMarkup);
+
+        ReplyKeyboardMarkup markup = (ReplyKeyboardMarkup) actual.getReplyMarkup();
+
+        List<KeyboardRow> keyboard = markup.getKeyboard();
+
+        assertEquals("Декодировать аудио", keyboard.get(0).get(0).getText());
+
+        //Then
+        assertEquals(Long.toString(message.getChatId()), actual.getChatId());
+        assertEquals(expectedMsgText, actual.getText());
+
+    }
+
+    @Test
+    public void testAuthCommand() throws JsonProcessingException {
+
+        //Given
+        Update update = new Update();
+        Message message = createTelegramMessage(Commands.AUTHORIZE.getCommand());
+        update.setMessage(message);
+
+        String expectedMsgText = MessageProvider.EMAIL_CHECKING_MSG;
+
+        String requestBody = objectMapper.writeValueAsString(update);
+
+        //When
+        WebTestClient.ResponseSpec exchange = client.post()
+                .uri("/api/bot/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(requestBody)
+                .exchange();
+
+        exchange.expectStatus().is2xxSuccessful();
+
+        ArgumentCaptor<SendMessage> captor = ArgumentCaptor.forClass(SendMessage.class);
+
+        Mockito.verify(telegramBotMessageSender,Mockito.timeout(5000L)).sendMessage(captor.capture());
+
+        SendMessage actual = captor.getValue();
+
+        //Then
+        assertEquals(expectedMsgText, actual.getText());
+
+    }
+
+    private Message createTelegramMessage(String msgText) {
+
+        Message message = new Message();
+        message.setText(msgText);
+        message.setChat(CHAT_FOR_TESTS);
+        message.setFrom(TELEGRAM_API_USER_FOR_TESTS);
+
+        return message;
+    }
+
+}

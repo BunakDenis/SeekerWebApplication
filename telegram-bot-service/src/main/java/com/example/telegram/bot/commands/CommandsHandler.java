@@ -4,10 +4,11 @@ package com.example.telegram.bot.commands;
 import com.example.telegram.api.clients.DataProviderClient;
 import com.example.telegram.bot.chat.states.UiElements;
 import com.example.telegram.bot.chat.states.impl.CommandChatDialogServiceImpl;
-import com.example.telegram.bot.commands.impl.AuthCommandImpl;
 import com.example.telegram.bot.commands.impl.RegCommandImpl;
-import com.example.telegram.bot.commands.impl.StartCommandImpl;
 import com.example.telegram.bot.entity.TelegramChat;
+import com.example.telegram.bot.message.MessageProvider;
+import com.example.telegram.bot.commands.impl.AuthCommandImpl;
+import com.example.telegram.bot.commands.impl.StartCommandImpl;
 import com.example.telegram.bot.entity.TelegramUser;
 import com.example.telegram.bot.message.TelegramBotMessageSender;
 import com.example.telegram.bot.service.ModelMapperService;
@@ -20,8 +21,6 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
-
-import static com.example.telegram.bot.message.MessageProvider.*;
 
 import java.util.Map;
 
@@ -97,7 +96,7 @@ public class CommandsHandler {
             });
 */
         } else  {
-            sender.sendMessage(new SendMessage(String.valueOf(chatId), UNKNOWN_COMMAND_OR_QUERY));
+            sender.sendMessage(new SendMessage(String.valueOf(chatId), MessageProvider.UNKNOWN_COMMAND_OR_QUERY));
         }
 
         return dialogService;

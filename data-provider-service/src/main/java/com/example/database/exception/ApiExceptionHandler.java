@@ -4,7 +4,6 @@ package com.example.database.exception;
 import com.example.data.models.entity.dto.response.ApiResponse;
 import com.example.data.models.exception.ApiException;
 import com.example.utils.text.ExceptionServiceUtils;
-import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;

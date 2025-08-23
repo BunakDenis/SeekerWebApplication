@@ -29,7 +29,7 @@ services:
       #retries: 3
 
   telegram-bot-service:
-    image: bunakdenis/telegram-bot-service:latest
+    image: ${TELEGRAM_BOT_SERVICE_IMAGE}
     #volumes:
       #- ./telegram-bot-service/src:/app/src
       #- ./utils-service/src:/app/utils-service

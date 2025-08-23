@@ -1,19 +1,12 @@
 package com.example.telegram.bot.service;
 
-import com.example.data.models.entity.dto.UserDTO;
-import com.example.data.models.entity.dto.UserDetailsDTO;
-import com.example.data.models.entity.dto.telegram.TelegramChatDTO;
-import com.example.data.models.entity.dto.telegram.TelegramSessionDTO;
 import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
-import com.example.telegram.bot.entity.*;
+import com.example.telegram.bot.entity.TelegramUser;
+import com.example.telegram.bot.entity.User;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 @Service
 @Data

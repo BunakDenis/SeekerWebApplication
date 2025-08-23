@@ -1,9 +1,7 @@
 package com.example.database.service.telegram;
 
 import com.example.data.models.entity.dto.response.ApiResponse;
-import com.example.data.models.entity.dto.telegram.TelegramSessionDTO;
 import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
-import com.example.database.entity.TelegramSession;
 import com.example.database.entity.TelegramUser;
 import com.example.database.repo.telegram.TelegramUserRepo;
 import lombok.RequiredArgsConstructor;
@@ -12,8 +10,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Objects;
 
-import static com.example.database.consts.RequestMessageProvider.NOT_FOUND_MSG;
-import static com.example.database.consts.RequestMessageProvider.SUCCESSES_MSG;
+import static com.example.data.models.consts.RequestMessageProvider.NOT_FOUND_MSG;
+import static com.example.data.models.consts.RequestMessageProvider.SUCCESSES_MSG;
 
 @Service
 @RequiredArgsConstructor

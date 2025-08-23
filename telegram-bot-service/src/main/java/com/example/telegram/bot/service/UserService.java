@@ -1,10 +1,10 @@
 package com.example.telegram.bot.service;
 
-import com.example.data.models.entity.dto.UserDTO;
 import com.example.data.models.entity.dto.UserDetailsDTO;
+import com.example.data.models.enums.UserRoles;
+import com.example.data.models.entity.dto.UserDTO;
 import com.example.data.models.entity.dto.response.ApiResponse;
 import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
-import com.example.data.models.enums.UserRoles;
 import com.example.telegram.api.clients.DataProviderClient;
 import com.example.telegram.bot.entity.TelegramUser;
 import com.example.telegram.bot.entity.User;
@@ -112,7 +112,6 @@ public class UserService implements ReactiveUserDetailsService {
 
         return result;
     }
-
     @Override
     public Mono<org.springframework.security.core.userdetails.UserDetails> findByUsername(String username) {
         return getUserByUsername(username)
@@ -148,6 +147,5 @@ public class UserService implements ReactiveUserDetailsService {
                 .roles(UserRoles.TOURIST.getRole())
                 .build();
     }
-
 
 }

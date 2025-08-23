@@ -1,27 +1,22 @@
 package com.example.telegram.api.controller;
 
-import com.example.telegram.api.clients.DataProviderClient;
 import com.example.telegram.bot.TelegramBot;
-import com.example.telegram.bot.entity.User;
 import com.example.telegram.bot.service.AuthService;
 import com.example.telegram.bot.service.ModelMapperService;
 import com.example.telegram.bot.service.UserService;
-import com.example.telegram.bot.utils.update.UpdateUtilsService;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+
+import java.util.Objects;
 
 @RestController
 @RequestMapping("${telegram.bot.webhook-path}")
@@ -47,28 +42,29 @@ public class WebhookController {
     private void init() {
         log.debug("telegramBotName {}", telegramBotName);
     }
-/*
-    @PostMapping("/")
-    public BotApiMethod<?> onUpdateReceived(
-            @RequestBody Update update,
-            @AuthenticationPrincipal org.springframework.security.core.userdetails.User principal) {
-
-        log.debug("principal = {}", principal);
-
-        telegramBot.setUserDetails(principal);
-
-        return telegramBot.onWebhookUpdateReceived(update);
-
-    }
-  */
 
     @PostMapping("/")
-    public Mono<ResponseEntity<?>> handleWebhook(@RequestBody Update update) {
+    public Mono<ResponseEntity<?>> handleWebhook(
+            @RequestHeader(name = "X-Session-Id") String sessionId,
+            @RequestBody Update update
+    ) {
+
         log.debug("Метод handleWebhook");
+
+        if (Objects.nonNull(sessionId) || sessionId.isEmpty()) {
+            return Mono.just(update)
+                    .flatMap(upd ->
+                            Mono.fromCallable(() -> telegramBot.onWebhookUpdateReceived(update))
+                    .subscribeOn(Schedulers.boundedElastic()))
+                .map(response -> ResponseEntity.ok().body(response));
+        }
 
         return ReactiveSecurityContextHolder.getContext()
                 .map(SecurityContext::getAuthentication)
                 .flatMap(auth -> {
+
+                    log.debug(auth);
+
                     // Передаем аутентификацию в бот
                     return Mono.fromCallable(() -> {
                         telegramBot.setAuthentication(auth);

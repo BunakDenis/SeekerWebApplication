@@ -1,8 +1,8 @@
 package com.example.telegram.bot.multimedia;
 
 import com.example.telegram.api.clients.UsefulToolsClient;
-import com.example.telegram.bot.message.TelegramBotMessageSender;
 import com.example.telegram.bot.utils.update.UpdateUtilsService;
+import com.example.telegram.bot.message.TelegramBotMessageSender;
 import com.example.utils.file.FileService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;

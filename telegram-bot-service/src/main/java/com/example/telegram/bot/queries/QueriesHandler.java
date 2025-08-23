@@ -1,12 +1,11 @@
 package com.example.telegram.bot.queries;
 
 
-import static com.example.telegram.bot.message.MessageProvider.*;
-
 import com.example.telegram.api.clients.UsefulToolsClient;
+import com.example.telegram.bot.message.MessageProvider;
+import com.example.telegram.bot.utils.update.UpdateUtilsService;
 import com.example.telegram.bot.message.MessageForWifeProvider;
 import com.example.telegram.bot.message.TelegramBotMessageSender;
-import com.example.telegram.bot.utils.update.UpdateUtilsService;
 import lombok.Data;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +54,7 @@ public class QueriesHandler {
                 answer = query.apply(update);
             } catch (NullPointerException e) {
                 log.debug("Query - " + msg.getText() + ", не найден в коллекции обрабатываемых Query.");
-                answer = new SendMessage(String.valueOf(chatId), UNKNOWN_COMMAND_OR_QUERY);
+                answer = new SendMessage(String.valueOf(chatId), MessageProvider.UNKNOWN_COMMAND_OR_QUERY);
             }
 
         if (update.getMessage().getChatId() == WIFE_CHAT_ID) {

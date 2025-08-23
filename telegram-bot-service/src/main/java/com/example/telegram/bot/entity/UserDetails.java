@@ -1,6 +1,5 @@
 package com.example.telegram.bot.entity;
 
-import com.example.data.models.entity.dto.UserDTO;
 import lombok.*;
 
 import java.time.LocalDateTime;

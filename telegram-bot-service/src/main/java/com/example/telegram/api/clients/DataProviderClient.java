@@ -1,11 +1,11 @@
 package com.example.telegram.api.clients;
 
 
+import com.example.data.models.entity.dto.telegram.TelegramSessionDTO;
 import com.example.data.models.entity.dto.UserDTO;
 import com.example.data.models.entity.dto.telegram.TelegramChatDTO;
 import com.example.data.models.entity.dto.request.ApiRequest;
 import com.example.data.models.entity.dto.response.ApiResponse;
-import com.example.data.models.entity.dto.telegram.TelegramSessionDTO;
 import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
 import com.example.data.models.exception.ApiException;
 import com.example.telegram.bot.entity.TelegramChat;
@@ -33,6 +33,8 @@ public class DataProviderClient {
     @Value("${data.provide.api.version}")
     private String apiVersion;
 
+    private String apiUserEndpoint;
+
     private String apiChatEndpoint;
 
     private String apiSessionEndPoint;
@@ -43,8 +45,9 @@ public class DataProviderClient {
 
     @PostConstruct
     public void init() {
-        apiChatEndpoint = "/chat";
 
+        apiUserEndpoint = "/user";
+        apiChatEndpoint = "/chat";
         apiSessionEndPoint = "/session";
 
         String baseURL = dataProviderURL + apiVersion;
@@ -66,11 +69,13 @@ public class DataProviderClient {
 
     public Mono<ApiResponse<UserDTO>> getUserById(Long id) {
 
-        String endpoint = "/user/get/id/" + id;
+        StringBuilder endpoint = new StringBuilder(apiUserEndpoint);
+        endpoint.append("/get/id/");
+        endpoint.append(id);
 
         try {
             return webClient.get()
-                    .uri(endpoint)
+                    .uri(endpoint.toString())
                     .accept(MediaType.APPLICATION_JSON)
                     .retrieve()
                     .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
@@ -88,11 +93,13 @@ public class DataProviderClient {
     }
     public Mono<ApiResponse<UserDTO>> getUserByUsername(String username) {
 
-        String endpoint = "/user/get/username/" + username;
+        StringBuilder endpoint = new StringBuilder(apiUserEndpoint);
+        endpoint.append("/get/username/");
+        endpoint.append(username);
 
         try {
             return webClient.get()
-                    .uri(endpoint)
+                    .uri(endpoint.toString())
                     .accept(MediaType.APPLICATION_JSON)
                     .retrieve()
                     .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
@@ -110,11 +117,13 @@ public class DataProviderClient {
     }
     public Mono<ApiResponse<UserDTO>> getUserByEmail(String email) {
 
-        String endpoint = "/user/get/email/" + email;
+        StringBuilder endpoint = new StringBuilder(apiUserEndpoint);
+        endpoint.append("/get/email/");
+        endpoint.append(email);
 
         try {
             return webClient.get()
-                    .uri(endpoint)
+                    .uri(endpoint.toString())
                     .accept(MediaType.APPLICATION_JSON)
                     .retrieve()
                     .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
@@ -132,11 +141,13 @@ public class DataProviderClient {
     }
     public Mono<ApiResponse<UserDTO>> getUserByTelegramUserId(Long id) {
 
-        String endpoint = "/user/get/telegram_user_id/" + id;
+        StringBuilder endpoint = new StringBuilder(apiUserEndpoint);
+        endpoint.append("/get/telegram_user_id/");
+        endpoint.append(id);
 
         try {
             return webClient.get()
-                    .uri(endpoint)
+                    .uri(endpoint.toString())
                     .accept(MediaType.APPLICATION_JSON)
                     .retrieve()
                     .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
@@ -154,11 +165,13 @@ public class DataProviderClient {
     }
     public Mono<ApiResponse<UserDTO>> getUserByTelegramUserIdWithUserDetails(Long id) {
 
-        String endpoint = "/user/user_details/get/telegram_user_id/" + id;
+        StringBuilder endpoint = new StringBuilder(apiUserEndpoint);
+        endpoint.append("/user_details/get/telegram_user_id/");
+        endpoint.append(id);
 
         try {
             return webClient.get()
-                    .uri(endpoint)
+                    .uri(endpoint.toString())
                     .accept(MediaType.APPLICATION_JSON)
                     .retrieve()
                     .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
@@ -176,11 +189,13 @@ public class DataProviderClient {
     }
     public Mono<ApiResponse<UserDTO>> getUserByTelegramUserIdWithTelegramUser(Long id) {
 
-        String endpoint = "/user/telegram_user/get/telegram_user_id/" + id;
+        StringBuilder endpoint = new StringBuilder(apiUserEndpoint);
+        endpoint.append("/telegram_user/get/telegram_user_id/");
+        endpoint.append(id);
 
         try {
             return webClient.get()
-                    .uri(endpoint)
+                    .uri(endpoint.toString())
                     .accept(MediaType.APPLICATION_JSON)
                     .retrieve()
                     .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
@@ -198,11 +213,13 @@ public class DataProviderClient {
     }
     public Mono<ApiResponse<UserDTO>> getUserByTelegramUserIdFull(Long id) {
 
-        String endpoint = "/user/full/get/telegram_user_id/" + id;
+        StringBuilder endpoint = new StringBuilder(apiUserEndpoint);
+        endpoint.append("/full/get/telegram_user_id/");
+        endpoint.append(id);
 
         try {
             return webClient.get()
-                    .uri(endpoint)
+                    .uri(endpoint.toString())
                     .accept(MediaType.APPLICATION_JSON)
                     .retrieve()
                     .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
@@ -218,7 +235,6 @@ public class DataProviderClient {
         }
         return null;
     }
-
     public Mono<ApiResponse> checkTelegramUserAuthentication(Long telegramUserId) {
 
         String endpoint = "/user/check/auth/" + telegramUserId;
@@ -240,7 +256,6 @@ public class DataProviderClient {
         }
         return null;
     }
-
     public Mono<ApiResponse<TelegramUserDTO>> getTelegramUserById(Long id) {
 
         String endpoint = "/telegram/user/get/" + id;
@@ -264,7 +279,6 @@ public class DataProviderClient {
         return null;
 
     }
-
     public Mono<ApiResponse<TelegramChatDTO>> saveTelegramChat(TelegramChat chat) {
 
         TelegramChatDTO dto = mapperService.toDTO(chat, TelegramChatDTO.class);
@@ -301,7 +315,6 @@ public class DataProviderClient {
             return null;
         }
     }
-
     public Mono<ApiResponse<TelegramChatDTO>> getTelegramChats(Long id) {
 
         log.debug("Отправляю запрос к Data provide service для получения чата {}", id);
@@ -332,7 +345,6 @@ public class DataProviderClient {
             return null;
         }
     }
-
     public Mono<ApiResponse<TelegramSessionDTO>> getTelegramSessionByTelegramUserId(Long id) {
 
         try {

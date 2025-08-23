@@ -1,6 +1,5 @@
 package com.example.telegram.bot.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import java.util.List;

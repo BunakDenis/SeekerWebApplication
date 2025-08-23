@@ -1,5 +1,6 @@
 package com.example.database.api.controller;
 
+import com.example.data.models.entity.dto.telegram.TelegramSessionDTO;
 import com.example.data.models.entity.dto.UserDTO;
 import com.example.data.models.entity.dto.mysticschool.ArticleCategory;
 import com.example.data.models.entity.dto.response.ApiResponseWithDataList;
@@ -7,7 +8,6 @@ import com.example.data.models.entity.dto.telegram.TelegramChatDTO;
 import com.example.data.models.entity.dto.request.ApiRequest;
 import com.example.data.models.entity.dto.response.ApiResponse;
 import com.example.data.models.entity.dto.response.CheckUserResponse;
-import com.example.data.models.entity.dto.telegram.TelegramSessionDTO;
 import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
 import com.example.database.api.client.MysticSchoolClient;
 import com.example.database.entity.TelegramChat;
@@ -15,7 +15,6 @@ import com.example.database.entity.TelegramSession;
 import com.example.database.entity.User;
 import com.example.database.service.telegram.*;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

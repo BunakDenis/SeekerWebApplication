@@ -1,4 +1,4 @@
-package com.example.database.consts;
+package com.example.data.models.consts;
 
 public class RequestMessageProvider {
 

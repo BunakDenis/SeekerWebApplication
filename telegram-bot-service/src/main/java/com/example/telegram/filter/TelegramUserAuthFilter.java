@@ -13,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpRequestDecorator;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -55,6 +55,10 @@ public class TelegramUserAuthFilter implements WebFilter {
 
         ServerHttpRequest request = exchange.getRequest();
 
+        String path = request.getURI().getPath();
+
+        log.debug("Request URI path = {}", path);
+
         return DataBufferUtils.join(request.getBody())
                 .flatMap(buffer -> {
                     String body = StandardCharsets.UTF_8.decode(buffer.toByteBuffer()).toString();
@@ -62,10 +66,20 @@ public class TelegramUserAuthFilter implements WebFilter {
 
                     log.debug("Body запроса от Telegram API: {}", body);
 
+                    // Пропускаем запросы с командами /auth и /register
+                    if ("/api/bot/".equals(path) && (body.contains("/authorize") || body.contains("/register"))) {
+
+                        log.debug("Обработка в фильтре запроса \"/authorize\" или \"/register\"");
+
+                        return chain.filter(exchange.mutate()
+                                .request(decorateRequest(exchange, body, ""))
+                                .build()); // Пропускаем дальше по цепочке
+                    }
+
                     Long telegramUserId = extractUserId(body);
                     if (telegramUserId == null) {
                         return chain.filter(exchange.mutate()
-                                .request(decorateRequest(exchange, body, null))
+                                .request(decorateRequest(exchange, body, ""))
                                 .build());
                     }
 
@@ -73,6 +87,7 @@ public class TelegramUserAuthFilter implements WebFilter {
                             .flatMap(resp -> {
 
                                 if (Objects.nonNull(resp)) {
+
                                     User user = mapperService.toEntity(resp.getData(), User.class);
 
                                     log.debug("User {}", user);

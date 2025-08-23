@@ -1,6 +1,7 @@
 package com.example.utils.file.loader;
 
 import io.github.cdimascio.dotenv.Dotenv;
+import io.github.cdimascio.dotenv.DotenvEntry;
 import lombok.extern.log4j.Log4j2;
 
 import java.util.Map;

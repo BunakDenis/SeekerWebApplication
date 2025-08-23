@@ -1,8 +1,6 @@
 package com.example.database.service.telegram;
 
-import com.example.data.models.entity.dto.UserDTO;
 import com.example.data.models.entity.dto.UserDetailsDTO;
-import com.example.database.entity.User;
 import com.example.database.entity.UserDetails;
 import com.example.database.repo.telegram.UserDetailsRepo;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service

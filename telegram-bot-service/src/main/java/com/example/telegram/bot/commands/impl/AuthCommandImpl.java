@@ -4,6 +4,7 @@ import com.example.telegram.bot.chat.states.ChatDialogService;
 import com.example.telegram.bot.chat.states.DialogStates;
 import com.example.telegram.bot.chat.states.impl.CommandChatDialogServiceImpl;
 import com.example.telegram.bot.commands.Command;
+import com.example.telegram.bot.message.MessageProvider;
 import com.example.telegram.bot.commands.Commands;
 import com.example.telegram.bot.utils.update.UpdateUtilsService;
 import lombok.Data;
@@ -12,8 +13,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-
-import static com.example.telegram.bot.message.MessageProvider.*;
 
 
 @Component
@@ -37,16 +36,16 @@ public class AuthCommandImpl implements Command {
         if (Commands.AUTHORIZE.getCommand().equals(msgText)) {
 
             dialogService.setDialogState(DialogStates.ENTER_EMAIL.getDialogState());
-            result.setText(EMAIL_CHECKING_MSG);
+            result.setText(MessageProvider.EMAIL_CHECKING_MSG);
 
         } else if (DialogStates.ENTER_EMAIL.getDialogState().equals(msgText)) {
             log.debug("Стадия проверки введённого юзером емейла");
-            result.setText(DATA_VERIFICATION_MSG);
+            result.setText(MessageProvider.DATA_VERIFICATION_MSG);
 
             dialogService.setDialogState(null);
 
         } else {
-            result.setText(UNKNOWN_COMMAND_OR_QUERY);
+            result.setText(MessageProvider.UNKNOWN_COMMAND_OR_QUERY);
         }
         return result;
     }

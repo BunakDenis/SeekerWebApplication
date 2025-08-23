@@ -2,6 +2,7 @@ package com.example.telegram.bot.commands.impl;
 
 import com.example.telegram.bot.chat.states.ChatDialogService;
 import com.example.telegram.bot.commands.Command;
+import com.example.telegram.bot.message.MessageProvider;
 import com.example.telegram.bot.queries.Queries;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -13,8 +14,6 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
-
-import static com.example.telegram.bot.message.MessageProvider.*;
 
 import java.util.Collections;
 
@@ -45,14 +44,17 @@ public class StartCommandImpl implements Command {
             greeting.append("! ");
         }
 
-        greeting.append(START_MSG);
+        greeting.append(MessageProvider.START_MSG);
 
         SendMessage answer = new SendMessage(String.valueOf(chatId),
                 greeting.toString());
 
         // Создание reply-кнопки
+        KeyboardButton decodeAudioButton = new KeyboardButton(Queries.DECODE_AUDIO.getQuery());
+
         KeyboardRow row = new KeyboardRow();
-        row.add(new KeyboardButton(Queries.DECODE_AUDIO.getQuery()));
+        row.add(decodeAudioButton);
+
         ReplyKeyboardMarkup keyboard = new ReplyKeyboardMarkup();
         keyboard.setKeyboard(Collections.singletonList(row));
         keyboard.setResizeKeyboard(true);

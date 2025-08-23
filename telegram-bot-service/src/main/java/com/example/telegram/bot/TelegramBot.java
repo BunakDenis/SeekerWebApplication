@@ -1,8 +1,9 @@
 package com.example.telegram.bot;
 
 
-import com.example.telegram.api.clients.DataProviderClient;
 import com.example.telegram.bot.chat.states.impl.CommandChatDialogServiceImpl;
+import com.example.telegram.bot.message.MessageProvider;
+import com.example.telegram.api.clients.DataProviderClient;
 import com.example.telegram.bot.commands.Commands;
 import com.example.telegram.bot.commands.CommandsHandler;
 import com.example.telegram.bot.message.TelegramBotMessageSender;
@@ -16,10 +17,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.ReactiveSecurityContextHolder;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramWebhookBot;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
@@ -29,9 +26,6 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import reactor.core.publisher.Mono;
-
-import static com.example.telegram.bot.message.MessageProvider.*;
 
 import java.util.List;
 import java.util.Objects;
@@ -54,6 +48,7 @@ public class TelegramBot extends TelegramWebhookBot {
     private Authentication authentication;
 
     private final DataProviderClient dataProviderClient;
+
     private final AuthService authService;
     private final TelegramBotMessageSender sender;
     private final CommandsHandler commandsHandler;
@@ -88,7 +83,7 @@ public class TelegramBot extends TelegramWebhookBot {
         log.debug("--------------------------------------");
         log.debug("Начало метода onWebhookUpdateReceived");
 
-        log.debug("authentication = {}", authentication);
+        //log.debug("authentication = {}", authentication);
 
         if (Objects.nonNull(update)) {
 
@@ -123,7 +118,7 @@ public class TelegramBot extends TelegramWebhookBot {
                     log.debug("Юзер прислал медиа файл");
                     multimediaHandler.handleMultimedia(update);
                 } else {
-                    sender.sendMessage(update.getMessage().getChatId(), UNKNOWN_COMMAND_OR_QUERY);
+                    sender.sendMessage(update.getMessage().getChatId(), MessageProvider.UNKNOWN_COMMAND_OR_QUERY);
                 }
 
             } else if (update.hasCallbackQuery()) {

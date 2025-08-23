@@ -1,0 +1,20 @@
+services:
+  mock-server:
+    image: mockserver/mockserver:5.15.0
+    ports:
+      - "1080:1080"  # Проброс порта наружу для доступа с хост-машины
+    networks:
+      - my-network
+
+  telegram-bot:
+    image: bunakdenis/telegram-bot-service:latest
+    depends_on:
+      - mock-server  # Указываем зависимость от mock-server
+    networks:
+      - my-network
+    ports:
+      - "8090:8090"  # Или любой другой порт для вашего бота
+
+networks:
+  my-network:
+    name: my-network
