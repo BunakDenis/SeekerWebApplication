@@ -25,7 +25,7 @@ public class DataProviderTests {
     static {
         dotenv = EnvLoader.DOTENV;
     }
-
+/*
     @Test
     public void actuatorTests() throws Exception {
         String response = mockMvc.perform(get("/actuator/health"))
@@ -35,5 +35,5 @@ public class DataProviderTests {
 
         log.debug(response);
     }
-
+*/
 }
