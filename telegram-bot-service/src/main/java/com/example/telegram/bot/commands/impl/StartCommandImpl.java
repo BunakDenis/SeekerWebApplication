@@ -2,6 +2,7 @@ package com.example.telegram.bot.commands.impl;
 
 import com.example.telegram.bot.chat.states.ChatDialogService;
 import com.example.telegram.bot.commands.Command;
+import com.example.telegram.bot.entity.TelegramChat;
 import com.example.telegram.bot.message.MessageProvider;
 import com.example.telegram.bot.queries.Queries;
 import lombok.Data;
@@ -14,6 +15,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
+import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 
@@ -24,7 +26,7 @@ import java.util.Collections;
 public class StartCommandImpl implements Command {
 
     @Override
-    public SendMessage apply(Update update) {
+    public Mono<SendMessage> apply(Update update, TelegramChat lastTelegramChat) {
 
         log.debug("StartCommandImpl метод apply");
 
@@ -61,11 +63,6 @@ public class StartCommandImpl implements Command {
 
         answer.setReplyMarkup(keyboard);
 
-        return answer;
-    }
-
-    @Override
-    public ChatDialogService getChatDialogService() {
-        return null;
+        return Mono.just(answer);
     }
 }

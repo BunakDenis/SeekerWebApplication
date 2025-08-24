@@ -182,6 +182,20 @@ public class TelegramDataController {
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 
+    @GetMapping("/chat/telegram_user/get/{id}")
+    public ResponseEntity<ApiResponse<TelegramChatDTO>> getChatsWithTelegramUser(
+            @PathVariable("id") Long chatId
+    ) {
+
+        log.debug("Входящий запрос на получения чатов с телеграм юзером по id {}", chatId);
+
+        ApiResponse<TelegramChatDTO> response = chatsService.getTelegramChatByIdWithTelegramUser(chatId);
+
+        log.debug("Ответ {}", response);
+
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
     @PostMapping(path = {"/chat/add/", "/chat/add"})
     public ResponseEntity<ApiResponse<TelegramChatDTO>> addChat(
             @RequestBody ApiRequest<TelegramChatDTO> request

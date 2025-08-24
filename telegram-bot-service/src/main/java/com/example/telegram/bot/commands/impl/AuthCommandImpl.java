@@ -2,10 +2,12 @@ package com.example.telegram.bot.commands.impl;
 
 import com.example.telegram.bot.chat.states.ChatDialogService;
 import com.example.telegram.bot.chat.states.DialogStates;
-import com.example.telegram.bot.chat.states.impl.CommandChatDialogServiceImpl;
+import com.example.telegram.bot.chat.states.UiElements;
 import com.example.telegram.bot.commands.Command;
+import com.example.telegram.bot.entity.TelegramChat;
 import com.example.telegram.bot.message.MessageProvider;
 import com.example.telegram.bot.commands.Commands;
+import com.example.telegram.bot.service.TelegramChatService;
 import com.example.telegram.bot.utils.update.UpdateUtilsService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +15,9 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import reactor.core.publisher.Mono;
+
+import java.util.Objects;
 
 
 @Component
@@ -21,37 +26,61 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 @RequiredArgsConstructor
 public class AuthCommandImpl implements Command {
 
-    private final CommandChatDialogServiceImpl dialogService;
+    private final TelegramChatService chatService;
 
     @Override
-    public SendMessage apply(Update update) {
+    public Mono<SendMessage> apply(Update update, TelegramChat chat) {
 
-        log.debug("CommandChatDialogServiceImpl метод apply");
+        log.debug("AuthCommandImpl метод apply");
 
         String msgText = UpdateUtilsService.getMessageText(update);
         SendMessage result = new SendMessage();
 
         result.setChatId(UpdateUtilsService.getChatId(update));
 
-        if (Commands.AUTHORIZE.getCommand().equals(msgText)) {
+        chat.setUiElement(UiElements.COMMAND.getUiElement());
+        chat.setUiElementValue(Commands.AUTHORIZE.getCommand());
 
-            dialogService.setDialogState(DialogStates.ENTER_EMAIL.getDialogState());
+        String chatState = chat.getChatState();
+
+        if (chatState.isEmpty()) {
+
+            chat.setChatState(DialogStates.ENTER_EMAIL.getDialogState());
             result.setText(MessageProvider.EMAIL_CHECKING_MSG);
 
-        } else if (DialogStates.ENTER_EMAIL.getDialogState().equals(msgText)) {
-            log.debug("Стадия проверки введённого юзером емейла");
-            result.setText(MessageProvider.DATA_VERIFICATION_MSG);
+        } else if (msgText.equals(DialogStates.ENTER_EMAIL.getDialogState()) &&
+                chatState.equals(DialogStates.ENTER_EMAIL.getDialogState())) {
 
-            dialogService.setDialogState(null);
+            log.debug("Стадия проверки введённого юзером емейла");
+
+            chat.setChatState(DialogStates.EMAIL_VERIFICATION.getDialogState());
+            result.setText(MessageProvider.EMAIL_VERIFICATION_MSG);
+
+        } else if (msgText.equals(DialogStates.EMAIL_VERIFICATION.getDialogState()) &&
+                chatState.equals(DialogStates.EMAIL_VERIFICATION.getDialogState())) {
+
+            log.debug("Стадия проверки введённого юзером емейла");
+
+            chat.setUiElement("");
+            chat.setUiElementValue("");
+            chat.setChatState("");
+            result.setText(MessageProvider.SUCCESSES_AUTHORIZATION_MSG);
 
         } else {
+
             result.setText(MessageProvider.UNKNOWN_COMMAND_OR_QUERY);
+
         }
-        return result;
+
+        /*
+            TODO Добавить логику проверки сохранённого чата, если чат не сохранён, написать кастомное сообщение юзеру
+         */
+
+        return chatService.save(chat)
+                .flatMap(resp -> {
+                    log.debug("Сохранённый чат {}", resp);
+                    return Mono.just(result);
+                });
     }
 
-    @Override
-    public ChatDialogService getChatDialogService() {
-        return dialogService;
-    }
 }

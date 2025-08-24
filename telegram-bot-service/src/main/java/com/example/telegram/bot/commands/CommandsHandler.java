@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
+import reactor.core.publisher.Mono;
 
 import java.util.Map;
 
@@ -54,7 +55,7 @@ public class CommandsHandler {
         );
     }
 
-    public CommandChatDialogServiceImpl handleCommands(Update update) {
+    public Mono<Boolean> handleCommands(Update update, TelegramChat lastTelegramChat) {
 
         log.debug("handleCommands method");
 
@@ -70,36 +71,21 @@ public class CommandsHandler {
 
         var commandHandler = getCommandHandler(command);
 
+        log.debug(commandHandler);
+
         if (commandHandler != null) {
 
-            sender.sendMessage(commandHandler.apply(update));
+            return commandHandler.apply(update, lastTelegramChat)
+                            .flatMap(upd -> {
+                                sender.sendMessage(upd);
+                                return Mono.just(true);
+                            });
 
-            TelegramChat chatForSave = TelegramChat.builder()
-                    .id(chatId)
-                    .uiElement(UiElements.COMMAND.getUiElement())
-                    .uiElementValue(command)
-                    .telegramUser(telegramUserForCheck)
-                    .build();
-
-            /*
-            Mono<ApiResponse<TelegramChatDTO>> saveTelegramChat = dataProviderClient.saveTelegramChat(chatForSave);
-
-            saveTelegramChat.doOnSuccess(resp -> {
-                log.debug("Chat saved successfully {}", resp);
-            })
-                    .doOnError(err -> log.debug("Chat don't saved {}", err));
-
-            Mono<ApiResponse<TelegramChatDTO>> telegramChats = dataProviderClient.getTelegramChats(chatId);
-
-            telegramChats.doOnSuccess(resp -> {
-                log.debug("All user " + telegramUser + " chats " + resp.getData());
-            });
-*/
         } else  {
             sender.sendMessage(new SendMessage(String.valueOf(chatId), MessageProvider.UNKNOWN_COMMAND_OR_QUERY));
         }
 
-        return dialogService;
+        return Mono.empty();
     }
 
     private Command getCommandHandler(String command) {

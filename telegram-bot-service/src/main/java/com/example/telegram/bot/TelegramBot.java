@@ -2,6 +2,7 @@ package com.example.telegram.bot;
 
 
 import com.example.telegram.bot.chat.states.impl.CommandChatDialogServiceImpl;
+import com.example.telegram.bot.entity.TelegramChat;
 import com.example.telegram.bot.message.MessageProvider;
 import com.example.telegram.api.clients.DataProviderClient;
 import com.example.telegram.bot.commands.Commands;
@@ -10,6 +11,7 @@ import com.example.telegram.bot.message.TelegramBotMessageSender;
 import com.example.telegram.bot.multimedia.MultimediaHandler;
 import com.example.telegram.bot.queries.QueriesHandler;
 import com.example.telegram.bot.service.AuthService;
+import com.example.telegram.bot.service.TelegramChatService;
 import com.example.telegram.bot.utils.update.UpdateUtilsService;
 import jakarta.annotation.PostConstruct;
 import lombok.Data;
@@ -21,11 +23,13 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramWebhookBot;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Objects;
@@ -47,9 +51,9 @@ public class TelegramBot extends TelegramWebhookBot {
 
     private Authentication authentication;
 
-    private final DataProviderClient dataProviderClient;
-
     private final AuthService authService;
+
+    private final TelegramChatService telegramChatService;
     private final TelegramBotMessageSender sender;
     private final CommandsHandler commandsHandler;
     private final QueriesHandler queriesHandler;
@@ -80,55 +84,77 @@ public class TelegramBot extends TelegramWebhookBot {
     @Override
     public BotApiMethod<?> onWebhookUpdateReceived(Update update) {
 
+        long chatId = UpdateUtilsService.getChatId(update);
+
         log.debug("--------------------------------------");
         log.debug("Начало метода onWebhookUpdateReceived");
 
-        //log.debug("authentication = {}", authentication);
+        telegramChatService.getTelegramChatByIdWithTelegramUser(chatId)
+                .flatMap(lastTelegramChat -> {
 
-        if (Objects.nonNull(update)) {
+                    log.debug("authentication = {}", authentication);
 
-            log.debug("Objects.nonNull(update) = true");
+                    if (Objects.nonNull(update)) {
 
-            //Проверка авторизации юзера
-            User telegramApiUser = UpdateUtilsService.getTelegramUser(update);
+                        log.debug("Objects.nonNull(update) = true");
 
-            log.debug("Входящее сообщение от Юзера - " + telegramApiUser.getFirstName() + " " + telegramApiUser.getLastName());
-            log.debug("Id юзера - {}", telegramApiUser.getId());
+                        //Проверка авторизации юзера
+                        User telegramApiUser = UpdateUtilsService.getTelegramUser(update);
 
-            if (update.hasMessage()) {
+                        log.debug("Входящее сообщение от Юзера - " + telegramApiUser.getFirstName() + " " + telegramApiUser.getLastName());
+                        log.debug("Id юзера - {}", telegramApiUser.getId());
 
-                Message message = update.getMessage();
+                        if (update.hasMessage()) {
 
-                log.debug("Входящее сообщение - " + message.getText());
+                            Message message = update.getMessage();
 
-                if (message.hasText()) {
-                    String msgText = message.getText();
+                            log.debug("Входящее сообщение - " + message.getText());
 
-                    if (
-                            msgText.equals("/start") || (dialogService.getCommand() != null)
-                    ) {
-                        commandsHandler.handleCommands(update);
-                    } else if (msgText.startsWith("/")) {
-                        CommandChatDialogServiceImpl updatedDialogService = commandsHandler.handleCommands(update);
-                    } else {
-                        queriesHandler.handleQueries(update);
+                            //Создаём чат для дальнейшей записи в БД
+                            TelegramChat currentTelegramChat = TelegramChat.builder()
+                                    .id(chatId)
+                                    .build();
+
+                            if (message.hasText()) {
+
+                                String msgText = message.getText();
+
+                                if (
+                                        msgText.equals("/start") || !Objects.nonNull(lastTelegramChat.getChatState())
+                                ) {
+                                    return commandsHandler.handleCommands(update, lastTelegramChat);
+                                } else if (msgText.startsWith("/")) {
+                                    return commandsHandler.handleCommands(update, lastTelegramChat);
+                                } else {
+                                    queriesHandler.handleQueries(update);
+                                }
+
+                            } else if (message.hasAudio() || message.hasVoice()) {
+                                log.debug("Юзер прислал медиа файл");
+                                multimediaHandler.handleMultimedia(update);
+                            } else {
+                                sender.sendMessage(update.getMessage().getChatId(),
+                                        MessageProvider.UNKNOWN_COMMAND_OR_QUERY);
+                                return Mono.just(true);
+                            }
+
+                        } else if (update.hasCallbackQuery()) {
+                            log.debug(update.getCallbackQuery().getData());
+                        }
                     }
+                    return Mono.just(false);
+                })
+                .flatMap(msg -> {
 
-                } else if (message.hasAudio() || message.hasVoice()) {
-                    log.debug("Юзер прислал медиа файл");
-                    multimediaHandler.handleMultimedia(update);
-                } else {
-                    sender.sendMessage(update.getMessage().getChatId(), MessageProvider.UNKNOWN_COMMAND_OR_QUERY);
-                }
+                    log.debug("Сообщение отправлено юзеру!");
 
-            } else if (update.hasCallbackQuery()) {
-                log.debug(update.getCallbackQuery().getData());
-            }
+                    log.debug("Конец метода onWebhookUpdateReceived");
+                    log.debug("--------------------------------------");
 
-        }
+                    return Mono.empty();
 
-        log.debug("Конец метода onWebhookUpdateReceived");
-        log.debug("--------------------------------------");
+                })
+                .subscribe();
 
         return null;
     }

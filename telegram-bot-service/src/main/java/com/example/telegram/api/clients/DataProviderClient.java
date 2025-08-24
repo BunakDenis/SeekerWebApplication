@@ -1,6 +1,7 @@
 package com.example.telegram.api.clients;
 
 
+import com.example.data.models.entity.dto.response.CheckUserResponse;
 import com.example.data.models.entity.dto.telegram.TelegramSessionDTO;
 import com.example.data.models.entity.dto.UserDTO;
 import com.example.data.models.entity.dto.telegram.TelegramChatDTO;
@@ -235,7 +236,7 @@ public class DataProviderClient {
         }
         return null;
     }
-    public Mono<ApiResponse> checkTelegramUserAuthentication(Long telegramUserId) {
+    public Mono<ApiResponse<CheckUserResponse>> checkTelegramUserAuthentication(Long telegramUserId) {
 
         String endpoint = "/user/check/auth/" + telegramUserId;
 
@@ -250,7 +251,8 @@ public class DataProviderClient {
                                         log.debug("Получен ответ от Data provider service {}", errorBody);
                                         return Mono.empty();
                                     }))
-                    .bodyToMono(ApiResponse.class);
+                    .bodyToMono(new ParameterizedTypeReference<>() {
+                    });
         } catch (Exception e) {
             log.debug("Ошибка отправки сообщения проверки аутентификации юзера" + e.getMessage());
         }
@@ -283,7 +285,7 @@ public class DataProviderClient {
 
         TelegramChatDTO dto = mapperService.toDTO(chat, TelegramChatDTO.class);
 
-        log.debug("Отправляю запрос к Data provide service для записи {}", dto);
+        log.debug("Отправляю запрос к Data provide service для записи чата {}", dto);
         log.debug("Отправка на endpoint " + apiChatEndpoint + "/add/");
 
         try {
@@ -315,7 +317,7 @@ public class DataProviderClient {
             return null;
         }
     }
-    public Mono<ApiResponse<TelegramChatDTO>> getTelegramChats(Long id) {
+    public Mono<ApiResponse<TelegramChatDTO>> getTelegramChat(Long id) {
 
         log.debug("Отправляю запрос к Data provide service для получения чата {}", id);
         log.debug("Отправка на endpoint " + apiChatEndpoint + "/get/" + id);
@@ -338,6 +340,26 @@ public class DataProviderClient {
             result.subscribe(resp -> log.debug(resp));
 
             return result;
+
+        } catch (Exception e) {
+            log.debug("Ошибка отправки запроса " + apiChatEndpoint + "/get/" + id);
+            log.debug("Текст ошибки {}", e.getMessage(), e);
+            return null;
+        }
+    }
+
+    public Mono<ApiResponse<TelegramChatDTO>> getTelegramChatWithTelegramUser(Long id) {
+
+        log.debug("Отправляю запрос к Data provide service для получения чата с телеграм юзером {}", id);
+        log.debug("Отправка на endpoint " + apiChatEndpoint + "/telegram_user/get/" + id);
+
+        try {
+
+            return webClient.get()
+                    .uri(apiChatEndpoint + "/telegram_user/get/" + id).accept(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .bodyToMono(new ParameterizedTypeReference<>() {
+                    });
 
         } catch (Exception e) {
             log.debug("Ошибка отправки запроса " + apiChatEndpoint + "/get/" + id);

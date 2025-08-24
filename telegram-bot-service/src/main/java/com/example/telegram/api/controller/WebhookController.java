@@ -51,13 +51,19 @@ public class WebhookController {
 
         log.debug("Метод handleWebhook");
 
-        if (Objects.nonNull(sessionId) || sessionId.isEmpty()) {
+        if (Objects.isNull(sessionId) || sessionId.isEmpty()) {
+            log.debug("SessionId is null or empty");
             return Mono.just(update)
                     .flatMap(upd ->
-                            Mono.fromCallable(() -> telegramBot.onWebhookUpdateReceived(update))
+                            Mono.fromCallable(() -> telegramBot.onWebhookUpdateReceived(upd))
                     .subscribeOn(Schedulers.boundedElastic()))
-                .map(response -> ResponseEntity.ok().body(response));
+                .map(response -> {
+                    log.debug(response);
+                    return ResponseEntity.ok().body(response);
+                });
         }
+
+        log.debug("SessionId {}", sessionId);
 
         return ReactiveSecurityContextHolder.getContext()
                 .map(SecurityContext::getAuthentication)
