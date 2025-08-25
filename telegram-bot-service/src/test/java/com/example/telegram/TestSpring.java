@@ -306,11 +306,12 @@ public class TestSpring {
         log.debug("testAuthCommand()");
 
         //Given
+        String testMsg = "test@mail.com";
         Update update = new Update();
-        Message message = createTelegramMessage("test@mail.com");
+        Message message = createTelegramMessage(testMsg);
         update.setMessage(message);
 
-        String expectedMsgText = MessageProvider.EMAIL_VERIFICATION_MSG;
+        String expectedMsgText = MessageProvider.getEmailVerificationMsg(testMsg);
 
         String requestBody = objectMapper.writeValueAsString(update);
 
@@ -380,7 +381,10 @@ public class TestSpring {
         Message message = createTelegramMessage("2545678");
         update.setMessage(message);
 
-        String expectedMsgText = MessageProvider.SUCCESSES_AUTHORIZATION_MSG;
+        String expectedMsgText = MessageProvider.getSuccessesAuthorizationMsg(
+                TELEGRAM_API_USER_FOR_TESTS.getFirstName(),
+                TELEGRAM_API_USER_FOR_TESTS.getLastName()
+        );
 
         String requestBody = objectMapper.writeValueAsString(update);
 
