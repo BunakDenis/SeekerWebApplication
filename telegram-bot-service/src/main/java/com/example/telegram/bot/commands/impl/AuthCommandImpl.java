@@ -15,6 +15,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.User;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
@@ -33,6 +34,9 @@ public class AuthCommandImpl implements Command {
 
         log.debug("AuthCommandImpl метод apply");
 
+        log.debug("Последний чат {}", chat);
+
+        User currentUser = UpdateUtilsService.getTelegramUser(update);
         String msgText = UpdateUtilsService.getMessageText(update);
         SendMessage result = new SendMessage();
 
@@ -48,28 +52,28 @@ public class AuthCommandImpl implements Command {
             chat.setChatState(DialogStates.ENTER_EMAIL.getDialogState());
             result.setText(MessageProvider.EMAIL_CHECKING_MSG);
 
-        } else if (msgText.equals(DialogStates.ENTER_EMAIL.getDialogState()) &&
+        } else if (msgText.equals(DialogStates.ENTER_EMAIL.getDialogState()) ||
                 chatState.equals(DialogStates.ENTER_EMAIL.getDialogState())) {
 
-            log.debug("Стадия проверки введённого юзером емейла");
+            log.debug("Стадия ввода юзером емейла");
 
             chat.setChatState(DialogStates.EMAIL_VERIFICATION.getDialogState());
-            result.setText(MessageProvider.EMAIL_VERIFICATION_MSG);
+            result.setText(MessageProvider.getEmailVerificationMsg(msgText));
 
-        } else if (msgText.equals(DialogStates.EMAIL_VERIFICATION.getDialogState()) &&
+        } else if (msgText.equals(DialogStates.EMAIL_VERIFICATION.getDialogState()) ||
                 chatState.equals(DialogStates.EMAIL_VERIFICATION.getDialogState())) {
 
-            log.debug("Стадия проверки введённого юзером емейла");
+            log.debug("Стадия проверки введённого юзером кода верификации");
 
             chat.setUiElement("");
             chat.setUiElementValue("");
             chat.setChatState("");
-            result.setText(MessageProvider.SUCCESSES_AUTHORIZATION_MSG);
+            result.setText(MessageProvider.getSuccessesAuthorizationMsg(
+                    currentUser.getFirstName(), currentUser.getLastName())
+            );
 
         } else {
-
             result.setText(MessageProvider.UNKNOWN_COMMAND_OR_QUERY);
-
         }
 
         /*

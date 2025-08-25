@@ -1,6 +1,7 @@
 package com.example.telegram.bot;
 
 
+import com.example.telegram.bot.chat.states.UiElements;
 import com.example.telegram.bot.chat.states.impl.CommandChatDialogServiceImpl;
 import com.example.telegram.bot.entity.TelegramChat;
 import com.example.telegram.bot.message.MessageProvider;
@@ -33,6 +34,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Component
 @Slf4j
@@ -92,6 +94,7 @@ public class TelegramBot extends TelegramWebhookBot {
         telegramChatService.getTelegramChatByIdWithTelegramUser(chatId)
                 .flatMap(lastTelegramChat -> {
 
+                    log.debug("Последний сохранённый чат Юзера {}", lastTelegramChat);
                     log.debug("authentication = {}", authentication);
 
                     if (Objects.nonNull(update)) {
@@ -119,10 +122,21 @@ public class TelegramBot extends TelegramWebhookBot {
 
                                 String msgText = message.getText();
 
-                                if (
-                                        msgText.equals("/start") || !Objects.nonNull(lastTelegramChat.getChatState())
-                                ) {
-                                    return commandsHandler.handleCommands(update, lastTelegramChat);
+                                String uiElement = "";
+
+                                try {
+                                    lastTelegramChat.getUiElement().equals("");
+                                    uiElement = lastTelegramChat.getUiElement();
+                                } catch (NullPointerException e) {
+                                    log.debug("Отсутвует информация о последнем введённом меню.");
+                                }
+
+                                if (!uiElement.isEmpty()) {
+                                    if (uiElement.equals(UiElements.COMMAND.getUiElement())) {
+                                        return commandsHandler.handleCommands(update, lastTelegramChat);
+                                    } else if (uiElement.equals(UiElements.QUERY.getUiElement())) {
+                                        queriesHandler.handleQueries(update);
+                                    }
                                 } else if (msgText.startsWith("/")) {
                                     return commandsHandler.handleCommands(update, lastTelegramChat);
                                 } else {

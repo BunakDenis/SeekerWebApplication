@@ -284,16 +284,19 @@ public class DataProviderClient {
     public Mono<ApiResponse<TelegramChatDTO>> saveTelegramChat(TelegramChat chat) {
 
         TelegramChatDTO dto = mapperService.toDTO(chat, TelegramChatDTO.class);
+        TelegramUserDTO telegramUserDTO = mapperService.toDTO(chat.getTelegramUser(), TelegramUserDTO.class);
+
+        ApiRequest<TelegramChatDTO> request = new ApiRequest(dto);
+
+        request.addIncludeObject("telegram_user", telegramUserDTO);
 
         log.debug("Отправляю запрос к Data provide service для записи чата {}", dto);
         log.debug("Отправка на endpoint " + apiChatEndpoint + "/add/");
 
         try {
-            Mono<ApiResponse<TelegramChatDTO>> result = webClient.post().uri(apiChatEndpoint + "/add/")
+            return webClient.post().uri(apiChatEndpoint + "/add/")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(ApiRequest.<TelegramChatDTO>builder()
-                            .data(dto)
-                            .build())
+                    .bodyValue(request)
                     .accept(MediaType.APPLICATION_JSON)
                     .retrieve()
                     .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
@@ -306,11 +309,6 @@ public class DataProviderClient {
                                     }))
                     .bodyToMono(new ParameterizedTypeReference<>() {
                     });
-
-            result.subscribe(resp -> log.debug(resp));
-
-            return result;
-
         } catch (Exception e) {
             log.debug("Ошибка отправки запроса " + apiChatEndpoint + "/add/ " + chat);
             log.debug("Текст ошибки {}", e.getMessage(), e);

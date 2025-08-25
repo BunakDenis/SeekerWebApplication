@@ -7,6 +7,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@ToString
 public class TelegramChat {
 
     private Long id;
@@ -17,15 +18,7 @@ public class TelegramChat {
 
     private String chatState;
 
+    @ToString.Exclude
     private TelegramUser telegramUser;
 
-    @Override
-    public String toString() {
-        return "TelegramChat{" +
-                "id=" + id +
-                ", uiElement='" + uiElement + '\'' +
-                ", chatState='" + chatState + '\'' +
-                ", telegramUserId=" + telegramUser.getId() +
-                '}';
-    }
 }

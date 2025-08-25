@@ -12,6 +12,7 @@ import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
 import com.example.database.api.client.MysticSchoolClient;
 import com.example.database.entity.TelegramChat;
 import com.example.database.entity.TelegramSession;
+import com.example.database.entity.TelegramUser;
 import com.example.database.entity.User;
 import com.example.database.service.telegram.*;
 import lombok.RequiredArgsConstructor;
@@ -206,6 +207,11 @@ public class TelegramDataController {
         TelegramChatDTO data = request.getData();
 
         TelegramChat chat = mapperService.toEntity(data, TelegramChat.class);
+        TelegramUser telegramUser = mapperService.toEntity(
+                request.getIncludeObject("telegram_user"), TelegramUser.class
+        );
+
+        chat.setTelegramUser(telegramUser);
 
         ApiResponse<TelegramChatDTO> response = chatsService.create(chat);
 

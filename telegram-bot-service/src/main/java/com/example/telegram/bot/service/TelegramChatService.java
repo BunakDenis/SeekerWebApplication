@@ -72,16 +72,22 @@ public class TelegramChatService {
 
         TelegramChat telegramChat = mapperService.toEntity(dto, TelegramChat.class);
 
-        if (!respWithDto.getIncluded().isEmpty()) {
+        log.debug("respWithDto.getIncluded().isEmpty() = {}", respWithDto.getIncluded().isEmpty());
+
+        if (!respWithDto.getIncluded().isEmpty() && Objects.nonNull(respWithDto.getIncluded())) {
             TelegramUser telegramUser = mapperService.toEntity(
                     respWithDto.getIncludeObject("telegram_user"),
                     TelegramUser.class
             );
 
+            log.debug(telegramUser.toString());
+
             if (Objects.nonNull(telegramUser)) {
                 telegramChat.setTelegramUser(telegramUser);
             }
         }
+
+        log.debug("Метод TelegramChat toEntity, результат {}", telegramChat);
 
         return telegramChat;
     }

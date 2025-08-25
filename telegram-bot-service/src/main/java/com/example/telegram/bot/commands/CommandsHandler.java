@@ -65,7 +65,9 @@ public class CommandsHandler {
 
         String messageText = update.getMessage().getText();
         String command = messageText.split(" ")[0];
+
         long chatId = update.getMessage().getChatId();
+        String lastCommand = lastTelegramChat.getUiElementValue();
 
         log.debug("ChatId = " + chatId + ", command = " + command);
 
@@ -81,6 +83,14 @@ public class CommandsHandler {
                                 return Mono.just(true);
                             });
 
+        } else if (!lastCommand.isEmpty()) {
+            commandHandler = getCommandHandler(lastCommand);
+
+            return commandHandler.apply(update, lastTelegramChat)
+                    .flatMap(upd -> {
+                        sender.sendMessage(upd);
+                        return Mono.just(true);
+                    });
         } else  {
             sender.sendMessage(new SendMessage(String.valueOf(chatId), MessageProvider.UNKNOWN_COMMAND_OR_QUERY));
         }

@@ -35,7 +35,6 @@ public class TelegramChatsService {
         return new ApiResponse(HttpStatus.OK, HttpStatus.OK.toString(), result);
     }
 
-
     public ApiResponse<TelegramChatDTO> getTelegramChatById(Long id) {
 
         List<TelegramChat> all = chatRepo.getAllById(id);
