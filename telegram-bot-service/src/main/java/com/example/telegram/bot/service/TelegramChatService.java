@@ -26,7 +26,6 @@ public class TelegramChatService {
 
     private final ModelMapperService mapperService;
 
-
     public Mono<TelegramChat> save(TelegramChat chat) {
         return dataProviderClient.saveTelegramChat(chat)
                 .flatMap(resp -> {

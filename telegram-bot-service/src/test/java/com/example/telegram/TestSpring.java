@@ -4,7 +4,6 @@ import com.example.data.models.consts.RequestMessageProvider;
 import com.example.data.models.entity.dto.UserDTO;
 import com.example.data.models.entity.dto.response.ApiResponse;
 import com.example.data.models.entity.dto.telegram.TelegramChatDTO;
-import com.example.data.models.enums.ResponseIncludeDataKeys;
 import com.example.telegram.bot.chat.states.DialogStates;
 import com.example.telegram.bot.chat.states.UiElements;
 import com.example.telegram.bot.commands.Commands;
@@ -12,6 +11,7 @@ import com.example.telegram.bot.message.MessageProvider;
 import com.example.telegram.bot.message.TelegramBotMessageSender;
 import com.example.telegram.bot.service.ModelMapperService;
 import com.example.utils.file.loader.EnvLoader;
+import com.example.utils.sender.EmailService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -51,13 +51,10 @@ import java.util.List;
 import java.util.Map;
 
 import static com.example.telegram.constanst.TelegramBotConstants.*;
-import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
@@ -81,6 +78,9 @@ public class TestSpring {
 
     @MockBean
     private TelegramBotMessageSender telegramBotMessageSender;
+
+    @Autowired
+    private EmailService emailService;
 
     @Container
     static MockServerContainer mockServerContainer =
@@ -112,6 +112,7 @@ public class TestSpring {
         objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
     }
 
     @BeforeEach
@@ -442,6 +443,19 @@ public class TestSpring {
         //Then
         assertEquals(expectedMsgText, actual.getText());
 
+    }
+
+    @Test
+    public void testSendingEmailMessage() {
+        try {
+            emailService.sendSimpleMail(
+                    "xisi926@ukr.net",
+                    "Код активации",
+                    "Привет, вот твой код активации - 5555"
+            );
+        } catch (Exception e) {
+            log.debug("Сообщение не отправлено по причине {}", e.getMessage(), e);
+        }
     }
 
     private Message createTelegramMessage(String msgText) {

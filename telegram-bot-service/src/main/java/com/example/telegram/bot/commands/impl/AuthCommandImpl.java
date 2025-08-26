@@ -1,6 +1,5 @@
 package com.example.telegram.bot.commands.impl;
 
-import com.example.telegram.bot.chat.states.ChatDialogService;
 import com.example.telegram.bot.chat.states.DialogStates;
 import com.example.telegram.bot.chat.states.UiElements;
 import com.example.telegram.bot.commands.Command;
@@ -9,6 +8,7 @@ import com.example.telegram.bot.message.MessageProvider;
 import com.example.telegram.bot.commands.Commands;
 import com.example.telegram.bot.service.TelegramChatService;
 import com.example.telegram.bot.utils.update.UpdateUtilsService;
+import com.example.utils.sender.EmailService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -18,8 +18,6 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import reactor.core.publisher.Mono;
 
-import java.util.Objects;
-
 
 @Component
 @Data
@@ -28,6 +26,8 @@ import java.util.Objects;
 public class AuthCommandImpl implements Command {
 
     private final TelegramChatService chatService;
+
+    private final EmailService emailService;
 
     @Override
     public Mono<SendMessage> apply(Update update, TelegramChat chat) {
@@ -49,16 +49,22 @@ public class AuthCommandImpl implements Command {
 
         if (chatState.isEmpty()) {
 
+            log.debug("Стадия ввода юзером емейла");
+
             chat.setChatState(DialogStates.ENTER_EMAIL.getDialogState());
             result.setText(MessageProvider.EMAIL_CHECKING_MSG);
 
         } else if (msgText.equals(DialogStates.ENTER_EMAIL.getDialogState()) ||
                 chatState.equals(DialogStates.ENTER_EMAIL.getDialogState())) {
 
-            log.debug("Стадия ввода юзером емейла");
-
-            chat.setChatState(DialogStates.EMAIL_VERIFICATION.getDialogState());
-            result.setText(MessageProvider.getEmailVerificationMsg(msgText));
+            try {
+                emailService.sendSimpleMail(msgText, "Код верификации", "55555");
+                chat.setChatState(DialogStates.EMAIL_VERIFICATION.getDialogState());
+                result.setText(MessageProvider.getEmailVerificationMsg(msgText));
+            } catch (Exception e) {
+                log.debug("Сообщение не отправлено по причине - {}", e.getMessage(), e);
+                result.setText("Сообщение не отправлено по причине - " + e.getMessage());
+            }
 
         } else if (msgText.equals(DialogStates.EMAIL_VERIFICATION.getDialogState()) ||
                 chatState.equals(DialogStates.EMAIL_VERIFICATION.getDialogState())) {

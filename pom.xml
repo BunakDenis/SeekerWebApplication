@@ -44,6 +44,11 @@
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-context-support</artifactId>
+				<version>6.2.10</version>
+			</dependency>
+			<dependency>
 				<groupId>jakarta.servlet</groupId>
 				<artifactId>jakarta.servlet-api</artifactId>
 				<version>6.1.0</version>
@@ -142,12 +147,6 @@
 				<groupId>com.fasterxml.jackson.datatype</groupId>
 				<artifactId>jackson-datatype-jsr310</artifactId>
 				<version>2.19.2</version>
-			</dependency>
-			<!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
-			<dependency>
-				<groupId>com.google.code.gson</groupId>
-				<artifactId>gson</artifactId>
-				<version>2.13.1</version>
 			</dependency>
 			<!-- https://mvnrepository.com/artifact/io.github.cdimascio/dotenv-java -->
 			<dependency>
