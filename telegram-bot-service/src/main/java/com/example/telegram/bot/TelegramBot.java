@@ -3,9 +3,8 @@ package com.example.telegram.bot;
 
 import com.example.telegram.bot.chat.states.UiElements;
 import com.example.telegram.bot.chat.states.impl.CommandChatDialogServiceImpl;
-import com.example.telegram.bot.entity.TelegramChat;
+import com.example.data.models.entity.TelegramChat;
 import com.example.telegram.bot.message.MessageProvider;
-import com.example.telegram.api.clients.DataProviderClient;
 import com.example.telegram.bot.commands.Commands;
 import com.example.telegram.bot.commands.CommandsHandler;
 import com.example.telegram.bot.message.TelegramBotMessageSender;
@@ -24,7 +23,6 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramWebhookBot;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
@@ -34,7 +32,6 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @Component
 @Slf4j

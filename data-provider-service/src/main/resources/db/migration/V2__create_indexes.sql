@@ -1,6 +1,15 @@
 -- Уникальный индекс для email в таблице users
 CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email ON users (email);
 
+-- Индекс для user_id в таблице user_details
+CREATE INDEX IF NOT EXISTS idx_user_details_user_id ON user_details (user_id);
+
+-- Индекс для user_id в таблице verification_codes
+CREATE INDEX IF NOT EXISTS idx_verification_codes_user_id ON verification_codes (user_id);
+
+-- Индекс для user_id в таблице telegram_users
+CREATE INDEX IF NOT EXISTS idx_telegram_users_user_id ON telegram_users (user_id);
+
 -- Индекс для telegram_user_id в таблице telegram_chats
 CREATE INDEX IF NOT EXISTS idx_telegram_chats_telegram_user_id ON telegram_chats (telegram_user_id);
 

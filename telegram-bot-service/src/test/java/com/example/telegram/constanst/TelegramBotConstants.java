@@ -1,17 +1,14 @@
 package com.example.telegram.constanst;
 
 import com.example.data.models.enums.UserRoles;
-import com.example.telegram.bot.chat.states.DialogStates;
-import com.example.telegram.bot.chat.states.UiElements;
-import com.example.telegram.bot.commands.Commands;
-import com.example.telegram.bot.entity.TelegramChat;
-import com.example.telegram.bot.entity.TelegramUser;
+import com.example.data.models.entity.TelegramChat;
+import com.example.data.models.entity.TelegramUser;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.User;
 
 public class TelegramBotConstants {
 
-    public static final com.example.telegram.bot.entity.User USER_FOR_TESTS = new com.example.telegram.bot.entity.User(
+    public static final com.example.data.models.entity.User USER_FOR_TESTS = new com.example.data.models.entity.User(
             1L, "testUser", "test@exemple.com", UserRoles.ADMIN.getRole(), true, null, null
     );
 

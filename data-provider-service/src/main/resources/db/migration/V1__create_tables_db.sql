@@ -22,6 +22,16 @@ CREATE TABLE IF NOT EXISTS user_details (
     curator VARCHAR(255)
 );
 
+CREATE TABLE verification_codes (
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT REFERENCES users(id) NOT NULL,
+    otp_hash VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    attempts INT DEFAULT 0,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
 -- Информация о пользователе Telegram
 CREATE TABLE IF NOT EXISTS telegram_users (
     id BIGINT PRIMARY KEY, -- Telegram user id

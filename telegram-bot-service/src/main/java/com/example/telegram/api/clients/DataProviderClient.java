@@ -1,6 +1,7 @@
 package com.example.telegram.api.clients;
 
 
+import com.example.data.models.entity.dto.VerificationCodeDTO;
 import com.example.data.models.entity.dto.response.CheckUserResponse;
 import com.example.data.models.entity.dto.telegram.TelegramSessionDTO;
 import com.example.data.models.entity.dto.UserDTO;
@@ -9,17 +10,20 @@ import com.example.data.models.entity.dto.request.ApiRequest;
 import com.example.data.models.entity.dto.response.ApiResponse;
 import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
 import com.example.data.models.exception.ApiException;
-import com.example.telegram.bot.entity.TelegramChat;
+import com.example.data.models.entity.TelegramChat;
 import com.example.telegram.bot.service.ModelMapperService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.mockserver.serialization.model.VerificationDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
+
+import static com.example.telegram.api.clients.DataProviderEndpointsConsts.*;
 
 import reactor.core.publisher.Mono;
 
@@ -34,22 +38,12 @@ public class DataProviderClient {
     @Value("${data.provide.api.version}")
     private String apiVersion;
 
-    private String apiUserEndpoint;
-
-    private String apiChatEndpoint;
-
-    private String apiSessionEndPoint;
-
     private WebClient webClient;
 
     private final ModelMapperService mapperService;
 
     @PostConstruct
     public void init() {
-
-        apiUserEndpoint = "/user";
-        apiChatEndpoint = "/chat";
-        apiSessionEndPoint = "/session";
 
         String baseURL = dataProviderURL + apiVersion;
 
@@ -70,8 +64,7 @@ public class DataProviderClient {
 
     public Mono<ApiResponse<UserDTO>> getUserById(Long id) {
 
-        StringBuilder endpoint = new StringBuilder(apiUserEndpoint);
-        endpoint.append("/get/id/");
+        StringBuilder endpoint = new StringBuilder(getApiUserEndpoint("/get/id/"));
         endpoint.append(id);
 
         try {
@@ -94,8 +87,7 @@ public class DataProviderClient {
     }
     public Mono<ApiResponse<UserDTO>> getUserByUsername(String username) {
 
-        StringBuilder endpoint = new StringBuilder(apiUserEndpoint);
-        endpoint.append("/get/username/");
+        StringBuilder endpoint = new StringBuilder(getApiUserEndpoint("/get/username/"));
         endpoint.append(username);
 
         try {
@@ -118,8 +110,7 @@ public class DataProviderClient {
     }
     public Mono<ApiResponse<UserDTO>> getUserByEmail(String email) {
 
-        StringBuilder endpoint = new StringBuilder(apiUserEndpoint);
-        endpoint.append("/get/email/");
+        StringBuilder endpoint = new StringBuilder(getApiUserEndpoint("/get/email/"));
         endpoint.append(email);
 
         try {
@@ -142,8 +133,7 @@ public class DataProviderClient {
     }
     public Mono<ApiResponse<UserDTO>> getUserByTelegramUserId(Long id) {
 
-        StringBuilder endpoint = new StringBuilder(apiUserEndpoint);
-        endpoint.append("/get/telegram_user_id/");
+        StringBuilder endpoint = new StringBuilder(getApiUserEndpoint("/get/telegram_user_id/"));
         endpoint.append(id);
 
         try {
@@ -166,8 +156,7 @@ public class DataProviderClient {
     }
     public Mono<ApiResponse<UserDTO>> getUserByTelegramUserIdWithUserDetails(Long id) {
 
-        StringBuilder endpoint = new StringBuilder(apiUserEndpoint);
-        endpoint.append("/user_details/get/telegram_user_id/");
+        StringBuilder endpoint = new StringBuilder(getApiUserEndpoint("/user_details/get/telegram_user_id/"));
         endpoint.append(id);
 
         try {
@@ -190,8 +179,7 @@ public class DataProviderClient {
     }
     public Mono<ApiResponse<UserDTO>> getUserByTelegramUserIdWithTelegramUser(Long id) {
 
-        StringBuilder endpoint = new StringBuilder(apiUserEndpoint);
-        endpoint.append("/telegram_user/get/telegram_user_id/");
+        StringBuilder endpoint = new StringBuilder(getApiUserEndpoint("/telegram_user/get/telegram_user_id/"));
         endpoint.append(id);
 
         try {
@@ -214,8 +202,7 @@ public class DataProviderClient {
     }
     public Mono<ApiResponse<UserDTO>> getUserByTelegramUserIdFull(Long id) {
 
-        StringBuilder endpoint = new StringBuilder(apiUserEndpoint);
-        endpoint.append("/full/get/telegram_user_id/");
+        StringBuilder endpoint = new StringBuilder(getApiUserEndpoint("/full/get/telegram_user_id/"));
         endpoint.append(id);
 
         try {
@@ -238,11 +225,12 @@ public class DataProviderClient {
     }
     public Mono<ApiResponse<CheckUserResponse>> checkTelegramUserAuthentication(Long telegramUserId) {
 
-        String endpoint = "/user/check/auth/" + telegramUserId;
+        StringBuilder endpoint = new StringBuilder(getApiUserEndpoint("/check/auth/"));
+        endpoint.append(telegramUserId);
 
         try {
             return webClient.get()
-                    .uri(builder -> builder.path(endpoint).build())
+                    .uri(builder -> builder.path(endpoint.toString()).build())
                     .accept(MediaType.APPLICATION_JSON)
                     .retrieve()
                     .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
@@ -260,11 +248,12 @@ public class DataProviderClient {
     }
     public Mono<ApiResponse<TelegramUserDTO>> getTelegramUserById(Long id) {
 
-        String endpoint = "/telegram/user/get/" + id;
+        StringBuilder endpoint = new StringBuilder(getApiTelegramUserEndpoint("/get/"));
+        endpoint.append(id);
 
         try {
             return webClient.get()
-                    .uri(endpoint)
+                    .uri(endpoint.toString())
                     .accept(MediaType.APPLICATION_JSON)
                     .retrieve()
                     .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
@@ -283,6 +272,8 @@ public class DataProviderClient {
     }
     public Mono<ApiResponse<TelegramChatDTO>> saveTelegramChat(TelegramChat chat) {
 
+        StringBuilder endpoint = new StringBuilder(getApiChatEndpoint("/add/"));
+
         TelegramChatDTO dto = mapperService.toDTO(chat, TelegramChatDTO.class);
         TelegramUserDTO telegramUserDTO = mapperService.toDTO(chat.getTelegramUser(), TelegramUserDTO.class);
 
@@ -291,10 +282,10 @@ public class DataProviderClient {
         request.addIncludeObject("telegram_user", telegramUserDTO);
 
         log.debug("Отправляю запрос к Data provide service для записи чата {}", dto);
-        log.debug("Отправка на endpoint " + apiChatEndpoint + "/add/");
+        log.debug("Отправка на endpoint {}", endpoint);
 
         try {
-            return webClient.post().uri(apiChatEndpoint + "/add/")
+            return webClient.post().uri(endpoint.toString())
                     .contentType(MediaType.APPLICATION_JSON)
                     .bodyValue(request)
                     .accept(MediaType.APPLICATION_JSON)
@@ -310,18 +301,21 @@ public class DataProviderClient {
                     .bodyToMono(new ParameterizedTypeReference<>() {
                     });
         } catch (Exception e) {
-            log.debug("Ошибка отправки запроса " + apiChatEndpoint + "/add/ " + chat);
+            log.debug("Ошибка отправки запроса {}", endpoint);
             log.debug("Текст ошибки {}", e.getMessage(), e);
             return null;
         }
     }
     public Mono<ApiResponse<TelegramChatDTO>> getTelegramChat(Long id) {
 
+        StringBuilder endpoint = new StringBuilder(getApiChatEndpoint("/get/"));
+        endpoint.append(id);
+
         log.debug("Отправляю запрос к Data provide service для получения чата {}", id);
-        log.debug("Отправка на endpoint " + apiChatEndpoint + "/get/" + id);
+        log.debug("Отправка на endpoint {}", endpoint);
 
         try {
-            Mono<ApiResponse<TelegramChatDTO>> result = webClient.get().uri(apiChatEndpoint + "/get/" + id)
+            Mono<ApiResponse<TelegramChatDTO>> result = webClient.get().uri(endpoint.toString())
                     .accept(MediaType.APPLICATION_JSON)
                     .retrieve()
                     .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
@@ -340,49 +334,199 @@ public class DataProviderClient {
             return result;
 
         } catch (Exception e) {
-            log.debug("Ошибка отправки запроса " + apiChatEndpoint + "/get/" + id);
+            log.debug("Ошибка отправки запроса {}", endpoint);
             log.debug("Текст ошибки {}", e.getMessage(), e);
             return null;
         }
     }
-
     public Mono<ApiResponse<TelegramChatDTO>> getTelegramChatWithTelegramUser(Long id) {
 
+        StringBuilder endpoint = new StringBuilder( getApiChatEndpoint("/telegram_user/get/"));
+        endpoint.append(id);
+
         log.debug("Отправляю запрос к Data provide service для получения чата с телеграм юзером {}", id);
-        log.debug("Отправка на endpoint " + apiChatEndpoint + "/telegram_user/get/" + id);
+        log.debug("Отправка на endpoint {}", endpoint);
 
         try {
 
             return webClient.get()
-                    .uri(apiChatEndpoint + "/telegram_user/get/" + id).accept(MediaType.APPLICATION_JSON)
+                    .uri(endpoint.toString()).accept(MediaType.APPLICATION_JSON)
                     .retrieve()
                     .bodyToMono(new ParameterizedTypeReference<>() {
                     });
 
         } catch (Exception e) {
-            log.debug("Ошибка отправки запроса " + apiChatEndpoint + "/get/" + id);
+            log.debug("Ошибка отправки запроса {}", endpoint);
             log.debug("Текст ошибки {}", e.getMessage(), e);
             return null;
         }
     }
     public Mono<ApiResponse<TelegramSessionDTO>> getTelegramSessionByTelegramUserId(Long id) {
 
+        StringBuilder endpoint = new StringBuilder(getApiSessionEndpoint("/get/telegramUserId/"));
+        endpoint.append(id);
+
+        log.debug("Отправляю запрос к Data provide service для получения TelegramSession по telegram_user_id {}", id);
+        log.debug("Отправка на endpoint {}", endpoint);
+
         try {
             return webClient.get()
-                    .uri(apiSessionEndPoint + "/get/telegramUserId/" + id)
+                    .uri(endpoint.toString())
                     .accept(MediaType.APPLICATION_JSON)
                     .retrieve()
-                    .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
-                            response -> response.bodyToMono(String.class) // Можно прочитать тело ошибки
-                                    .flatMap(errorBody -> {
-                                        log.debug("Получен ответ от Data provider service {}", errorBody);
-                                        return Mono.empty();
-                                    }))
                     .bodyToMono(new ParameterizedTypeReference<>() {
                     });
 
         } catch (Exception e) {
-            log.debug("Ошибка отправки сообщения проверки аутентификации юзера" + e.getMessage());
+            log.debug("Ошибка отправки сообщения получения TelegramSession по telegram_user_id {}", e.getMessage());
+        }
+        return null;
+    }
+    public Mono<ApiResponse<VerificationCodeDTO>> getVerificationCodeById(Long id) {
+
+        StringBuilder endpoint = new StringBuilder(getApiOtpCodeEndpoint("/get/" + id));
+        endpoint.append(id);
+
+        log.debug("Отправляю запрос к Data provide service для получения VerificationCode по id {}", id);
+        log.debug("Отправка на endpoint {}", endpoint);
+
+        try {
+            return webClient.get()
+                    .uri(endpoint.toString())
+                    .accept(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .bodyToMono(new ParameterizedTypeReference<>() {
+                    });
+
+        } catch (Exception e) {
+            log.debug("Ошибка отправки сообщения получения VerificationCode по id {}", e.getMessage());
+        }
+        return null;
+    }
+    public Mono<ApiResponse<VerificationCodeDTO>> getVerificationCodeByUserId(Long userId) {
+
+        StringBuilder endpoint = new StringBuilder(getApiOtpCodeEndpoint("/get/user_id/"));
+        endpoint.append(userId);
+
+        log.debug(
+                "Отправляю запрос к Data provide service для получения VerificationCode по user_id {}",
+                userId
+        );
+        log.debug("Отправка на endpoint {}", endpoint);
+
+        try {
+            return webClient.get()
+                    .uri(endpoint.toString())
+                    .accept(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .bodyToMono(new ParameterizedTypeReference<>() {
+                    });
+
+        } catch (Exception e) {
+            log.error("Ошибка отправки сообщения получения VerificationCode по user_id {}", e.getMessage());
+        }
+        return null;
+    }
+    public Mono<ApiResponse<VerificationCodeDTO>> getVerificationCodeByTelegramUserId(Long telegramUserId) {
+
+        StringBuilder endpoint = new StringBuilder(getApiOtpCodeEndpoint("/get/telegram_user_id/"));
+        endpoint.append(telegramUserId);
+
+        log.debug(
+                "Отправляю запрос к Data provide service для получения VerificationCode по user_id {}",
+                telegramUserId
+        );
+        log.debug("Отправка на endpoint {}", endpoint);
+
+        try {
+            return webClient.get()
+                    .uri(endpoint.toString())
+                    .accept(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .bodyToMono(new ParameterizedTypeReference<>() {
+                    });
+
+        } catch (Exception e) {
+            log.error("Ошибка отправки сообщения получения VerificationCode по user_id {}", e.getMessage());
+        }
+        return null;
+    }
+    public Mono<ApiResponse<VerificationDTO>> saveVerificationCode(VerificationDTO dto) {
+
+        StringBuilder endpoint = new StringBuilder(getApiOtpCodeEndpoint("/add/"));
+
+        log.debug(
+                "Отправляю запрос к Data provide service для сохранения VerificationCode {}",
+                dto
+        );
+        log.debug("Отправка на endpoint {}", endpoint);
+
+        try {
+            return webClient.post()
+                    .uri(endpoint.toString())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(new ApiRequest<>(dto))
+                    .accept(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .bodyToMono(new ParameterizedTypeReference<>() {
+                    });
+
+        } catch (Exception e) {
+            log.error("Ошибка отправки сообщения получения VerificationCode по user_id {}", e.getMessage());
+        }
+        return null;
+
+    }
+    public Mono<ApiResponse<VerificationCodeDTO>> updateVerificationCode(VerificationDTO dto) {
+
+        StringBuilder endpoint = new StringBuilder(getApiOtpCodeEndpoint("/update/"));
+
+        log.debug(
+                "Отправляю запрос к Data provide service для обновления информации об VerificationCode {}",
+                dto
+        );
+        log.debug("Отправка на endpoint {}", endpoint);
+
+        try {
+
+            return webClient.post().uri(endpoint.toString())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .bodyValue(new ApiRequest<>(dto))
+                    .retrieve()
+                    .bodyToMono(new ParameterizedTypeReference<>() {
+                    });
+
+        } catch (Exception e) {
+            log.error("Ошибка отправки сообщения для обновления информации об VerificationCode {}", e.getMessage());
+        }
+        return null;
+    }
+    public Mono<ApiResponse<Boolean>> deleteVerificationCode(Long id) {
+
+        StringBuilder endpoint = new StringBuilder(getApiOtpCodeEndpoint("/delete/"));
+        endpoint.append(id);
+
+        log.debug(
+                "Отправляю запрос к Data provide service для удаления информации об VerificationCode с id {}",
+                id
+        );
+
+        log.debug("Отправка на endpoint {}", endpoint);
+
+        try {
+
+            return webClient.post().uri(endpoint.toString())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .bodyToMono(new ParameterizedTypeReference<>() {
+                    });
+
+        } catch (Exception e) {
+            log.error(
+                    "Ошибка отправки сообщения для удаления информации об VerificationCode {}",
+                    e.getMessage()
+            );
         }
         return null;
     }

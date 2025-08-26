@@ -3,20 +3,26 @@ package com.example.utils.validator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.regex.Pattern;
+
 @Component
-@Data
 @RequiredArgsConstructor
-public class EmailValidator implements Validator {
+@Data
+public class EmailValidator {
 
     private final ObjectMapper objectMapper;
 
-    @Override
     public boolean isValid(Object object) {
 
-        String email = objectMapper.convertValue(object, String.class);
+        String emailAddress = objectMapper.convertValue(object, String.class);
 
-        return false;
+        String regexPattern = "^(.+)@(\\S+)$";
+
+        return Pattern.compile(regexPattern)
+                .matcher(emailAddress)
+                .matches();
     }
 }

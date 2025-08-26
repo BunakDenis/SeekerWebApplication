@@ -1,5 +1,6 @@
 package com.example.utils.sender;
 
+import com.example.utils.validator.EmailValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,6 +18,8 @@ public class EmailService {
 
     private final JavaMailSender javaMailSender;
 
+    private final EmailValidator emailValidator;
+
     public void sendSimpleMail(String to, String subject, String text) {
 
         log.debug("Отправка сообщения " + to + ", от " + sendFrom + ", с текстом " + text);
@@ -28,6 +31,10 @@ public class EmailService {
         message.setText(text);
 
         javaMailSender.send(message);
+    }
+
+    public boolean isEmailAddressValid(String emailAddress) {
+        return emailValidator.isValid(emailAddress);
     }
 
 }

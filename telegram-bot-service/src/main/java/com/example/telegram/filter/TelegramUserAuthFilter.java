@@ -1,7 +1,7 @@
 package com.example.telegram.filter;
 
 
-import com.example.telegram.bot.entity.User;
+import com.example.data.models.entity.User;
 import com.example.telegram.bot.service.AuthService;
 import com.example.telegram.bot.service.ModelMapperService;
 import com.example.telegram.bot.service.TelegramUserService;
@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpRequestDecorator;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

@@ -1,8 +1,7 @@
 package com.example.telegram.bot.commands.impl;
 
-import com.example.telegram.bot.chat.states.ChatDialogService;
 import com.example.telegram.bot.commands.Command;
-import com.example.telegram.bot.entity.TelegramChat;
+import com.example.data.models.entity.TelegramChat;
 import com.example.telegram.bot.message.MessageProvider;
 import com.example.telegram.bot.queries.Queries;
 import lombok.Data;

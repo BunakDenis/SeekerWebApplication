@@ -1,5 +1,6 @@
 package com.example.database.api.controller;
 
+import com.example.data.models.entity.dto.VerificationCodeDTO;
 import com.example.data.models.entity.dto.telegram.TelegramSessionDTO;
 import com.example.data.models.entity.dto.UserDTO;
 import com.example.data.models.entity.dto.mysticschool.ArticleCategory;
@@ -10,10 +11,7 @@ import com.example.data.models.entity.dto.response.ApiResponse;
 import com.example.data.models.entity.dto.response.CheckUserResponse;
 import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
 import com.example.database.api.client.MysticSchoolClient;
-import com.example.database.entity.TelegramChat;
-import com.example.database.entity.TelegramSession;
-import com.example.database.entity.TelegramUser;
-import com.example.database.entity.User;
+import com.example.database.entity.*;
 import com.example.database.service.telegram.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +28,7 @@ import reactor.core.publisher.Mono;
 public class TelegramDataController {
 
     private final UserService userService;
-
+    private final VerificationCodeService verificationCodeService;
     private final TelegramChatsService chatsService;
 
     private final TelegramUserService telegramUserService;
@@ -155,6 +153,72 @@ public class TelegramDataController {
                             new ApiResponse<>(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage())
                     ));
                 });
+    }
+
+    @GetMapping("/otp_code/get/{id}")
+    public ResponseEntity<ApiResponse<VerificationCodeDTO>> getVerificationCodeById(
+            @PathVariable("id") Long id
+    ) {
+        log.debug("Запрос на получение VerificationCode по id {}", id);
+
+        ApiResponse<VerificationCodeDTO> response = verificationCodeService.getCodeById(id);
+
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    @GetMapping("/otp_code/get/user_id/{id}")
+    public ResponseEntity<ApiResponse<VerificationCodeDTO>> getVerificationCodeByUserId(
+            @PathVariable("id") Long id
+    ) {
+        log.debug("Запрос на получение VerificationCode по user_id {}", id);
+
+        ApiResponse<VerificationCodeDTO> response = verificationCodeService.getCodeByUserId(id);
+
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    @GetMapping("/otp_code/get/telegram_user_id/{id}")
+    public ResponseEntity<ApiResponse<VerificationCodeDTO>> getVerificationCodeByTelegramUserId(
+            @PathVariable("id") Long id
+    ) {
+        log.debug("Запрос на получение VerificationCode по user_id {}", id);
+
+        ApiResponse<VerificationCodeDTO> response = verificationCodeService.getCodeByUserId(id);
+
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    @PostMapping("/otp_code/add/")
+    public ResponseEntity<ApiResponse<VerificationCodeDTO>> saveVerificationCode(
+            @RequestBody VerificationCode verificationCode
+    ) {
+        log.debug("Запрос на сохранения VerificationCode {}", verificationCode);
+
+        ApiResponse<VerificationCodeDTO> response = verificationCodeService.save(verificationCode);
+
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    @PostMapping("/otp_code/update/")
+    public ResponseEntity<ApiResponse<VerificationCodeDTO>> updateVerificationCode(
+            @RequestBody VerificationCode verificationCode
+    ) {
+        log.debug("Запрос на обновление VerificationCode {}", verificationCode);
+
+        ApiResponse<VerificationCodeDTO> response = verificationCodeService.update(verificationCode);
+
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    @PostMapping("/otp_code/delete/{id}")
+    public ResponseEntity<ApiResponse<Boolean>> deleteVerificationCode(
+            @PathVariable("id") Long id
+    ) {
+        log.debug("Запрос на удаление VerificationCode с id {}", id);
+
+        ApiResponse<Boolean> response = verificationCodeService.delete(id);
+
+        return ResponseEntity.status(response.getStatus()).body(response);
     }
 
     @GetMapping("/telegram/user/get/{id}")

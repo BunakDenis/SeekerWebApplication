@@ -1,8 +1,8 @@
 package com.example.telegram.bot.service;
 
 import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
-import com.example.telegram.bot.entity.TelegramUser;
-import com.example.telegram.bot.entity.User;
+import com.example.data.models.entity.TelegramUser;
+import com.example.data.models.entity.User;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;

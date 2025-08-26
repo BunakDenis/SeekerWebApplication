@@ -1,10 +1,8 @@
 package com.example.telegram.bot.message;
 
-import org.jvnet.hk2.annotations.Service;
-
 import java.text.MessageFormat;
 
-@Service
+
 public class MessageProvider {
 
     public static final String START_MSG = "Добро пожаловать в телеграмм бот для Искателей Истины!\n\n" +

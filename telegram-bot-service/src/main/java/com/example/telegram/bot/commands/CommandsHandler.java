@@ -2,14 +2,13 @@ package com.example.telegram.bot.commands;
 
 
 import com.example.telegram.api.clients.DataProviderClient;
-import com.example.telegram.bot.chat.states.UiElements;
 import com.example.telegram.bot.chat.states.impl.CommandChatDialogServiceImpl;
 import com.example.telegram.bot.commands.impl.RegCommandImpl;
-import com.example.telegram.bot.entity.TelegramChat;
+import com.example.data.models.entity.TelegramChat;
 import com.example.telegram.bot.message.MessageProvider;
 import com.example.telegram.bot.commands.impl.AuthCommandImpl;
 import com.example.telegram.bot.commands.impl.StartCommandImpl;
-import com.example.telegram.bot.entity.TelegramUser;
+import com.example.data.models.entity.TelegramUser;
 import com.example.telegram.bot.message.TelegramBotMessageSender;
 import com.example.telegram.bot.service.ModelMapperService;
 import com.example.telegram.bot.service.TelegramUserService;

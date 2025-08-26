@@ -2,12 +2,11 @@ package com.example.telegram.bot.service;
 
 import com.example.data.models.entity.dto.response.ApiResponse;
 import com.example.data.models.entity.dto.telegram.TelegramChatDTO;
-import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
 import com.example.data.models.exception.EntityNotFoundException;
 import com.example.data.models.exception.EntityNotSavedException;
 import com.example.telegram.api.clients.DataProviderClient;
-import com.example.telegram.bot.entity.TelegramChat;
-import com.example.telegram.bot.entity.TelegramUser;
+import com.example.data.models.entity.TelegramChat;
+import com.example.data.models.entity.TelegramUser;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
