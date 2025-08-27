@@ -1,5 +1,6 @@
 package com.example.data.models.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
 import java.time.LocalDateTime;

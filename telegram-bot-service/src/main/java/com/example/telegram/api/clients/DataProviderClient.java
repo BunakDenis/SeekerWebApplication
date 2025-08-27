@@ -451,13 +451,13 @@ public class DataProviderClient {
         }
         return null;
     }
-    public Mono<ApiResponse<VerificationDTO>> saveVerificationCode(VerificationDTO dto) {
+    public Mono<ApiResponse<VerificationCodeDTO>> saveVerificationCode(ApiRequest<VerificationCodeDTO> request) {
 
         StringBuilder endpoint = new StringBuilder(getApiOtpCodeEndpoint("/add/"));
 
         log.debug(
                 "Отправляю запрос к Data provide service для сохранения VerificationCode {}",
-                dto
+                request
         );
         log.debug("Отправка на endpoint {}", endpoint);
 
@@ -465,25 +465,25 @@ public class DataProviderClient {
             return webClient.post()
                     .uri(endpoint.toString())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(new ApiRequest<>(dto))
+                    .bodyValue(request)
                     .accept(MediaType.APPLICATION_JSON)
                     .retrieve()
                     .bodyToMono(new ParameterizedTypeReference<>() {
                     });
 
         } catch (Exception e) {
-            log.error("Ошибка отправки сообщения получения VerificationCode по user_id {}", e.getMessage());
+            log.error("Ошибка отправки сообщения сохранения VerificationCode {}", e.getMessage());
         }
         return null;
 
     }
-    public Mono<ApiResponse<VerificationCodeDTO>> updateVerificationCode(VerificationDTO dto) {
+    public Mono<ApiResponse<VerificationCodeDTO>> updateVerificationCode(ApiRequest<VerificationCodeDTO> request) {
 
         StringBuilder endpoint = new StringBuilder(getApiOtpCodeEndpoint("/update/"));
 
         log.debug(
                 "Отправляю запрос к Data provide service для обновления информации об VerificationCode {}",
-                dto
+                request
         );
         log.debug("Отправка на endpoint {}", endpoint);
 
@@ -492,7 +492,7 @@ public class DataProviderClient {
             return webClient.post().uri(endpoint.toString())
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
-                    .bodyValue(new ApiRequest<>(dto))
+                    .bodyValue(request)
                     .retrieve()
                     .bodyToMono(new ParameterizedTypeReference<>() {
                     });

@@ -9,6 +9,7 @@ import com.example.data.models.entity.TelegramChat;
 import com.example.telegram.bot.message.MessageProvider;
 import com.example.telegram.bot.commands.Commands;
 import com.example.telegram.bot.service.TelegramChatService;
+import com.example.telegram.bot.service.UserService;
 import com.example.telegram.bot.service.VerificationCodeService;
 import com.example.telegram.bot.utils.update.UpdateUtilsService;
 import com.example.utils.generator.GenerationService;
@@ -34,87 +35,162 @@ public class AuthCommandImpl implements Command {
 
     @Value("${telegram.bot.name}")
     private String botName;
+
+    private final UserService userService;
     private final TelegramChatService chatService;
     private final VerificationCodeService verificationCodeService;
     private final EmailService emailService;
 
     @Override
     public Mono<SendMessage> apply(Update update, TelegramChat chat) {
+        return Mono.just("")
+                .flatMap(resp -> {
+                    log.info("AuthCommandImpl метод apply");
 
-        log.info("AuthCommandImpl метод apply");
+                    log.debug("Последний чат {}", chat);
 
-        log.debug("Последний чат {}", chat);
+                    String msgText = UpdateUtilsService.getMessageText(update);
 
-        User currentUser = UpdateUtilsService.getTelegramUser(update);
+                    chat.setUiElement(UiElements.COMMAND.getUiElement());
+                    chat.setUiElementValue(Commands.AUTHORIZE.getCommand());
+
+                    String chatState = chat.getChatState();
+
+                    if (chatState.isEmpty()) {
+
+                        return emailInputtingStateHandler(update, chat);
+
+                    } else if (msgText.equals(DialogStates.ENTER_EMAIL.getDialogState()) ||
+                            chatState.equals(DialogStates.ENTER_EMAIL.getDialogState())) {
+
+                        return emailCheckingStateHandler(update, chat);
+
+                    } else if (msgText.equals(DialogStates.EMAIL_VERIFICATION.getDialogState()) ||
+                            chatState.equals(DialogStates.EMAIL_VERIFICATION.getDialogState())) {
+
+                        return verificationCodeValidatingStateHandler(update, chat);
+
+                    }
+
+                    return Mono.just(
+                            new SendMessage(
+                                    UpdateUtilsService.getStringChatId(update),
+                                    MessageProvider.UNKNOWN_COMMAND_OR_QUERY
+                            )
+                    );
+                })
+                .flatMap(msg -> chatService.save(chat)
+                        .flatMap(resp -> {
+                            log.debug("Сохранённый чат {}", resp);
+                            return Mono.just(msg);
+                        })
+                );
+    }
+
+    private Mono<SendMessage> emailInputtingStateHandler(Update update, TelegramChat chat) {
+        return Mono.just("")
+                .flatMap(some -> {
+
+                    log.info("Стадия ввода юзером емейла");
+
+                    chat.setChatState(DialogStates.ENTER_EMAIL.getDialogState());
+
+                    return Mono.just(
+                            new SendMessage(
+                                    UpdateUtilsService.getStringChatId(update),
+                                    MessageProvider.EMAIL_CHECKING_MSG
+                            )
+                    );
+                });
+
+    }
+
+    private Mono<SendMessage> emailCheckingStateHandler(Update update, TelegramChat chat) {
+
+        log.info("Стадия валидации емейла и отправки сообщения для его верификации");
+
+        Long telegramUserId = UpdateUtilsService.getTelegramUserId(update);
+
         String msgText = UpdateUtilsService.getMessageText(update);
-        SendMessage result = new SendMessage();
 
+        SendMessage result = new SendMessage();
         result.setChatId(UpdateUtilsService.getChatId(update));
 
-        chat.setUiElement(UiElements.COMMAND.getUiElement());
-        chat.setUiElementValue(Commands.AUTHORIZE.getCommand());
+        return Mono.just(result)
+                .flatMap(msg -> {
 
-        String chatState = chat.getChatState();
-
-        if (chatState.isEmpty()) {
-
-            log.info("Стадия ввода юзером емейла");
-
-            chat.setChatState(DialogStates.ENTER_EMAIL.getDialogState());
-            result.setText(MessageProvider.EMAIL_CHECKING_MSG);
-
-        } else if (msgText.equals(DialogStates.ENTER_EMAIL.getDialogState()) ||
-                chatState.equals(DialogStates.ENTER_EMAIL.getDialogState())) {
-
-            try {
-                if (emailService.isEmailAddressValid(msgText)) {
-
-                    String verificationCode = GenerationService.generateEmailVerificationCode();
-
-                    emailService.sendSimpleMail(
-                            msgText,
-                            "Код верификации в " + botName,
-                            "Ваш верификационный код - " + verificationCode
+                    log.debug(
+                            "emailService.isEmailAddressValid(msgText) = {}",
+                            emailService.isEmailAddressValid(msgText)
                     );
 
-                    verificationCodeService.save(
-                            VerificationCode.builder()
-                                    .otpHash(verificationCode)
-                                    .build()
-                    );
+                    try {
+                        if (emailService.isEmailAddressValid(msgText)) {
+                            log.debug("Email {} is valid", msgText);
+                            String verificationCode = GenerationService.generateEmailVerificationCode();
 
-                    chat.setChatState(DialogStates.EMAIL_VERIFICATION.getDialogState());
-                    result.setText(MessageProvider.getEmailVerificationMsg(msgText));
-                } else {
-                    result.setText(getNotValidEmailAddress(msgText));
-                }
-            } catch (Exception e) {
-                log.error("Сообщение не отправлено по причине - {}", e.getMessage(), e);
-                result.setText(getSorryMsg("на данный момент нет возможности отправить письмо " +
-                        "для верификации вашей электронной почты, попробуйте пройти верификацию позже."));
-            }
+                            emailService.sendSimpleMail(
+                                    msgText,
+                                    "Код верификации в " + botName,
+                                    "Ваш верификационный код - " + verificationCode
+                            );
+                            return Mono.just(verificationCode);
+                        }
 
-        } else if (msgText.equals(DialogStates.EMAIL_VERIFICATION.getDialogState()) ||
-                chatState.equals(DialogStates.EMAIL_VERIFICATION.getDialogState())) {
+                        result.setText(getNotValidEmailAddress(msgText));
+                        return Mono.just("");
 
-            log.info("Стадия проверки введённого юзером кода верификации");
+                    } catch (Exception e) {
+                        log.error("Сообщение не отправлено по причине - {}", e.getMessage(), e);
+                        result.setText(getSorryMsg("на данный момент нет возможности отправить письмо " +
+                                "для верификации вашей электронной почты, попробуйте пройти верификацию позже."));
 
-            chat.setUiElement("");
-            chat.setUiElementValue("");
-            chat.setChatState("");
-            result.setText(MessageProvider.getSuccessesAuthorizationMsg(
-                    currentUser.getFirstName(), currentUser.getLastName())
-            );
+                        return Mono.just("");
+                    }
+                })
+                .flatMap(code -> {
+                    if (!code.isEmpty()) {
 
-        } else {
-            result.setText(MessageProvider.UNKNOWN_COMMAND_OR_QUERY);
-        }
+                        chat.setChatState(DialogStates.EMAIL_VERIFICATION.getDialogState());
+                        result.setText(MessageProvider.getEmailVerificationMsg(msgText));
 
-        return chatService.save(chat)
-                .flatMap(resp -> {
-                    log.debug("Сохранённый чат {}", resp);
+                        return userService.getUserByTelegramUserId(telegramUserId)
+                                .flatMap(user ->
+                                    verificationCodeService.save(
+                                            VerificationCode.builder()
+                                                    .otpHash(code)
+                                                    .user(user)
+                                                    .build())
+                                )
+                                .flatMap(verificationCode -> Mono.just(verificationCode.getOtpHash()));
+                    }
+                    return Mono.just("");
+                })
+                .flatMap(code -> {
+                    log.debug("Verification code перед отправкой сообщения {}", code);
+                    log.debug("SendMessage = {}", result);
                     return Mono.just(result);
                 });
+
+    }
+
+    private Mono<SendMessage> verificationCodeValidatingStateHandler(Update update, TelegramChat chat) {
+
+        log.info("Стадия проверки введённого юзером кода верификации");
+
+        User currentUser = UpdateUtilsService.getTelegramUser(update);
+
+        chat.setUiElement("");
+        chat.setUiElementValue("");
+        chat.setChatState("");
+
+        return Mono.just(
+                new SendMessage(
+                        UpdateUtilsService.getStringChatId(update),
+                        MessageProvider.getSuccessesAuthorizationMsg(
+                                currentUser.getFirstName(), currentUser.getLastName())
+                )
+        );
     }
 
 }

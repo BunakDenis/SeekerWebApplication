@@ -13,29 +13,40 @@ import java.util.Properties;
 @Slf4j
 public class MainConfiguration {
 
+    @Value("${spring.profiles.active}")
+    private String activeSpringProfile;
+
     @Value("${spring.mail.username}")
     private String mailUsername;
 
     @Value("${spring.mail.password}")
     private String mailUserPassword;
 
-    @Value("${mail.sender.from}")
-    private String sendFrom;
-
     @Bean
     public JavaMailSender getJavaMailSender() {
 
         log.debug("Username = {}", mailUsername);
         log.debug("User password = {}", mailUserPassword);
-        log.debug("mail address = {}", sendFrom);
 
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-        mailSender.setHost("smtp.migadu.com");
-        mailSender.setPort(587);
-        mailSender.setUsername(mailUsername);
-        mailSender.setPassword(mailUserPassword);
-
         Properties props = mailSender.getJavaMailProperties();
+
+        if (activeSpringProfile.equals("prod")) {
+
+            mailSender.setHost("smtp.migadu.com");
+            mailSender.setPort(587);
+            mailSender.setUsername(mailUsername);
+            mailSender.setPassword(mailUserPassword);
+
+        } else {
+
+            mailSender.setHost("smtp.gmail.com");
+            mailSender.setPort(587);
+            mailSender.setUsername(mailUsername);
+            mailSender.setPassword(mailUserPassword);
+
+        }
+
         props.put("mail.transport.protocol", "smtp");
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");

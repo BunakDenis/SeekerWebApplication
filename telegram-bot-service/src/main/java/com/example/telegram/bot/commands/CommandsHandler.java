@@ -60,8 +60,6 @@ public class CommandsHandler {
 
         User telegramUser = UpdateUtilsService.getTelegramUser(update);
 
-        TelegramUser telegramUserForCheck = mapperService.apiTelegramUserToEntity(telegramUser);
-
         String messageText = update.getMessage().getText();
         String command = messageText.split(" ")[0];
 
@@ -77,8 +75,8 @@ public class CommandsHandler {
         if (commandHandler != null) {
 
             return commandHandler.apply(update, lastTelegramChat)
-                            .flatMap(upd -> {
-                                sender.sendMessage(upd);
+                            .flatMap(msg -> {
+                                sender.sendMessage(msg);
                                 return Mono.just(true);
                             });
 
@@ -94,7 +92,7 @@ public class CommandsHandler {
             sender.sendMessage(new SendMessage(String.valueOf(chatId), MessageProvider.UNKNOWN_COMMAND_OR_QUERY));
         }
 
-        return Mono.empty();
+        return Mono.just(false);
     }
 
     private Command getCommandHandler(String command) {

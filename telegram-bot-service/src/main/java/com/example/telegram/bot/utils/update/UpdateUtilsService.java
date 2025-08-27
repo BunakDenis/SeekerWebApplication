@@ -13,8 +13,16 @@ public class UpdateUtilsService {
     public static User getTelegramUser(Update update) {
         return update.getMessage().getFrom();
     }
+
+    public static Long getTelegramUserId(Update update) {
+        return getTelegramUser(update).getId();
+    }
     public static long getChatId(Update update) {
         return update.getMessage().getChatId();
+    }
+
+    public static String getStringChatId(Update update) {
+        return Long.toString(update.getMessage().getChatId());
     }
 
     public static Message getMessage(Update update) {return update.getMessage();}

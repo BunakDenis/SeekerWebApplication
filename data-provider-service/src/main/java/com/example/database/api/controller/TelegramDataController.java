@@ -128,7 +128,7 @@ public class TelegramDataController {
             @PathVariable("id") Long id
     ) {
 
-        log.debug("Входящий запрос на проверку авторизации юзера с id {}", id);
+        log.debug("Запрос на проверку авторизации юзера с id {}", id);
 
         return Mono.just(userService.getUserByTelegramUserId(id))
                 .flatMap(response -> {
@@ -190,9 +190,18 @@ public class TelegramDataController {
 
     @PostMapping("/otp_code/add/")
     public ResponseEntity<ApiResponse<VerificationCodeDTO>> saveVerificationCode(
-            @RequestBody VerificationCode verificationCode
+            @RequestBody ApiRequest<VerificationCodeDTO> request
     ) {
-        log.debug("Запрос на сохранения VerificationCode {}", verificationCode);
+        log.debug("Запрос на сохранения VerificationCode {}", request);
+
+        VerificationCode verificationCode = mapperService.toEntity(request.getData(), VerificationCode.class);
+
+        User user = mapperService.toEntity(
+                request.getIncludeObject("user"),
+                User.class
+        );
+
+        verificationCode.setUser(user);
 
         ApiResponse<VerificationCodeDTO> response = verificationCodeService.save(verificationCode);
 
@@ -201,11 +210,13 @@ public class TelegramDataController {
 
     @PostMapping("/otp_code/update/")
     public ResponseEntity<ApiResponse<VerificationCodeDTO>> updateVerificationCode(
-            @RequestBody VerificationCode verificationCode
+            @RequestBody ApiRequest<VerificationCodeDTO> request
     ) {
-        log.debug("Запрос на обновление VerificationCode {}", verificationCode);
+        log.debug("Запрос на обновление VerificationCode {}", request);
 
-        ApiResponse<VerificationCodeDTO> response = verificationCodeService.update(verificationCode);
+        ApiResponse<VerificationCodeDTO> response = verificationCodeService.update(
+                mapperService.toEntity(request.getData(), VerificationCode.class)
+        );
 
         return ResponseEntity.status(response.getStatus()).body(response);
     }
@@ -238,7 +249,7 @@ public class TelegramDataController {
             @PathVariable("id") Long chatId
             ) {
 
-        log.debug("Входящий запрос на получения чатов по id {}", chatId);
+        log.debug("Запрос на получения чатов по id {}", chatId);
 
         ApiResponse<TelegramChatDTO> response = chatsService.getTelegramChatById(chatId);
 
@@ -252,7 +263,7 @@ public class TelegramDataController {
             @PathVariable("id") Long chatId
     ) {
 
-        log.debug("Входящий запрос на получения чатов с телеграм юзером по id {}", chatId);
+        log.debug("Запрос на получения чатов с телеграм юзером по id {}", chatId);
 
         ApiResponse<TelegramChatDTO> response = chatsService.getTelegramChatByIdWithTelegramUser(chatId);
 
@@ -266,7 +277,7 @@ public class TelegramDataController {
             @RequestBody ApiRequest<TelegramChatDTO> request
             ) {
 
-        log.debug("Входящий запрос на сохранение чата {}", request);
+        log.debug("Запрос на сохранение чата {}", request);
 
         TelegramChatDTO data = request.getData();
 

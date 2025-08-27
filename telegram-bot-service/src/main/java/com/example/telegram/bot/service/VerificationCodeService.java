@@ -1,14 +1,20 @@
 package com.example.telegram.bot.service;
 
+import com.example.data.models.entity.User;
 import com.example.data.models.entity.VerificationCode;
+import com.example.data.models.entity.dto.UserDTO;
 import com.example.data.models.entity.dto.VerificationCodeDTO;
+import com.example.data.models.entity.dto.request.ApiRequest;
+import com.example.data.models.entity.dto.response.ApiResponse;
 import com.example.telegram.api.clients.DataProviderClient;
+import com.example.telegram.bot.TelegramBot;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.mockserver.serialization.model.VerificationDTO;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -60,6 +66,13 @@ public class VerificationCodeService {
     }
     public Mono<VerificationCode> save(VerificationCode code) {
 
+        /*
+            TODO
+                1. Добавить запрос на получение юзера
+                2. Добавить в реквест вложенные объекты и коллекции
+                3. Добавить юзера в реквест
+         */
+
         log.debug("Сохранение верификационного кода {}", code);
 
         LocalDateTime createdAt = LocalDateTime.now(ZoneId.of("UTC+2"));
@@ -70,9 +83,20 @@ public class VerificationCodeService {
         code.setCreatedAt(createdAt);
         code.setExpiresAt(expiresAt);
 
-        VerificationDTO dto = mapperService.toDTO(code, VerificationDTO.class);
+        User user = code.getUser();
 
-        return dataProviderClient.saveVerificationCode(dto)
+        VerificationCodeDTO dto = mapperService.toDTO(code, VerificationCodeDTO.class);
+
+        ApiRequest<VerificationCodeDTO> request = new ApiRequest<>(dto);
+
+        request.addIncludeObject(
+                "user",
+                mapperService.toDTO(
+                        user, UserDTO.class));
+
+        log.debug("VerificationDTO перед отправкой {}", request);
+
+        return dataProviderClient.saveVerificationCode(request)
                 .flatMap(resp -> {
 
                     if (resp.getData() != null) {

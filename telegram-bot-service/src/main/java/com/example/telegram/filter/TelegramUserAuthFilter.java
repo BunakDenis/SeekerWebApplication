@@ -83,14 +83,10 @@ public class TelegramUserAuthFilter implements WebFilter {
                     }
 
                     return userService.getUserByTelegramUserId(telegramUserId)
-                            .flatMap(resp -> {
+                            .flatMap(user -> {
 
-                                if (Objects.nonNull(resp)) {
-
-                                    User user = mapperService.toEntity(resp.getData(), User.class);
-
+                                if (Objects.nonNull(user)) {
                                     log.debug("User {}", user);
-
                                     return userService.findByUsername(user.getUsername());
                                 } else {
                                     return Mono.just(org.springframework.security.core.userdetails.User.builder().build());
@@ -101,7 +97,7 @@ public class TelegramUserAuthFilter implements WebFilter {
 
                                 if (Objects.nonNull(userDetails)) {
                                     Authentication auth = new UsernamePasswordAuthenticationToken(
-                                            userDetails,                  // <-- principal = UserDetails
+                                            userDetails,
                                             null,
                                             userDetails.getAuthorities()
                                     );

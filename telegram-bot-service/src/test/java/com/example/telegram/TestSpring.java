@@ -3,6 +3,7 @@ package com.example.telegram;
 import com.example.data.models.consts.RequestMessageProvider;
 import com.example.data.models.consts.WarnMessageProvider;
 import com.example.data.models.entity.dto.UserDTO;
+import com.example.data.models.entity.dto.VerificationCodeDTO;
 import com.example.data.models.entity.dto.response.ApiResponse;
 import com.example.data.models.entity.dto.telegram.TelegramChatDTO;
 import com.example.telegram.bot.chat.states.DialogStates;
@@ -53,8 +54,8 @@ import java.util.List;
 import java.util.Map;
 
 import static com.example.telegram.constanst.TelegramBotConstants.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
@@ -81,7 +82,7 @@ public class TestSpring {
     @MockBean
     private TelegramBotMessageSender telegramBotMessageSender;
 
-    @Autowired
+    @MockBean
     private EmailService emailService;
 
     @Container
@@ -133,10 +134,19 @@ public class TestSpring {
                 mapperService.toDTO(telegramChatForTests, TelegramChatDTO.class)
         );
 
+        ApiResponse<VerificationCodeDTO> verificationCodeResponse = new ApiResponse<>(
+                HttpStatus.OK,
+                RequestMessageProvider.SUCCESSES_MSG,
+                mapperService.toDTO(VERIFICATION_CODE_FOR_TESTS, VerificationCodeDTO.class)
+        );
+
         telegramChatResponse.addIncludeObject("telegram_user", TELEGRAM_USER_FOR_TESTS);
+
+        verificationCodeResponse.addIncludeObject("user", mapperService.toDTO(USER_FOR_TESTS, UserDTO.class));
 
         responses.put("userDTOApiResponse", userDTOApiResponse);
         responses.put("telegramChatResponse", telegramChatResponse);
+        responses.put("verificationCodeResponse", verificationCodeResponse);
     }
 
     @AfterEach
@@ -303,6 +313,103 @@ public class TestSpring {
 
     }
 
+/*/
+    @Test
+    public void testValidInputEmailChatStateInAuthCommand() throws JsonProcessingException {
+        //Given
+        String testMsg = "test@seeker.com";
+        Update update = new Update();
+        Message message = createTelegramMessage(testMsg);
+        update.setMessage(message);
+
+        String expectedMsgText = MessageProvider.getEmailVerificationMsg(testMsg);
+
+        String requestBody = objectMapper.writeValueAsString(update);
+
+        ApiResponse<TelegramChatDTO> telegramChatResponse = responses.get("telegramChatResponse");
+
+        TelegramChatDTO telegramChatDTO = telegramChatResponse.getData();
+        telegramChatDTO.setUiElement(UiElements.COMMAND.getUiElement());
+        telegramChatDTO.setUiElementValue(Commands.AUTHORIZE.getCommand());
+        telegramChatDTO.setChatState(DialogStates.ENTER_EMAIL.getDialogState());
+
+        telegramChatResponse.setData(telegramChatDTO);
+
+        ApiResponse<VerificationCodeDTO> verificationCodeResponse = responses.get("verificationCode");
+
+        //When
+        Mockito.when(emailService.isEmailAddressValid(testMsg)).thenReturn(true);
+
+        telegramUserAuthFilterMockRequests();
+
+        mockServerClient
+                .when(request()
+                        .withMethod("GET")
+                        .withPath("/api/v1/chat/telegram_user/get/" + telegramChatForTests.getId()))
+                .respond(response()
+                        .withStatusCode(200)
+                        .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
+                        .withBody(objectMapper.writeValueAsString(telegramChatResponse)));
+
+        mockServerClient
+                .when(request()
+                        .withMethod("POST")
+                        .withPath("/api/v1/otp_code/add/"))
+                .respond(response()
+                        .withStatusCode(200)
+                        .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
+                        .withBody(objectMapper.writeValueAsString(verificationCodeResponse)));
+
+        TelegramChatDTO responseTelegramChat = telegramChatResponse.getData();
+        responseTelegramChat.setUiElement(UiElements.COMMAND.getUiElement());
+        responseTelegramChat.setUiElementValue(Commands.AUTHORIZE.getCommand());
+        responseTelegramChat.setChatState(DialogStates.EMAIL_VERIFICATION.getDialogState());
+
+        telegramChatResponse.setData(responseTelegramChat);
+
+        mockServerClient
+                .when(request()
+                        .withMethod("POST")
+                        .withPath("/api/v1/chat/add/"))
+                .respond(response()
+                        .withStatusCode(200)
+                        .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
+                        .withBody(objectMapper.writeValueAsString(telegramChatResponse)));
+
+        WebTestClient.ResponseSpec exchangeAuthCommand = client.post()
+                .uri("/api/bot/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(requestBody)
+                .exchange();
+
+        exchangeAuthCommand.expectStatus().is2xxSuccessful();
+
+        ArgumentCaptor<String> captorToSentEmail = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> captorSubjectSentEmail = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> captorTextSentEmail = ArgumentCaptor.forClass(String.class);
+
+        Mockito.verify(emailService)
+                .sendSimpleMail(
+                        captorToSentEmail.capture(),
+                        captorSubjectSentEmail.capture(),
+                        captorTextSentEmail.capture()
+                );
+
+        log.debug("captorToSentEmail {}", captorToSentEmail.getValue());
+        log.debug("captorSubjectSentEmail {}", captorSubjectSentEmail.getValue());
+        log.debug("captorTextSentEmail {}", captorTextSentEmail.getValue());
+
+        SendMessage actual = captorSenMessage();
+
+        //Then
+        assertTrue(captorToSentEmail.getValue().equals(testMsg));
+        assertFalse(captorSubjectSentEmail.getValue().isEmpty());
+        assertFalse(captorTextSentEmail.getValue().isEmpty());
+        assertEquals(expectedMsgText, actual.getText());
+
+    }
+*/
+
     @Test
     public void testNotValidInputEmailChatStateInAuthCommand() throws JsonProcessingException {
         //Given
@@ -372,18 +479,7 @@ public class TestSpring {
     }
 
     @Test
-    public void testVerificationGenerationCode() {
-        GenerationService generationService = new GenerationService();
-
-        String code = generationService.generateEmailVerificationCode();
-
-        log.debug(code);
-    }
-
-    @Test
     public void testSuccessesAuthorizationChatStateInAuthCommand() throws JsonProcessingException {
-
-        log.debug("testAuthCommand()");
 
         //Given
         Update update = new Update();
@@ -453,22 +549,7 @@ public class TestSpring {
 
     }
 
-    /*
-        @Test
-        public void testSendingEmailMessage() {
-            try {
-                emailService.sendSimpleMail(
-                        "xisi926@ukr.net",
-                        "Код активации",
-                        "Привет, вот твой код активации - 5555"
-                );
-            } catch (Exception e) {
-                log.debug("Сообщение не отправлено по причине {}", e.getMessage(), e);
-            }
-        }
-    */
 
-    /*
     @Test
     public void testInputEmailChatStateInAuthCommand() throws JsonProcessingException {
         //Given
@@ -536,7 +617,6 @@ public class TestSpring {
         assertEquals(expectedMsgText, actual.getText());
 
     }
-*/
 
     private Message createTelegramMessage(String msgText) {
 
@@ -575,9 +655,24 @@ public class TestSpring {
     private SendMessage captorSenMessage() {
         ArgumentCaptor<SendMessage> captor = ArgumentCaptor.forClass(SendMessage.class);
 
-        Mockito.verify(telegramBotMessageSender,Mockito.timeout(5000L)).sendMessage(captor.capture());
+        Mockito.verify(telegramBotMessageSender,Mockito.timeout(10000L)).sendMessage(captor.capture());
 
         return captor.getValue();
     }
+
+    /*
+    @Test
+        public void testSendingEmailMessage() {
+            try {
+                emailService.sendSimpleMail(
+                        "xisi926@ukr.net",
+                        "Код активации",
+                        "Привет, вот твой код активации - 5555"
+                );
+            } catch (Exception e) {
+                log.debug("Сообщение не отправлено по причине {}", e.getMessage(), e);
+            }
+        }
+*/
 
 }

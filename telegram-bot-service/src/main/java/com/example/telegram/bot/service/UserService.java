@@ -55,8 +55,12 @@ public class UserService implements ReactiveUserDetailsService {
                 });
     }
 
-    public Mono<ApiResponse<UserDTO>> getUserByTelegramUserId(Long id) {
-        return dataProviderClient.getUserByTelegramUserId(id);
+    public Mono<User> getUserByTelegramUserId(Long id) {
+        return dataProviderClient.getUserByTelegramUserId(id)
+                .flatMap(resp -> Objects.nonNull(resp.getData()) ?
+                            Mono.just(mapperService.toEntity(resp.getData(), User.class)) :
+                            Mono.just(new User())
+                );
     }
 
     public Mono<ApiResponse<UserDTO>> getUserByTelegramUserIdWithUserDetails(Long id) {
