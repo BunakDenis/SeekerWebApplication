@@ -7,7 +7,7 @@ import com.example.data.models.entity.dto.VerificationCodeDTO;
 import com.example.data.models.entity.dto.response.ApiResponse;
 import com.example.data.models.entity.dto.telegram.TelegramChatDTO;
 import com.example.telegram.bot.chat.states.DialogStates;
-import com.example.telegram.bot.chat.states.UiElements;
+import com.example.telegram.bot.chat.UiElements;
 import com.example.telegram.bot.commands.Commands;
 import com.example.telegram.bot.message.MessageProvider;
 import com.example.telegram.bot.message.TelegramBotMessageSender;

@@ -1,6 +1,7 @@
-package com.example.telegram.bot.queries;
+package com.example.telegram.bot.queries.impl;
 
 import com.example.telegram.api.clients.UsefulToolsClient;
+import com.example.telegram.bot.queries.QueryHandler;
 import com.example.telegram.bot.utils.update.UpdateUtilsService;
 import com.example.telegram.dto.responce.ActuatorHealthResponse;
 import lombok.Data;
@@ -15,7 +16,7 @@ import reactor.core.publisher.Mono;
 @Data
 @RequiredArgsConstructor
 @Log4j2
-public class UsefulToolsHealsQuery implements Query {
+public class UsefulToolsHealsQueryHandlerImpl implements QueryHandler {
 
     private final UsefulToolsClient client;
     @Override

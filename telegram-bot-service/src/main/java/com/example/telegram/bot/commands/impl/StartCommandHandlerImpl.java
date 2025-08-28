@@ -1,6 +1,6 @@
 package com.example.telegram.bot.commands.impl;
 
-import com.example.telegram.bot.commands.Command;
+import com.example.telegram.bot.commands.CommandHandler;
 import com.example.data.models.entity.TelegramChat;
 import com.example.telegram.bot.message.MessageProvider;
 import com.example.telegram.bot.queries.Queries;
@@ -22,7 +22,7 @@ import java.util.Collections;
 @Data
 @Log4j2
 @RequiredArgsConstructor
-public class StartCommandImpl implements Command {
+public class StartCommandHandlerImpl implements CommandHandler {
 
     @Override
     public Mono<SendMessage> apply(Update update, TelegramChat lastTelegramChat) {

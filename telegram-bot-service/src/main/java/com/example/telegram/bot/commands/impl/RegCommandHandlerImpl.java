@@ -1,6 +1,6 @@
 package com.example.telegram.bot.commands.impl;
 
-import com.example.telegram.bot.commands.Command;
+import com.example.telegram.bot.commands.CommandHandler;
 import com.example.data.models.entity.TelegramChat;
 import com.example.telegram.bot.utils.update.UpdateUtilsService;
 import lombok.Data;
@@ -13,7 +13,7 @@ import reactor.core.publisher.Mono;
 @Component
 @Log4j2
 @Data
-public class RegCommandImpl implements Command {
+public class RegCommandHandlerImpl implements CommandHandler {
 
     @Override
     public Mono<SendMessage> apply(Update update, TelegramChat lastTelegramChat) {

@@ -1,4 +1,4 @@
-package com.example.telegram.bot.chat.states;
+package com.example.telegram.bot.chat;
 
 public enum UiElements {
 

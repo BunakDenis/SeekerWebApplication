@@ -2,9 +2,9 @@ package com.example.telegram.bot.commands.impl;
 
 
 import com.example.data.models.entity.VerificationCode;
+import com.example.telegram.bot.chat.UiElements;
 import com.example.telegram.bot.chat.states.DialogStates;
-import com.example.telegram.bot.chat.states.UiElements;
-import com.example.telegram.bot.commands.Command;
+import com.example.telegram.bot.commands.CommandHandler;
 import com.example.data.models.entity.TelegramChat;
 import com.example.telegram.bot.message.MessageProvider;
 import com.example.telegram.bot.commands.Commands;
@@ -32,7 +32,7 @@ import static com.example.data.models.consts.WarnMessageProvider.*;
 @Data
 @Log4j2
 @RequiredArgsConstructor
-public class AuthCommandImpl implements Command {
+public class AuthCommandHandlerImpl implements CommandHandler {
 
     @Value("${telegram.bot.name}")
     private String botName;

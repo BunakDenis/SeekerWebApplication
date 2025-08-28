@@ -10,25 +10,25 @@ import org.telegram.telegrambots.meta.api.objects.User;
 @Data
 public class UpdateUtilsService {
 
+
     public static User getTelegramUser(Update update) {
         return update.getMessage().getFrom();
     }
-
     public static Long getTelegramUserId(Update update) {
         return getTelegramUser(update).getId();
     }
-    public static long getChatId(Update update) {
+    public static Long getChatId(Update update) {
         return update.getMessage().getChatId();
     }
-
     public static String getStringChatId(Update update) {
         return Long.toString(update.getMessage().getChatId());
     }
-
     public static Message getMessage(Update update) {return update.getMessage();}
-
     public static String getMessageText(Update update) {
         return update.getMessage().getText();
+    }
+    public static String getCommandValue(Update update) {
+        return update.getMessage().getText().split(" ")[0];
     }
 
 }
