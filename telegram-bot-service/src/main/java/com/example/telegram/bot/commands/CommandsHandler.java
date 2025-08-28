@@ -58,8 +58,6 @@ public class CommandsHandler {
 
         log.debug("handleCommands method");
 
-        User telegramUser = UpdateUtilsService.getTelegramUser(update);
-
         String messageText = update.getMessage().getText();
         String command = messageText.split(" ")[0];
 
@@ -69,8 +67,6 @@ public class CommandsHandler {
         log.debug("ChatId = " + chatId + ", command = " + command);
 
         var commandHandler = getCommandHandler(command);
-
-        log.debug(commandHandler);
 
         if (commandHandler != null) {
 

@@ -23,6 +23,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import static com.example.data.models.consts.WarnMessageProvider.*;
 
@@ -106,72 +107,50 @@ public class AuthCommandImpl implements Command {
     }
 
     private Mono<SendMessage> emailCheckingStateHandler(Update update, TelegramChat chat) {
+        final long chatId = UpdateUtilsService.getChatId(update);
+        final Long tgUserId = UpdateUtilsService.getTelegramUserId(update);
+        final String email = UpdateUtilsService.getMessageText(update);
 
-        log.info("Стадия валидации емейла и отправки сообщения для его верификации");
+        return Mono.defer(() -> {
+            // 1) Валидация email — синхронно -> map / just
+            if (!emailService.isEmailAddressValid(email)) {
+                return Mono.just(new SendMessage(String.valueOf(chatId), getNotValidEmailAddress(email)));
+            }
 
-        Long telegramUserId = UpdateUtilsService.getTelegramUserId(update);
+            // 2) Генерация и подготовка сообщений
+            final String code = GenerationService.generateEmailVerificationCode();
 
-        String msgText = UpdateUtilsService.getMessageText(update);
+            chat.setChatState(DialogStates.EMAIL_VERIFICATION.getDialogState());
+            final SendMessage okMsg = new SendMessage(String.valueOf(chatId), MessageProvider.getEmailVerificationMsg(email));
+            final SendMessage sorryMsg = new SendMessage(String.valueOf(chatId),
+                    getSorryMsg("на данный момент нет возможности отправить письмо " +
+                            "для верификации вашей электронной почты, попробуйте пройти верификацию позже."));
 
-        SendMessage result = new SendMessage();
-        result.setChatId(UpdateUtilsService.getChatId(update));
-
-        return Mono.just(result)
-                .flatMap(msg -> {
-
-                    log.debug(
-                            "emailService.isEmailAddressValid(msgText) = {}",
-                            emailService.isEmailAddressValid(msgText)
-                    );
-
-                    try {
-                        if (emailService.isEmailAddressValid(msgText)) {
-                            log.debug("Email {} is valid", msgText);
-                            String verificationCode = GenerationService.generateEmailVerificationCode();
-
+            // 3) Отправка письма (side-effect) + сохранение кода + возврат итогового сообщения
+            return Mono.fromRunnable(() ->
                             emailService.sendSimpleMail(
-                                    msgText,
+                                    email,
                                     "Код верификации в " + botName,
-                                    "Ваш верификационный код - " + verificationCode
-                            );
-                            return Mono.just(verificationCode);
-                        }
-
-                        result.setText(getNotValidEmailAddress(msgText));
-                        return Mono.just("");
-
-                    } catch (Exception e) {
-                        log.error("Сообщение не отправлено по причине - {}", e.getMessage(), e);
-                        result.setText(getSorryMsg("на данный момент нет возможности отправить письмо " +
-                                "для верификации вашей электронной почты, попробуйте пройти верификацию позже."));
-
-                        return Mono.just("");
-                    }
-                })
-                .flatMap(code -> {
-                    if (!code.isEmpty()) {
-
-                        chat.setChatState(DialogStates.EMAIL_VERIFICATION.getDialogState());
-                        result.setText(MessageProvider.getEmailVerificationMsg(msgText));
-
-                        return userService.getUserByTelegramUserId(telegramUserId)
-                                .flatMap(user ->
-                                    verificationCodeService.save(
-                                            VerificationCode.builder()
-                                                    .otpHash(code)
-                                                    .user(user)
-                                                    .build())
-                                )
-                                .flatMap(verificationCode -> Mono.just(verificationCode.getOtpHash()));
-                    }
-                    return Mono.just("");
-                })
-                .flatMap(code -> {
-                    log.debug("Verification code перед отправкой сообщения {}", code);
-                    log.debug("SendMessage = {}", result);
-                    return Mono.just(result);
-                });
-
+                                    "Ваш верификационный код - " + code
+                            )
+                    )
+                    .subscribeOn(Schedulers.boundedElastic())
+                    .then( // дождаться отправки письма
+                            userService.getUserByTelegramUserId(tgUserId)
+                                    .switchIfEmpty(Mono.error(new IllegalStateException(
+                                            "User not found for telegramUserId=" + tgUserId)))
+                                    .flatMap(user -> verificationCodeService.save(
+                                                    VerificationCode.builder()
+                                                            .otpHash(code)
+                                                            .user(user)
+                                                            .build()
+                                            )
+                                    )
+                                    .then()
+                    )
+                    .thenReturn(okMsg)
+                    .onErrorReturn(sorryMsg);
+        });
     }
 
     private Mono<SendMessage> verificationCodeValidatingStateHandler(Update update, TelegramChat chat) {

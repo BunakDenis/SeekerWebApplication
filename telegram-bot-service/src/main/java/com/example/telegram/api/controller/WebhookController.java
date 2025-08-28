@@ -51,34 +51,11 @@ public class WebhookController {
 
         log.debug("Метод handleWebhook");
 
-        if (Objects.isNull(sessionId) || sessionId.isEmpty()) {
-            log.debug("SessionId is null or empty");
-            return Mono.just(update)
-                    .flatMap(upd ->
-                            Mono.fromCallable(() -> telegramBot.onWebhookUpdateReceived(upd))
-                    .subscribeOn(Schedulers.boundedElastic()))
-                .map(response -> {
-                    log.debug(response);
-                    return ResponseEntity.ok().body(response);
-                });
-        }
-
-        log.debug("SessionId {}", sessionId);
-
         return ReactiveSecurityContextHolder.getContext()
                 .map(SecurityContext::getAuthentication)
-                .flatMap(auth -> {
-
-                    log.debug(auth);
-
-                    // Передаем аутентификацию в бот
-                    return Mono.fromCallable(() -> {
-                        telegramBot.setAuthentication(auth);
-                        return telegramBot.onWebhookUpdateReceived(update);
-                    })
-                            .subscribeOn(Schedulers.boundedElastic());
-                })
-                .map(response -> ResponseEntity.ok().body(response));
+                .doOnNext(auth -> telegramBot.getReactiveHandler().setAuthentication(auth))
+                .then(telegramBot.getReactiveHandler().handleUpdate(update))
+                .map(sent -> ResponseEntity.ok().body("ok"));
     }
 
     @GetMapping(path = {"/info", "/info/"})

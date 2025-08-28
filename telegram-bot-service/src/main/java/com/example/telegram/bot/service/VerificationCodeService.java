@@ -66,13 +66,6 @@ public class VerificationCodeService {
     }
     public Mono<VerificationCode> save(VerificationCode code) {
 
-        /*
-            TODO
-                1. Добавить запрос на получение юзера
-                2. Добавить в реквест вложенные объекты и коллекции
-                3. Добавить юзера в реквест
-         */
-
         log.debug("Сохранение верификационного кода {}", code);
 
         LocalDateTime createdAt = LocalDateTime.now(ZoneId.of("UTC+2"));
@@ -93,8 +86,6 @@ public class VerificationCodeService {
                 "user",
                 mapperService.toDTO(
                         user, UserDTO.class));
-
-        log.debug("VerificationDTO перед отправкой {}", request);
 
         return dataProviderClient.saveVerificationCode(request)
                 .flatMap(resp -> {
