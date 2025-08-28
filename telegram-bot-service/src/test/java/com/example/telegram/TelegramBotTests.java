@@ -65,7 +65,7 @@ import static org.mockserver.model.HttpResponse.response;
 @EnableReactiveMethodSecurity
 @Testcontainers
 @Slf4j
-public class TestSpring {
+public class TelegramBotTests {
 
     @Autowired
     private WebTestClient client;

@@ -2,6 +2,7 @@ package com.example.telegram.bot;
 
 import com.example.data.models.entity.TelegramChat;
 import com.example.telegram.bot.chat.states.UiElements;
+import com.example.telegram.bot.commands.Commands;
 import com.example.telegram.bot.commands.CommandsHandler;
 import com.example.telegram.bot.message.MessageProvider;
 import com.example.telegram.bot.message.TelegramBotMessageSender;
@@ -47,7 +48,7 @@ public class TelegramBotReactiveHandler {
                     }
                     return Mono.just(false);
                 })
-                .doOnNext(sent -> log.debug("Сообщение {}отправлено юзеру!",
+                .doOnNext(sent -> log.debug("Сообщение {} отправлено юзеру!",
                         sent ? "" : "не "))
                 .doOnTerminate(() -> {
                     log.debug("Конец метода onWebhookUpdateReceived");
@@ -58,28 +59,16 @@ public class TelegramBotReactiveHandler {
     private Mono<Boolean> handleMessage(Update update, TelegramChat lastChat) {
         Message message = update.getMessage();
 
-        if (message.hasText()) {
-            String msgText = message.getText();
-            String uiElement = Objects.requireNonNullElse(lastChat.getUiElement(), "");
+        String msgText = message.getText();
+        String uiElement = Objects.requireNonNullElse(lastChat.getUiElement(), "");
 
-            if (!uiElement.isEmpty() && uiElement.equals(UiElements.COMMAND.getUiElement())) {
+            if (uiElement.equals(UiElements.COMMAND.getUiElement()) || msgText.startsWith("/")) {
                 return commandsHandler.handleCommands(update, lastChat);
-            } else if (!uiElement.isEmpty() && uiElement.equals(UiElements.QUERY.getUiElement())) {
-                queriesHandler.handleQueries(update);
-                return Mono.just(true);
-            } else if (msgText.startsWith("/")) {
-                return commandsHandler.handleCommands(update, lastChat);
-            } else {
-                queriesHandler.handleQueries(update);
-                return Mono.just(true);
+            } else if (!msgText.isEmpty()) {
+                return queriesHandler.handleQueries(update, lastChat);
             }
-        } else if (message.hasAudio() || message.hasVoice()) {
-            multimediaHandler.handleMultimedia(update);
-            return Mono.just(true);
-        } else {
-            sender.sendMessage(message.getChatId(), MessageProvider.UNKNOWN_COMMAND_OR_QUERY);
-            return Mono.just(true);
-        }
+
+            return Mono.just(false);
     }
 
 }

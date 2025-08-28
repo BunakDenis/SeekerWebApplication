@@ -1,6 +1,7 @@
 package com.example.telegram.bot.queries;
 
 
+import com.example.data.models.entity.TelegramChat;
 import com.example.telegram.api.clients.UsefulToolsClient;
 import com.example.telegram.bot.message.MessageProvider;
 import com.example.telegram.bot.utils.update.UpdateUtilsService;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import reactor.core.publisher.Mono;
 
 import java.util.Map;
 
@@ -42,7 +44,7 @@ public class QueriesHandler {
     }
 
 
-    public void handleQueries(Update update) {
+    public Mono<Boolean> handleQueries(Update update, TelegramChat lastChat) {
         log.debug("handleQueries method");
         SendMessage answer;
 
@@ -60,16 +62,9 @@ public class QueriesHandler {
         if (update.getMessage().getChatId() == WIFE_CHAT_ID) {
             sender.sendMessage(update.getMessage().getChatId(),
                     MessageForWifeProvider.getMessage());
-        } else if (update.hasMessage() && update.getMessage().getReplyToMessage() != null) {
-            Message replyTo = update.getMessage().getReplyToMessage();
-
-            // Например, проверка, что отвечали на сообщение, которое отправил бот
-            if (replyTo.getFrom().getIsBot()) {
-                log.debug("Это ответ на сообщение бота - " + replyTo);
-            }
         } else {
             sender.sendMessage(answer);
         }
-
+        return Mono.just(true);
     }
 }
