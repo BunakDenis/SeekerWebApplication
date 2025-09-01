@@ -6,11 +6,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class ApiException extends RuntimeException {
 
     private String message;
+
+    public ApiException(String msg) {
+        super(msg);
+    }
 
 }

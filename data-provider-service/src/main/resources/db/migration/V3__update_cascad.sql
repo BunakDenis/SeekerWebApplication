@@ -43,7 +43,21 @@ DROP CONSTRAINT IF EXISTS telegram_sessions_chat_id_fkey;
 
 ALTER TABLE telegram_sessions
 ADD CONSTRAINT telegram_sessions_chat_id_fkey
-FOREIGN KEY (chat_id) REFERENCES telegram_chats(id) ON UPDATE CASCADE;
+FOREIGN KEY (telegram_chat_id) REFERENCES telegram_chats(id) ON UPDATE CASCADE;
+
+ALTER TABLE telegram_sessions
+DROP CONSTRAINT IF EXISTS telegram_sessions_chat_id_fkey;
+
+ALTER TABLE telegram_sessions
+ADD CONSTRAINT telegram_persistent_session_id_fkey
+FOREIGN KEY (persistent_session_id) REFERENCES persistent_sessions(id) ON UPDATE CASCADE;
+
+ALTER TABLE telegram_sessions
+DROP CONSTRAINT IF EXISTS telegram_transient_session_id_fkey;
+
+ALTER TABLE telegram_sessions
+ADD CONSTRAINT telegram_transient_session_id_fkey
+FOREIGN KEY (transient_session_id) REFERENCES transient_sessions(id) ON UPDATE CASCADE;
 
 -- Обновляем внешний ключ в таблице sub_level_menus
 ALTER TABLE sub_level_menus

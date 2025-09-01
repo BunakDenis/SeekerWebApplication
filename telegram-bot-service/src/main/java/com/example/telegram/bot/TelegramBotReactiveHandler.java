@@ -1,8 +1,10 @@
 package com.example.telegram.bot;
 
+import com.example.data.models.consts.WarnMessageProvider;
 import com.example.data.models.entity.TelegramChat;
 import com.example.telegram.bot.chat.UiElements;
 import com.example.telegram.bot.commands.CommandsHandler;
+import com.example.telegram.bot.message.MessageProvider;
 import com.example.telegram.bot.message.TelegramBotMessageSender;
 import com.example.telegram.bot.multimedia.MultimediaHandler;
 import com.example.telegram.bot.queries.QueriesHandler;
@@ -13,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import reactor.core.publisher.Mono;
@@ -51,6 +54,17 @@ public class TelegramBotReactiveHandler {
                 .doOnTerminate(() -> {
                     log.debug("Конец метода onWebhookUpdateReceived");
                     log.debug("--------------------------------------");
+                })
+                // Ловим любые ошибки в цепочке
+                .doOnError(ex -> log.error("Ошибка обработки update:", ex))
+                .onErrorResume(ex -> {
+                    // При ошибке отправляем пользователю «sorryMsg»
+                    String text = WarnMessageProvider.getSorryMsg(
+                            "бот временно недоступен, попробуйте обратится к боту позже"
+                    );
+                    SendMessage sorry = new SendMessage(String.valueOf(chatId), text);
+                    sender.sendMessage(sorry);
+                    return Mono.just(false);
                 });
     }
 

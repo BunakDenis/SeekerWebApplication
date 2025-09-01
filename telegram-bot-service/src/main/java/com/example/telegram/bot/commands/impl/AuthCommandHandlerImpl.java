@@ -36,11 +36,11 @@ public class AuthCommandHandlerImpl implements CommandHandler {
 
     @Value("${telegram.bot.name}")
     private String botName;
-
     private final UserService userService;
     private final TelegramChatService chatService;
     private final VerificationCodeService verificationCodeService;
     private final EmailService emailService;
+
 
     @Override
     public Mono<SendMessage> apply(Update update, TelegramChat chat) {
@@ -83,11 +83,11 @@ public class AuthCommandHandlerImpl implements CommandHandler {
                 .flatMap(msg -> chatService.save(chat)
                         .flatMap(resp -> {
                             log.debug("Сохранённый чат {}", resp);
+                            log.debug("Telegram user={}", resp.getTelegramUser());
                             return Mono.just(msg);
                         })
                 );
     }
-
     private Mono<SendMessage> emailInputtingStateHandler(Update update, TelegramChat chat) {
         return Mono.just("")
                 .flatMap(some -> {
@@ -105,7 +105,6 @@ public class AuthCommandHandlerImpl implements CommandHandler {
                 });
 
     }
-
     private Mono<SendMessage> emailCheckingStateHandler(Update update, TelegramChat chat) {
         final long chatId = UpdateUtilsService.getChatId(update);
         final Long tgUserId = UpdateUtilsService.getTelegramUserId(update);
@@ -152,7 +151,6 @@ public class AuthCommandHandlerImpl implements CommandHandler {
                     .onErrorReturn(sorryMsg);
         });
     }
-
     private Mono<SendMessage> verificationCodeValidatingStateHandler(Update update, TelegramChat chat) {
 
         log.info("Стадия проверки введённого юзером кода верификации");

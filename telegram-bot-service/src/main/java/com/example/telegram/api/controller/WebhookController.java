@@ -51,6 +51,10 @@ public class WebhookController {
 
         log.debug("Метод handleWebhook");
 
+        log.debug(update);
+
+        if (update.getUpdateId() == 0) return Mono.just(ResponseEntity.ok().body("ok"));
+
         return ReactiveSecurityContextHolder.getContext()
                 .map(SecurityContext::getAuthentication)
                 .doOnNext(auth -> telegramBot.getReactiveHandler().setAuthentication(auth))

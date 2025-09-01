@@ -2,6 +2,7 @@ package com.example.telegram.bot.service;
 
 import com.example.data.models.entity.dto.response.ApiResponse;
 import com.example.data.models.entity.dto.telegram.TelegramChatDTO;
+import com.example.data.models.enums.ResponseIncludeDataKeys;
 import com.example.data.models.exception.EntityNotFoundException;
 import com.example.data.models.exception.EntityNotSavedException;
 import com.example.telegram.api.clients.DataProviderClient;
@@ -26,6 +27,10 @@ public class TelegramChatService {
     private final ModelMapperService mapperService;
 
     public Mono<TelegramChat> save(TelegramChat chat) {
+
+        log.debug(chat.toString());
+        log.debug(chat.getTelegramUser().toString());
+
         return dataProviderClient.saveTelegramChat(chat)
                 .flatMap(resp -> {
                     if (resp.getData() instanceof TelegramChatDTO) {
@@ -42,7 +47,7 @@ public class TelegramChatService {
                     if (resp.getData() instanceof TelegramChatDTO) {
                         return Mono.just(toEntity(resp));
                     } else {
-                        throw new EntityNotFoundException("Телеграм чат с id " + id + ", не найден");
+                        throw new EntityNotFoundException("Телеграм чат с id " + id + ", не найден", new TelegramChat());
                     }
                 });
 
@@ -53,10 +58,12 @@ public class TelegramChatService {
         return dataProviderClient.getTelegramChatWithTelegramUser(id)
                 .flatMap(resp -> {
                     if (resp.getData() instanceof TelegramChatDTO) {
+                        TelegramChat telegramChat = toEntity(resp);
+
                         return Mono.just(toEntity(resp));
                     } else {
                         log.debug("Телеграм чат с id " + id + ", не найден");
-                        throw new EntityNotFoundException("Телеграм чат с id " + id + ", не найден");
+                        throw new EntityNotFoundException("Телеграм чат с id " + id + ", не найден",  new TelegramChat());
                     }
                 });
 
@@ -64,29 +71,18 @@ public class TelegramChatService {
 
     public TelegramChat toEntity(ApiResponse<TelegramChatDTO> respWithDto) {
 
-        log.debug(respWithDto.toString());
-
         TelegramChatDTO dto = respWithDto.getData();
 
         TelegramChat telegramChat = mapperService.toEntity(dto, TelegramChat.class);
 
-        log.debug("respWithDto.getIncluded().isEmpty() = {}", respWithDto.getIncluded().isEmpty());
-
-        if (!respWithDto.getIncluded().isEmpty() && Objects.nonNull(respWithDto.getIncluded())) {
+        if (Objects.nonNull(respWithDto.getIncludedObject(ResponseIncludeDataKeys.TELEGRAM_USER.getKeyValue()))) {
             TelegramUser telegramUser = mapperService.toEntity(
-                    respWithDto.getIncludeObject("telegram_user"),
+                    respWithDto.getIncludedObject(ResponseIncludeDataKeys.TELEGRAM_USER.getKeyValue()),
                     TelegramUser.class
             );
 
-            log.debug(telegramUser.toString());
-
-            if (Objects.nonNull(telegramUser)) {
-                telegramChat.setTelegramUser(telegramUser);
-            }
+            telegramChat.setTelegramUser(telegramUser);
         }
-
-        log.debug("Метод TelegramChat toEntity, результат {}", telegramChat);
-
         return telegramChat;
     }
 

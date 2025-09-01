@@ -1,24 +1,25 @@
-package com.example.database.service.telegram;
+package com.example.database.service;
 
-import com.example.data.models.consts.RequestMessageProvider;
 import com.example.data.models.entity.dto.UserDTO;
 import com.example.data.models.entity.dto.UserDetailsDTO;
 import com.example.data.models.entity.dto.response.ApiResponse;
 import com.example.data.models.enums.ResponseIncludeDataKeys;
 import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
+import com.example.data.models.exception.EntityNotFoundException;
 import com.example.database.entity.TelegramUser;
 import com.example.database.entity.User;
 import com.example.database.exception.UserNotFoundException;
 import com.example.database.repo.telegram.UserRepo;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+
+import static com.example.data.models.utils.ApiResponseUtilsService.*;
 
 @Service
 @RequiredArgsConstructor
@@ -32,28 +33,28 @@ public class UserService {
     public ApiResponse<UserDTO> getUserById(Long id) {
         Optional<User> userOptional = repo.findById(id);
 
-        if (userOptional.isPresent()) {
-            return new ApiResponse<>(HttpStatus.OK, RequestMessageProvider.SUCCESSES_MSG, mapper.toDTO(userOptional.get(), UserDTO.class));
-        }
-        throw new UserNotFoundException("User with id " + id + " is not found");
+        if (userOptional.isPresent())
+            return success(mapper.toDTO(userOptional.get(), UserDTO.class));
+
+        throw new EntityNotFoundException("User with id " + id + " is not found", new User());
     }
 
     public ApiResponse<UserDTO> getUserByUsername(String username) {
         Optional<User> userOptional = repo.findByUsername(username);
 
-        if (userOptional.isPresent()) {
-            return new ApiResponse<>(HttpStatus.OK, RequestMessageProvider.SUCCESSES_MSG, mapper.toDTO(userOptional.get(), UserDTO.class));
-        }
-        throw new UserNotFoundException("User with username " + username + " is not found");
+        if (userOptional.isPresent())
+            return success(mapper.toDTO(userOptional.get(), UserDTO.class));
+
+        throw new EntityNotFoundException("User with username " + username + " is not found", new User());
     }
 
     public ApiResponse<UserDTO> getUserByEmail(String email) {
 
         Optional<User> userOptional = repo.findByUsername(email);
 
-        if (userOptional.isPresent()) {
-            return new ApiResponse<>(HttpStatus.OK, RequestMessageProvider.SUCCESSES_MSG, mapper.toDTO(userOptional.get(), UserDTO.class));
-        }
+        if (userOptional.isPresent())
+            return success(mapper.toDTO(userOptional.get(), UserDTO.class));
+
         throw new UserNotFoundException("User with email " + email + " is not found");
     }
 
@@ -61,9 +62,9 @@ public class UserService {
 
         User user = repo.getUserByTelegramUserId(id);
 
-        if (Objects.nonNull(user)) {
-            return new ApiResponse<>(HttpStatus.OK, RequestMessageProvider.SUCCESSES_MSG, mapper.toDTO(user, UserDTO.class));
-        }
+        if (Objects.nonNull(user))
+            return success(mapper.toDTO(user, UserDTO.class));
+
         throw new  UserNotFoundException("User with telegram user id " + id + " is not found");
     }
 
@@ -74,7 +75,7 @@ public class UserService {
 
         if (Objects.nonNull(user)) {
 
-            ApiResponse<UserDTO> resp = new ApiResponse<>(HttpStatus.OK, RequestMessageProvider.SUCCESSES_MSG, mapper.toDTO(user, UserDTO.class));
+            ApiResponse<UserDTO> resp = success(mapper.toDTO(user, UserDTO.class));
 
             UserDetailsDTO userDetailsDTO = mapper.toDTO(user.getUserDetails(), UserDetailsDTO.class);
 
@@ -92,7 +93,7 @@ public class UserService {
 
         if (Objects.nonNull(user)) {
 
-            ApiResponse<UserDTO> resp = new ApiResponse<>(HttpStatus.OK, RequestMessageProvider.SUCCESSES_MSG, mapper.toDTO(user, UserDTO.class));
+            ApiResponse<UserDTO> resp = success(mapper.toDTO(user, UserDTO.class));
 
             List<TelegramUser> telegramUsers = user.getTelegramUsers();
 
@@ -119,7 +120,7 @@ public class UserService {
 
         if (Objects.nonNull(user)) {
 
-            ApiResponse<UserDTO> resp = new ApiResponse<>(HttpStatus.OK, RequestMessageProvider.SUCCESSES_MSG, mapper.toDTO(user, UserDTO.class));
+            ApiResponse<UserDTO> resp = success(mapper.toDTO(user, UserDTO.class));
 
             UserDetailsDTO userDetailsDTO = mapper.toDTO(user.getUserDetails(), UserDetailsDTO.class);
 
@@ -130,7 +131,7 @@ public class UserService {
                 telegramUsers.forEach(tu -> telegramUserDTOList.add(mapper.toDTO(tu, TelegramUserDTO.class)));
 
             resp.addIncludeObject(ResponseIncludeDataKeys.USER_DETAILS.getKeyValue(), userDetailsDTO);
-            resp.addIncludeList(ResponseIncludeDataKeys.TELEGRAM_USER.getKeyValue(), telegramUserDTOList);
+            resp.addIncludeListObjects(ResponseIncludeDataKeys.TELEGRAM_USER.getKeyValue(), telegramUserDTOList);
 
             return resp;
         }

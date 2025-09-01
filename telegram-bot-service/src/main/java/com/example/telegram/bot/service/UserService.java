@@ -1,6 +1,8 @@
 package com.example.telegram.bot.service;
 
+import com.example.data.models.consts.DefaultEntityValuesConsts;
 import com.example.data.models.entity.dto.UserDetailsDTO;
+import com.example.data.models.enums.ResponseIncludeDataKeys;
 import com.example.data.models.enums.UserRoles;
 import com.example.data.models.entity.dto.UserDTO;
 import com.example.data.models.entity.dto.response.ApiResponse;
@@ -76,11 +78,11 @@ public class UserService implements ReactiveUserDetailsService {
 
         User result = mapperService.toEntity(dto.getData(), User.class);
 
-        Object userDetailsDTOObject = dto.getIncludeObject(USER_DETAILS.getKeyValue());
+        Object userDetailsDTOObject = dto.getIncludedObject(USER_DETAILS.getKeyValue());
 
-        Object telegramUserDTO = dto.getIncludeObject(TELEGRAM_USER.getKeyValue());
+        Object telegramUserDTO = dto.getIncludedObject(TELEGRAM_USER.getKeyValue());
 
-        List<Object> telegramUserDTOList = dto.getIncludeList(TELEGRAM_USER.getKeyValue());
+        List<Object> telegramUserDTOList = dto.getIncludedListObjects(TELEGRAM_USER.getKeyValue());
 
 
         if (Objects.nonNull(userDetailsDTOObject)) {
@@ -137,7 +139,7 @@ public class UserService implements ReactiveUserDetailsService {
                     }
 
                     return Mono.just(org.springframework.security.core.userdetails.User.builder()
-                            .username("user")
+                            .username(DefaultEntityValuesConsts.USER_USERNAME_DEFAULT)
                             .password("")
                             .roles(UserRoles.TOURIST.getRole())
                             .build());

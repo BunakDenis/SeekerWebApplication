@@ -1,4 +1,4 @@
-package com.example.database.service.telegram;
+package com.example.database.service;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;

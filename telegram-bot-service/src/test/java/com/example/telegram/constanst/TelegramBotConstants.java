@@ -31,6 +31,8 @@ public class TelegramBotConstants {
             .isActive(true)
             .build();
 
+    public static final Integer TELEGRAM_UPDATE_ID = 789456;
+
     public static TelegramChat telegramChatForTests = new TelegramChat(
             555L,
             "",

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -15,20 +16,20 @@ import java.time.LocalDateTime;
 public class TelegramSession {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(name = "session_data")
-    private String sessionData;
-
-    @Column(name = "is_active", nullable = false)
-    private boolean isActive;
-
-    @Column(name = "expiration_time")
-    private LocalDateTime expirationTime;
 
     @OneToOne
     @JoinColumn(name = "telegram_user_id", referencedColumnName = "id", nullable = false)
     @ToString.Exclude
     private TelegramUser telegramUser;
+
+    @OneToMany(mappedBy = "telegramSession", fetch = FetchType.EAGER)
+    @ToString.Exclude
+    private List<PersistentSession> persistentSessions;
+
+    @OneToMany(mappedBy = "telegramSession", fetch = FetchType.EAGER)
+    @ToString.Exclude
+    private List<TransientSession> transientSessions;
 
 }

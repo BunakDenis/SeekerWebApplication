@@ -12,13 +12,18 @@ import com.example.data.models.entity.dto.response.CheckUserResponse;
 import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
 import com.example.database.api.client.MysticSchoolClient;
 import com.example.database.entity.*;
+import com.example.database.service.ModelMapperService;
+import com.example.database.service.UserService;
 import com.example.database.service.telegram.*;
+import com.example.utils.text.ExceptionServiceUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+
+import static com.example.data.models.utils.ApiResponseUtilsService.*;
 
 
 @RestController
@@ -30,13 +35,9 @@ public class TelegramDataController {
     private final UserService userService;
     private final VerificationCodeService verificationCodeService;
     private final TelegramChatsService chatsService;
-
     private final TelegramUserService telegramUserService;
-
     private final TelegramSessionService sessionService;
-
     private final MysticSchoolClient mysticSchoolClient;
-
     private final ModelMapperService mapperService;
 
     @GetMapping("/user/get/id/{id}")
@@ -48,7 +49,7 @@ public class TelegramDataController {
 
         ApiResponse<UserDTO> response = userService.getUserById(id);
 
-        return ResponseEntity.status(response.getStatus()).body(response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/user/get/username/{username}")
@@ -60,7 +61,7 @@ public class TelegramDataController {
 
         ApiResponse<UserDTO> response = userService.getUserByUsername(username);
 
-        return ResponseEntity.status(response.getStatus()).body(response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/user/get/email/{email}")
@@ -72,7 +73,7 @@ public class TelegramDataController {
 
         ApiResponse<UserDTO> response = userService.getUserByEmail(email);
 
-        return ResponseEntity.status(response.getStatus()).body(response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/user/get/telegram_user_id/{id}")
@@ -84,7 +85,7 @@ public class TelegramDataController {
 
         ApiResponse<UserDTO> response = userService.getUserByTelegramUserId(id);
 
-        return ResponseEntity.status(response.getStatus()).body(response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/user/user_details/get/telegram_user_id/{id}")
@@ -96,7 +97,7 @@ public class TelegramDataController {
 
         ApiResponse<UserDTO> response = userService.getUserByTelegramUserIdWithUserDetails(id);
 
-        return ResponseEntity.status(response.getStatus()).body(response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/user/telegram_user/get/telegram_user_id/{id}")
@@ -108,7 +109,7 @@ public class TelegramDataController {
 
         ApiResponse<UserDTO> response = userService.getUserByTelegramUserIdWithTelegramUser(id);
 
-        return ResponseEntity.status(response.getStatus()).body(response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/user/full/get/telegram_user_id/{id}")
@@ -120,11 +121,11 @@ public class TelegramDataController {
 
         ApiResponse<UserDTO> response = userService.getUserByTelegramUserIdFull(id);
 
-        return ResponseEntity.status(response.getStatus()).body(response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/user/check/auth/{id}")
-    public Mono<ResponseEntity<ApiResponse<CheckUserResponse>>> checkUserAuthentication(
+    public Mono<ResponseEntity<ApiResponse>> checkUserAuthentication(
             @PathVariable("id") Long id
     ) {
 
@@ -140,18 +141,8 @@ public class TelegramDataController {
                     log.debug(mysticSchoolResponse.toString());
 
                     return ResponseEntity.status(HttpStatus.OK).body(
-                            new ApiResponse<>(HttpStatus.OK, HttpStatus.OK.toString(), mysticSchoolResponse)
+                            success(mysticSchoolResponse)
                     );
-                })
-                .defaultIfEmpty(
-                        ResponseEntity.status(HttpStatus.NOT_FOUND)
-                                .body(new ApiResponse<>(HttpStatus.INTERNAL_SERVER_ERROR, "User not found"))
-                )  // Handle empty user
-                .onErrorResume(e -> { // Handle errors
-                    log.error("Error during user check", e);
-                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                            new ApiResponse<>(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage())
-                    ));
                 });
     }
 
@@ -163,7 +154,7 @@ public class TelegramDataController {
 
         ApiResponse<VerificationCodeDTO> response = verificationCodeService.getCodeById(id);
 
-        return ResponseEntity.status(response.getStatus()).body(response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/otp_code/get/user_id/{id}")
@@ -174,7 +165,7 @@ public class TelegramDataController {
 
         ApiResponse<VerificationCodeDTO> response = verificationCodeService.getCodeByUserId(id);
 
-        return ResponseEntity.status(response.getStatus()).body(response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/otp_code/get/telegram_user_id/{id}")
@@ -185,7 +176,7 @@ public class TelegramDataController {
 
         ApiResponse<VerificationCodeDTO> response = verificationCodeService.getCodeByUserId(id);
 
-        return ResponseEntity.status(response.getStatus()).body(response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PostMapping("/otp_code/add/")
@@ -205,7 +196,7 @@ public class TelegramDataController {
 
         ApiResponse<VerificationCodeDTO> response = verificationCodeService.save(verificationCode);
 
-        return ResponseEntity.status(response.getStatus()).body(response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PostMapping("/otp_code/update/")
@@ -218,7 +209,7 @@ public class TelegramDataController {
                 mapperService.toEntity(request.getData(), VerificationCode.class)
         );
 
-        return ResponseEntity.status(response.getStatus()).body(response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PostMapping("/otp_code/delete/{id}")
@@ -229,7 +220,7 @@ public class TelegramDataController {
 
         ApiResponse<Boolean> response = verificationCodeService.delete(id);
 
-        return ResponseEntity.status(response.getStatus()).body(response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/telegram/user/get/{id}")
@@ -240,7 +231,7 @@ public class TelegramDataController {
 
         ApiResponse<TelegramUserDTO> response = telegramUserService.getUserById(id);
 
-        return ResponseEntity.status(response.getStatus()).body(response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
 
     }
 
@@ -255,7 +246,7 @@ public class TelegramDataController {
 
         log.debug("Ответ {}", response);
 
-        return ResponseEntity.status(response.getStatus()).body(response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/chat/telegram_user/get/{id}")
@@ -269,7 +260,7 @@ public class TelegramDataController {
 
         log.debug("Ответ {}", response);
 
-        return ResponseEntity.status(response.getStatus()).body(response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PostMapping(path = {"/chat/add/", "/chat/add"})
@@ -292,18 +283,7 @@ public class TelegramDataController {
 
         log.debug("Ответ {}", response);
 
-        return ResponseEntity.status(response.getStatus()).body(response);
-    }
-
-    @GetMapping(path = {"/session/get/{id}"})
-    public ResponseEntity<ApiResponse<TelegramSessionDTO>> getSessionById(
-            @PathVariable("id") Long id
-    ) {
-        log.debug("Запрос на получение TelegramSession по ID {}", id);
-
-        ApiResponse<TelegramSessionDTO> response = sessionService.getSessionById(id);
-
-        return ResponseEntity.status(response.getStatus()).body(response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PostMapping(path = {"/session/add", "/session/add"})
@@ -316,7 +296,42 @@ public class TelegramDataController {
                 mapperService.toEntity(request.getData(), TelegramSession.class)
         );
 
-        return ResponseEntity.status(response.getStatus()).body(response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping(path = {"/session/get/{id}"})
+    public ResponseEntity<ApiResponse<TelegramSessionDTO>> getSessionById(
+            @PathVariable("id") Long id
+    ) {
+        log.debug("Запрос на получение TelegramSession по ID {}", id);
+
+        ApiResponse<TelegramSessionDTO> response = sessionService.getSessionById(id);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PostMapping(path = {"/session/update/", "/session/update"})
+    public ResponseEntity<ApiResponse<TelegramSessionDTO>> updateSession(
+            @RequestBody ApiRequest<TelegramSessionDTO> request
+    ) {
+        log.debug("Запрос на обновление TelegramSession {}", request);
+
+        ApiResponse<TelegramSessionDTO> response = sessionService.update(
+                mapperService.toEntity(request.getData(), TelegramSession.class)
+        );
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PostMapping("/session/delete/{id}")
+    public ResponseEntity<ApiResponse<Boolean>> deleteSession(
+            @PathVariable("id") Long id
+    ) {
+        log.debug("Запрос на удаление TelegramSession с id {}", id);
+
+        ApiResponse<Boolean> response = sessionService.delete(id);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping(path = {"/session/get/telegramUserId/{telegramUserId}"})
@@ -328,7 +343,7 @@ public class TelegramDataController {
 
         ApiResponse<TelegramSessionDTO> response = sessionService.findByTelegramUserId(telegramUserId);
 
-        return ResponseEntity.status(response.getStatus()).body(response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
 
     }
 

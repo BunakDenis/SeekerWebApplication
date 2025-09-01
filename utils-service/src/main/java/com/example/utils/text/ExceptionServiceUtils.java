@@ -21,4 +21,17 @@ public class ExceptionServiceUtils {
 
         return sw.toString();
     }
+
+    public static String stackTraceToString(Throwable e) {
+        log.debug("Метод stackTraceToString, Exception {}", e);
+
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+
+        e.printStackTrace(pw);
+
+        log.debug("String stack trace {}", pw);
+
+        return sw.toString();
+    }
 }

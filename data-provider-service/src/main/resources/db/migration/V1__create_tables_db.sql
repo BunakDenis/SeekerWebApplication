@@ -49,14 +49,31 @@ CREATE TABLE IF NOT EXISTS telegram_chats (
     chat_state VARCHAR(255)
 );
 
+-- Долгосрочная сессия
+CREATE TABLE IF NOT EXISTS persistent_sessions (
+    id BIGSERIAL PRIMARY KEY,
+    telegram_session_id BIGINT NOT NULL,
+    persistent_session_data VARCHAR(255),
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    persistent_expiration_time TIMESTAMP WITH TIME ZONE NOT NULL
+);
+
+-- Краткосрочная сессия
+CREATE TABLE IF NOT EXISTS transient_sessions (
+    id BIGSERIAL PRIMARY KEY,
+    telegram_session_id BIGINT NOT NULL,
+    transient_session_data VARCHAR(255),
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    transient_expiration_time TIMESTAMP WITH TIME ZONE NOT NULL
+);
+
 -- Сессии пользователя Telegram
 CREATE TABLE IF NOT EXISTS telegram_sessions (
     id BIGSERIAL PRIMARY KEY,
     telegram_user_id BIGINT REFERENCES telegram_users(id) NOT NULL,
-    chat_id BIGINT REFERENCES telegram_chats(id) NOT NULL,
-    session_data VARCHAR(255),
-    is_active BOOLEAN NOT NULL DEFAULT TRUE,
-    expiration_time TIMESTAMP WITH TIME ZONE NOT NULL
+    telegram_chat_id BIGINT REFERENCES telegram_chats(id) NOT NULL,
+    persistent_session_id BIGINT,
+    transient_session_id BIGINT
 );
 
 -- Элементы меню верхнего уровня

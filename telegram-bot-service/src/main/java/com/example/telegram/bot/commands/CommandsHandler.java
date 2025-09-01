@@ -37,7 +37,8 @@ public class CommandsHandler {
         log.debug("chat_id = " + chatId + ", command = " + command);
         log.debug("Последний чат {}", lastTelegramChat);
 
-        command = lastCommand.isEmpty() ? command : lastCommand;
+
+        if (!lastCommand.isEmpty()) command = lastCommand;
 
         CommandHandler commandHandler = commandsHandlersService.getCommandHandler(command);
 

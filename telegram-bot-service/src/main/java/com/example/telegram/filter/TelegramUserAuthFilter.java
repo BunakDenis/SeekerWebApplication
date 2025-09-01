@@ -1,13 +1,15 @@
 package com.example.telegram.filter;
 
 
-import com.example.data.models.entity.User;
+import com.example.data.models.consts.WarnMessageProvider;
+import com.example.telegram.bot.message.TelegramBotMessageSender;
 import com.example.telegram.bot.service.AuthService;
 import com.example.telegram.bot.service.ModelMapperService;
 import com.example.telegram.bot.service.TelegramUserService;
 import com.example.telegram.bot.service.UserService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -24,6 +26,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
+import org.telegram.telegrambots.meta.api.objects.Update;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -38,14 +41,13 @@ public class TelegramUserAuthFilter implements WebFilter {
 
 
     private final TelegramUserService telegramUserService;
-
     private final UserService userService;
-
     private final AuthService authService;
-
+    private final TelegramBotMessageSender sender;
     private final ObjectMapper objectMapper;
-
     private final ModelMapperService mapperService;
+    private String requestBody;
+    private Long chatId;
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
@@ -59,43 +61,39 @@ public class TelegramUserAuthFilter implements WebFilter {
         log.debug("Request URI path = {}", path);
 
         return DataBufferUtils.join(request.getBody())
-                .flatMap(buffer -> {
-                    String body = StandardCharsets.UTF_8.decode(buffer.toByteBuffer()).toString();
-                    DataBufferUtils.release(buffer);
+                    .flatMap(buffer -> {
+                        String body = StandardCharsets.UTF_8.decode(buffer.toByteBuffer()).toString();
+                        DataBufferUtils.release(buffer);
 
-                    log.debug("Body запроса от Telegram API: {}", body);
+                        log.debug("Body от Telegram API: {}", body);
 
-                    // Пропускаем запросы с командами /auth и /register
-                    if ("/api/bot/".equals(path) && (body.contains("/authorize") || body.contains("/register"))) {
+                        // Пропускаем запросы с командами /auth и /register
+                        if ("/api/bot/".equals(path) && (body.contains("/authorize") || body.contains("/register"))) {
 
-                        log.debug("Обработка в фильтре запроса \"/authorize\" или \"/register\"");
+                            log.debug("Обработка в фильтре запроса \"/authorize\" или \"/register\"");
 
-                        return chain.filter(exchange.mutate()
-                                .request(decorateRequest(exchange, body, ""))
-                                .build()); // Пропускаем дальше по цепочке
-                    }
+                            return chain.filter(exchange.mutate()
+                                    .request(decorateRequest(exchange, body, ""))
+                                    .build()); // Пропускаем дальше по цепочке
+                        }
 
-                    Long telegramUserId = extractUserId(body);
-                    if (telegramUserId == null) {
-                        return chain.filter(exchange.mutate()
-                                .request(decorateRequest(exchange, body, ""))
-                                .build());
-                    }
+                        Long telegramUserId = extractTelegramUserId(body);
+                        if (telegramUserId == null) {
+                            return chain.filter(exchange.mutate()
+                                    .request(decorateRequest(exchange, body, ""))
+                                    .build());
+                        }
 
-                    return userService.getUserByTelegramUserId(telegramUserId)
-                            .flatMap(user -> {
+                        Long chatId = extractChatId(body);
+                        this.requestBody = body;
+                        this.chatId = chatId;
 
-                                if (Objects.nonNull(user)) {
+                        return userService.getUserByTelegramUserId(telegramUserId)
+                                .flatMap(user -> {
                                     log.debug("User {}", user);
                                     return userService.findByUsername(user.getUsername());
-                                } else {
-                                    return Mono.just(org.springframework.security.core.userdetails.User.builder().build());
-                                }
-
-                            })
-                            .flatMap(userDetails -> {
-
-                                if (Objects.nonNull(userDetails)) {
+                                })
+                                .flatMap(userDetails -> {
                                     Authentication auth = new UsernamePasswordAuthenticationToken(
                                             userDetails,
                                             null,
@@ -104,38 +102,68 @@ public class TelegramUserAuthFilter implements WebFilter {
 
                                     log.debug("Authentication = {}", auth);
                                     return Mono.just(auth);
-                                } else {
-                                    return Mono.empty();
-                                }
-                            })
-                            .filter(Objects::nonNull)
-                            .flatMap(auth -> {
+                                })
+                                .filter(Objects::nonNull)
+                                .flatMap(auth -> {
 
-                                // sessionId в хедер
-                                String sessionId = String.valueOf(12345L);
+                                    // sessionId в хедер
+                                    String sessionId = String.valueOf(12345L);
 
-                                SecurityContext emptyContext = SecurityContextHolder.createEmptyContext();
+                                    SecurityContext emptyContext = SecurityContextHolder.createEmptyContext();
 
-                                emptyContext.setAuthentication(auth);
+                                    emptyContext.setAuthentication(auth);
 
-                                log.debug("TelegramUserAuthFilter end.");
+                                    log.debug("TelegramUserAuthFilter end.");
 
-                                return chain.filter(exchange.mutate()
-                                                .request(decorateRequest(exchange, body, sessionId))
-                                                .build())
-                                        .contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth));
+                                    return chain.filter(exchange.mutate()
+                                                    .request(decorateRequest(exchange, body, sessionId))
+                                                    .build())
+                                            .contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth));
 
-                            });
+                                });
+                    })
+                // Ловим любые ошибки в цепочке
+                .doOnError(ex -> log.error("Ошибка обработки update:", ex.getMessage()))
+                .onErrorResume(ex -> {
+                    sender.sendMessage(
+                            chatId,
+                            WarnMessageProvider.getSorryMsg(
+                                    "бот временно недоступен, попробуйте написать позже!"
+                            )
+                    );
+
+                    String modifiedBody = requestBody.replaceFirst(
+                            "\"update_id\"\\s*:\\s*\\d+",
+                            "\"update_id\":0"
+                    );
+
+                    return chain.filter(exchange.mutate()
+                            .request(decorateRequest(exchange, modifiedBody, ""))
+                            .build());
                 });
     }
 
-    private Long extractUserId(String body) {
+    private Long extractTelegramUserId(String body) {
         try {
             JsonNode json = objectMapper.readTree(body);
             if (json.has("message") && json.get("message").has("from")) {
                 return json.get("message").get("from").get("id").asLong();
             } else if (json.has("callback_query")) {
                 return json.get("callback_query").get("from").get("id").asLong();
+            }
+        } catch (Exception e) {
+            log.error("Ошибка парсинга JSON: {}", e.getMessage());
+        }
+        return null;
+    }
+
+    private Long extractChatId(String body) {
+        try {
+            JsonNode json = objectMapper.readTree(body);
+            if (json.has("message") && json.get("message").has("chat")) {
+                return json.get("message").get("chat").get("id").asLong();
+            } else if (json.has("callback_query")) {
+                return json.get("callback_query").get("chat").get("id").asLong();
             }
         } catch (Exception e) {
             log.error("Ошибка парсинга JSON: {}", e.getMessage());

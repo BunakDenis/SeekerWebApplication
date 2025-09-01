@@ -5,17 +5,12 @@ import com.example.data.models.entity.VerificationCode;
 import com.example.data.models.entity.dto.UserDTO;
 import com.example.data.models.entity.dto.VerificationCodeDTO;
 import com.example.data.models.entity.dto.request.ApiRequest;
-import com.example.data.models.entity.dto.response.ApiResponse;
+import com.example.data.models.exception.ExpiredVerificationCodeException;
+import com.example.data.models.exception.NotValidVerificationCodeException;
 import com.example.telegram.api.clients.DataProviderClient;
-import com.example.telegram.bot.TelegramBot;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.mockserver.serialization.model.VerificationDTO;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -101,28 +96,26 @@ public class VerificationCodeService {
                     }
                 });
     }
-    public Mono<Boolean> isCodeValid(Long telegramUserId, String codeForCheck) {
-        return dataProviderClient.getVerificationCodeByTelegramUserId(telegramUserId)
-                .flatMap(resp -> {
-                    if (resp.getData() != null) {
+    public Mono<Boolean> checkCode(Long telegramUserId, String codeForCheck) {
 
-                        VerificationCodeDTO code = resp.getData();
+        return getByTelegramUserId(telegramUserId)
+                .flatMap(code -> {
 
-                        boolean checkExpirationTime =
-                                LocalDateTime.now(ZoneId.of(zoneId)).isAfter(code.getExpiresAt());
+                    if (!checkValidation(codeForCheck, code))
+                        return Mono.error(new NotValidVerificationCodeException(codeForCheck + " is not valid"));
 
-                        boolean checkMatch =
-                                encoder.matches(code.getOtpHash(), codeForCheck);
+                    if (!checkExpiration(code))
+                        return Mono.error(new ExpiredVerificationCodeException("Verification code " + code.getOtpHash() + " is expired"));
 
-                        boolean result = checkExpirationTime && checkMatch;
-
-                        return Mono.just(result);
-                    } else {
-                        log.error(resp.getMessage());
-                        log.error(resp.getDebugMsg());
-                        return Mono.just(false);
-                    }
+                    return Mono.just(true);
                 });
+
+    }
+    private boolean checkValidation(String codeForCheck, VerificationCode code) {
+        return encoder.matches(code.getOtpHash(), codeForCheck);
+    }
+    private boolean checkExpiration(VerificationCode code) {
+        return code.getExpiresAt().isAfter(LocalDateTime.now(ZoneId.of(zoneId)));
     }
 
 }

@@ -1,8 +1,9 @@
-package com.example.database.service.telegram;
+package com.example.database.service;
 
 import com.example.data.models.entity.dto.UserDetailsDTO;
 import com.example.database.entity.UserDetails;
 import com.example.database.repo.telegram.UserDetailsRepo;
+import com.example.database.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

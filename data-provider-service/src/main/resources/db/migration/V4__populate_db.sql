@@ -25,6 +25,23 @@ BEGIN
     VALUES (465963651, 465963651, 'command', '/auth', 'enter_email');
 
     -- Вставляем данные о сессии Telegram
-    INSERT INTO telegram_sessions (telegram_user_id, chat_id, expiration_time) VALUES (465963651, 465963651, '2026-08-07 10:23:54+02');
+    INSERT INTO telegram_sessions (telegram_user_id, telegram_chat_id) VALUES (465963651, 465963651);
+
+END $$;
+
+-- Получаем ID сессии, чтобы использовать его в других таблицах
+DO $$
+DECLARE
+    session_id BIGINT;
+BEGIN
+    SELECT id INTO session_id FROM telegram_sessions WHERE telegram_user_id = 465963651;
+
+    -- Вставляем данные о долгосрочной сессии
+    INSERT INTO persistent_sessions (telegram_session_id, persistent_session_data, persistent_expiration_time)
+    VALUES (session_id, 'persistent_session_data', '2026-08-29 00:00:00+02');
+
+    -- Вставляем данные о краткосрочной сессии
+    INSERT INTO transient_sessions (telegram_session_id, transient_session_data, transient_expiration_time)
+    VALUES (session_id, 'transient_session_data', '2025-09-29 00:00:00+02');
 
 END $$;

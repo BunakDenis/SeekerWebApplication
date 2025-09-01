@@ -1,16 +1,19 @@
 package com.example.data.models.exception;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
 public class EntityNotFoundException extends IllegalArgumentException{
 
-    private String message;
+    private Object object;
+
+    public EntityNotFoundException(String msg, Object object) {
+        super(msg);
+    }
+
+    /*
+       TODO
+            1. Вместо поля object добавить поле EntityClassName
+     */
 
 }
