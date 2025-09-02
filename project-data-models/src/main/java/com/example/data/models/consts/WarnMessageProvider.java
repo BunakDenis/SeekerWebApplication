@@ -4,10 +4,13 @@ import java.text.MessageFormat;
 
 public class WarnMessageProvider {
 
-    private final static String SORRY_MSG = "Извините за неудобства, {0}";
+    private static final String SORRY_MSG = "Извините за неудобства, {0}";
 
-    private final static String NOT_VALID_EMAIL_ADDRESS = "Введённый Вами email адрес {0} не корректный. \n" +
+    private static final String NOT_VALID_EMAIL_ADDRESS = "Введённый Вами email адрес {0} не корректный. \n" +
             "Введите Ваш email ещё раз.";
+
+    public static final String NOT_VALID_VERIFICATION_CODE = "Введённый Вами верификационный код не правильный, введите код повторно";
+    public static final String EXPIRED_VERIFICATION_CODE = "Срок действия верификационного кода вышел. Для повторной отправки кода введите email адрес.";
 
     public static String getSorryMsg(String msg) {
         return MessageFormat.format(SORRY_MSG, msg);

@@ -11,7 +11,7 @@ public class MessageProvider {
     public static final String EMAIL_CHECKING_MSG = "Введите свой email адрес";
     public static final String EMAIL_VERIFICATION_MSG = "На email адрес {0} было выслано письмо с кодом подтверждения.\n" +
             "Пожалуйста, введите код подтверждения";
-    public static final String SUCCESSES_AUTHORIZATION_MSG = "Поздравляю {0} {1}, вы успешно прошли авторизацию!";
+    public static final String SUCCESSES_AUTHORIZATION_MSG = "Поздравляю {0}, вы успешно прошли авторизацию!";
 
     public static final String PASSWORD_CHECKING_MSG = "Введите пароль учётной записи";
     public static final String DATA_VERIFICATION_MSG = "Ожидайте проверки введённых данных";
@@ -21,8 +21,8 @@ public class MessageProvider {
         return MessageFormat.format(EMAIL_VERIFICATION_MSG, email);
     }
 
-    public static String getSuccessesAuthorizationMsg(String firstname, String lastname) {
-            return MessageFormat.format(SUCCESSES_AUTHORIZATION_MSG, firstname, lastname);
+    public static String getSuccessesAuthorizationMsg(String fullName) {
+            return MessageFormat.format(SUCCESSES_AUTHORIZATION_MSG, fullName);
     }
 
 }

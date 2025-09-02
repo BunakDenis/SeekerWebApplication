@@ -2,8 +2,10 @@ package com.example.telegram.bot.commands.impl;
 
 import com.example.telegram.bot.commands.CommandHandler;
 import com.example.data.models.entity.TelegramChat;
+import com.example.telegram.bot.keyboard.ReplyKeyboardMarkupProvider;
 import com.example.telegram.bot.message.MessageProvider;
 import com.example.telegram.bot.queries.Queries;
+import com.example.telegram.bot.utils.update.UpdateUtilsService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -31,36 +33,22 @@ public class StartCommandHandlerImpl implements CommandHandler {
 
         Message msg = update.getMessage();
         Long chatId = msg.getChatId();
-        String userFirstName = msg.getFrom().getFirstName();
-        String userLastName = msg.getFrom().getLastName();
         StringBuilder greeting = new StringBuilder();
 
-        if (userFirstName != null) {
-            greeting.append(userFirstName);
-            greeting.append(" ");
-        }
+        String telegramUserFullName = UpdateUtilsService.getTelegramUserFullName(update);
 
-        if (userLastName != null) {
-            greeting.append(userLastName);
-            greeting.append("! ");
-        }
+        greeting.append(telegramUserFullName);
+        greeting.append("! ");
 
         greeting.append(MessageProvider.START_MSG);
 
         SendMessage answer = new SendMessage(String.valueOf(chatId),
                 greeting.toString());
 
-        // Создание reply-кнопки
-        KeyboardButton decodeAudioButton = new KeyboardButton(Queries.DECODE_AUDIO.getQuery());
+        // Создание кнопки
+        ReplyKeyboardMarkup decodeAudioKeyboard = ReplyKeyboardMarkupProvider.getDecodeAudioKeyboard();
 
-        KeyboardRow row = new KeyboardRow();
-        row.add(decodeAudioButton);
-
-        ReplyKeyboardMarkup keyboard = new ReplyKeyboardMarkup();
-        keyboard.setKeyboard(Collections.singletonList(row));
-        keyboard.setResizeKeyboard(true);
-
-        answer.setReplyMarkup(keyboard);
+        answer.setReplyMarkup(decodeAudioKeyboard);
 
         return Mono.just(answer);
     }

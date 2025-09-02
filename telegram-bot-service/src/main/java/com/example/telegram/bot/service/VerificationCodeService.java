@@ -112,7 +112,7 @@ public class VerificationCodeService {
 
     }
     private boolean checkValidation(String codeForCheck, VerificationCode code) {
-        return encoder.matches(code.getOtpHash(), codeForCheck);
+        return encoder.matches(codeForCheck, code.getOtpHash());
     }
     private boolean checkExpiration(VerificationCode code) {
         return code.getExpiresAt().isAfter(LocalDateTime.now(ZoneId.of(zoneId)));

@@ -59,6 +59,11 @@ public class DataProviderClient {
                 .build();
     }
 
+    /*
+        TODO
+            1. Сделать рефактор Get методов (убрать "get" с ендпоинта)
+     */
+
     public Mono<ApiResponse<UserDTO>> getUserById(Long id) {
 
         StringBuilder endpoint = new StringBuilder(getApiUserEndpoint("/get/id/"));

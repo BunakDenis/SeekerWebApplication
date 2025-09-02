@@ -50,14 +50,17 @@ public class QueriesHandler {
         if (Objects.nonNull(queryHandler)) {
             answer = queryHandler.apply(update);
         } else {
-            log.debug("Для query - {}, не найден handler." + query);
+            log.debug("Для query - {}, не найден handler.", query);
+            log.debug("Отправляю сообщение юзеру \"{}\"", MessageProvider.UNKNOWN_COMMAND_OR_QUERY);
             answer = new SendMessage(String.valueOf(chatId), MessageProvider.UNKNOWN_COMMAND_OR_QUERY);
         }
 
         if (chatId == WIFE_CHAT_ID) {
+            log.debug("Отправляю сообщение юзеру \"{}\"", MessageForWifeProvider.getMessage());
             sender.sendMessage(update.getMessage().getChatId(),
                     MessageForWifeProvider.getMessage());
         } else {
+            log.debug("Отправляю сообщение юзеру \"{}\"", answer);
             sender.sendMessage(answer);
         }
 

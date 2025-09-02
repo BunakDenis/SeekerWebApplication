@@ -22,7 +22,7 @@ BEGIN
 
     -- Вставляем данные о чате Telegram
     INSERT INTO telegram_chats (id, telegram_user_id, ui_element, ui_element_value, chat_state)
-    VALUES (465963651, 465963651, 'command', '/auth', 'enter_email');
+    VALUES (465963651, 465963651, '', '', '');
 
     -- Вставляем данные о сессии Telegram
     INSERT INTO telegram_sessions (telegram_user_id, telegram_chat_id) VALUES (465963651, 465963651);

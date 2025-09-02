@@ -1,11 +1,15 @@
 package com.example.telegram.bot.commands.impl;
 
 
+import com.example.data.models.consts.WarnMessageProvider;
 import com.example.data.models.entity.VerificationCode;
+import com.example.data.models.exception.ExpiredVerificationCodeException;
+import com.example.data.models.exception.NotValidVerificationCodeException;
 import com.example.telegram.bot.chat.UiElements;
 import com.example.telegram.bot.chat.states.DialogStates;
 import com.example.telegram.bot.commands.CommandHandler;
 import com.example.data.models.entity.TelegramChat;
+import com.example.telegram.bot.keyboard.ReplyKeyboardMarkupProvider;
 import com.example.telegram.bot.message.MessageProvider;
 import com.example.telegram.bot.commands.Commands;
 import com.example.telegram.bot.service.TelegramChatService;
@@ -21,7 +25,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.User;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
@@ -145,6 +149,10 @@ public class AuthCommandHandlerImpl implements CommandHandler {
                                                             .build()
                                             )
                                     )
+                                    .flatMap(verificationCode -> {
+                                        chat.setChatState(DialogStates.EMAIL_VERIFICATION.getDialogState());
+                                        return Mono.empty();
+                                    })
                                     .then()
                     )
                     .thenReturn(okMsg)
@@ -155,19 +163,47 @@ public class AuthCommandHandlerImpl implements CommandHandler {
 
         log.info("Стадия проверки введённого юзером кода верификации");
 
-        User currentUser = UpdateUtilsService.getTelegramUser(update);
+        Long telegramUserId = UpdateUtilsService.getTelegramUserId(update);
+        String verificationCode = UpdateUtilsService.getMessageText(update);
 
-        chat.setUiElement("");
-        chat.setUiElementValue("");
-        chat.setChatState("");
+        String currentUserFullName = UpdateUtilsService.getTelegramUserFullName(update);
 
-        return Mono.just(
-                new SendMessage(
-                        UpdateUtilsService.getStringChatId(update),
-                        MessageProvider.getSuccessesAuthorizationMsg(
-                                currentUser.getFirstName(), currentUser.getLastName())
-                )
-        );
+        return verificationCodeService.checkCode(telegramUserId, verificationCode)
+                        .flatMap(isCodeValid -> {
+                            SendMessage result = new SendMessage();
+                            result.setChatId(UpdateUtilsService.getStringChatId(update));
+
+                            if (isCodeValid) {
+
+                                chat.setUiElement("");
+                                chat.setUiElementValue("");
+                                chat.setChatState("");
+
+                                result.setText(MessageProvider.getSuccessesAuthorizationMsg(currentUserFullName));
+                            } else {
+                                result.setText(NOT_VALID_VERIFICATION_CODE);
+                            }
+
+                            return Mono.just(result);
+                        })
+                .onErrorResume(error -> {
+
+                    ReplyKeyboardMarkup notValidEmailKeyboard = ReplyKeyboardMarkupProvider.getNotValidEmailKeyboard();
+                    SendMessage result = new SendMessage();
+                    result.setChatId(UpdateUtilsService.getStringChatId(update));
+
+                    if (error instanceof NotValidVerificationCodeException) {
+                        result.setText(NOT_VALID_VERIFICATION_CODE);
+                        result.setReplyMarkup(notValidEmailKeyboard);
+                    } else if (error instanceof ExpiredVerificationCodeException) {
+                        result.setText(EXPIRED_VERIFICATION_CODE);
+                        result.setReplyMarkup(notValidEmailKeyboard);
+                        chat.setChatState(DialogStates.ENTER_EMAIL.getDialogState());
+                    } else {
+                        result.setText(WarnMessageProvider.getSorryMsg("бот временно недоступен, попробуйте обратится к боту позже"));
+                    }
+                    return Mono.just(result);
+                });
     }
 
 }

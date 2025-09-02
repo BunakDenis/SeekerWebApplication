@@ -13,7 +13,10 @@ import com.example.telegram.bot.commands.Commands;
 import com.example.telegram.bot.message.MessageProvider;
 import com.example.telegram.bot.message.TelegramBotMessageSender;
 import com.example.telegram.bot.service.ModelMapperService;
+import com.example.telegram.bot.service.VerificationCodeService;
+import com.example.telegram.bot.utils.update.UpdateUtilsService;
 import com.example.utils.file.loader.EnvLoader;
+import com.example.utils.generator.GenerationService;
 import com.example.utils.sender.EmailService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,6 +36,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -46,6 +50,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
+import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,6 +75,8 @@ public class TelegramBotTests {
 
     @Autowired
     private WebTestClient client;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     private static Dotenv dotenv;
     private static ObjectMapper objectMapper;
     private static ModelMapperService mapperService;
@@ -449,21 +456,18 @@ public class TelegramBotTests {
         assertEquals(expectedMsgText, actual.getText());
 
     }
-    /*
-        TODO
-            1. Тесты процедуры валидации кода верификации
-            2. Тесты ложного кода верификации
-     */
     @Test
     @Order(5)
     public void testSuccessesAuthorizationChatStateInAuthCommand() throws JsonProcessingException {
 
         //Given
-        Update update = createTelegramUpdate("2545678");
+        String verificationCode = GenerationService.generateEmailVerificationCode();
+        String encodeVerificationCode = passwordEncoder.encode(verificationCode);
+
+        Update update = createTelegramUpdate(verificationCode);
 
         String expectedMsgText = MessageProvider.getSuccessesAuthorizationMsg(
-                TELEGRAM_API_USER_FOR_TESTS.getFirstName(),
-                TELEGRAM_API_USER_FOR_TESTS.getLastName()
+                UpdateUtilsService.getTelegramUserFullName(update)
         );
 
         String requestBody = objectMapper.writeValueAsString(update);
@@ -477,7 +481,12 @@ public class TelegramBotTests {
 
         telegramChatResponse.setData(telegramChatDTO);
 
-        log.debug(telegramChatResponse.toString());
+        ApiResponse<VerificationCodeDTO> verificationCodeApiResponse = responses.get(VERIFICATION_CODE.getKeyValue());
+        VerificationCodeDTO verificationCodeDTO = verificationCodeApiResponse.getData();
+
+        verificationCodeDTO.setOtpHash(encodeVerificationCode);
+
+        verificationCodeApiResponse.setData(verificationCodeDTO);
 
         //When
         telegramUserAuthFilterMockRequests();
@@ -500,6 +509,15 @@ public class TelegramBotTests {
 
         mockServerClient
                 .when(request()
+                        .withMethod("GET")
+                        .withPath("/api/v1/otp_code/get/telegram_user_id/" + TELEGRAM_USER_FOR_TESTS.getId()))
+                .respond(response()
+                        .withStatusCode(200)
+                        .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
+                        .withBody(objectMapper.writeValueAsString(verificationCodeApiResponse)));
+
+        mockServerClient
+                .when(request()
                         .withMethod("POST")
                         .withPath("/api/v1/chat/add/"))
                 .respond(response()
@@ -515,18 +533,177 @@ public class TelegramBotTests {
 
         exchangeAuthCommand.expectStatus().is2xxSuccessful();
 
-        ArgumentCaptor<SendMessage> captor = ArgumentCaptor.forClass(SendMessage.class);
-
-        Mockito.verify(telegramBotMessageSender,Mockito.timeout(5000L)).sendMessage(captor.capture());
-
-        SendMessage actual = captor.getValue();
+        SendMessage actual = captorSendMessage();
 
         //Then
         assertEquals(expectedMsgText, actual.getText());
 
     }
+    @Test
+    @Order(6)
+    public void testUnSuccessesAuthorizationChatStateInAuthCommandWithExpiredOtpCode() throws JsonProcessingException {
 
+        //Given
+        String verificationCode = GenerationService.generateEmailVerificationCode();
+        String encodeVerificationCode = passwordEncoder.encode(verificationCode);
 
+        Update update = createTelegramUpdate(verificationCode);
+
+        String expectedMsgText = WarnMessageProvider.EXPIRED_VERIFICATION_CODE;
+
+        String requestBody = objectMapper.writeValueAsString(update);
+
+        ApiResponse<TelegramChatDTO> telegramChatResponse = responses.get(TELEGRAM_CHAT.getKeyValue());
+
+        TelegramChatDTO telegramChatDTO = telegramChatResponse.getData();
+        telegramChatDTO.setUiElement(UiElements.COMMAND.getUiElement());
+        telegramChatDTO.setUiElementValue(Commands.AUTHORIZE.getCommand());
+        telegramChatDTO.setChatState(DialogStates.EMAIL_VERIFICATION.getDialogState());
+
+        telegramChatResponse.setData(telegramChatDTO);
+
+        ApiResponse<VerificationCodeDTO> verificationCodeApiResponse = responses.get(VERIFICATION_CODE.getKeyValue());
+        VerificationCodeDTO verificationCodeDTO = verificationCodeApiResponse.getData();
+
+        verificationCodeDTO.setOtpHash(encodeVerificationCode);
+        verificationCodeDTO.setExpiresAt(LocalDateTime.now().minusDays(5L));
+
+        verificationCodeApiResponse.setData(verificationCodeDTO);
+
+        //When
+        telegramUserAuthFilterMockRequests();
+
+        mockServerClient
+                .when(request()
+                        .withMethod("GET")
+                        .withPath("/api/v1/chat/telegram_user/get/" + telegramChatForTests.getId()))
+                .respond(response()
+                        .withStatusCode(200)
+                        .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
+                        .withBody(objectMapper.writeValueAsString(telegramChatResponse)));
+
+        TelegramChatDTO responseTelegramChat = telegramChatResponse.getData();
+        responseTelegramChat.setUiElement(UiElements.COMMAND.getUiElement());
+        responseTelegramChat.setUiElementValue(Commands.AUTHORIZE.getCommand());
+        responseTelegramChat.setChatState(DialogStates.EMAIL_VERIFICATION.getDialogState());
+
+        telegramChatResponse.setData(responseTelegramChat);
+
+        mockServerClient
+                .when(request()
+                        .withMethod("GET")
+                        .withPath("/api/v1/otp_code/get/telegram_user_id/" + TELEGRAM_USER_FOR_TESTS.getId()))
+                .respond(response()
+                        .withStatusCode(200)
+                        .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
+                        .withBody(objectMapper.writeValueAsString(verificationCodeApiResponse)));
+
+        mockServerClient
+                .when(request()
+                        .withMethod("POST")
+                        .withPath("/api/v1/chat/add/"))
+                .respond(response()
+                        .withStatusCode(200)
+                        .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
+                        .withBody(objectMapper.writeValueAsString(telegramChatResponse)));
+
+        WebTestClient.ResponseSpec exchangeAuthCommand = client.post()
+                .uri("/api/bot/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(requestBody)
+                .exchange();
+
+        exchangeAuthCommand.expectStatus().is2xxSuccessful();
+
+        SendMessage actual = captorSendMessage();
+
+        //Then
+        assertEquals(expectedMsgText, actual.getText());
+
+    }
+    @Test
+    @Order(6)
+    public void testUnSuccessesAuthorizationChatStateInAuthCommandWithNotValidOtpCode() throws JsonProcessingException {
+
+        //Given
+        String verificationCode = GenerationService.generateEmailVerificationCode();
+        String fakeCode = GenerationService.generateEmailVerificationCode();
+        String encodeVerificationCode = passwordEncoder.encode(verificationCode);
+
+        Update update = createTelegramUpdate(fakeCode);
+
+        String expectedMsgText = WarnMessageProvider.NOT_VALID_VERIFICATION_CODE;
+
+        String requestBody = objectMapper.writeValueAsString(update);
+
+        ApiResponse<TelegramChatDTO> telegramChatResponse = responses.get(TELEGRAM_CHAT.getKeyValue());
+
+        TelegramChatDTO telegramChatDTO = telegramChatResponse.getData();
+        telegramChatDTO.setUiElement(UiElements.COMMAND.getUiElement());
+        telegramChatDTO.setUiElementValue(Commands.AUTHORIZE.getCommand());
+        telegramChatDTO.setChatState(DialogStates.EMAIL_VERIFICATION.getDialogState());
+
+        telegramChatResponse.setData(telegramChatDTO);
+
+        ApiResponse<VerificationCodeDTO> verificationCodeApiResponse = responses.get(VERIFICATION_CODE.getKeyValue());
+        VerificationCodeDTO verificationCodeDTO = verificationCodeApiResponse.getData();
+
+        verificationCodeDTO.setOtpHash(encodeVerificationCode);
+        verificationCodeDTO.setExpiresAt(LocalDateTime.now().minusDays(5L));
+
+        verificationCodeApiResponse.setData(verificationCodeDTO);
+
+        //When
+        telegramUserAuthFilterMockRequests();
+
+        mockServerClient
+                .when(request()
+                        .withMethod("GET")
+                        .withPath("/api/v1/chat/telegram_user/get/" + telegramChatForTests.getId()))
+                .respond(response()
+                        .withStatusCode(200)
+                        .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
+                        .withBody(objectMapper.writeValueAsString(telegramChatResponse)));
+
+        TelegramChatDTO responseTelegramChat = telegramChatResponse.getData();
+        responseTelegramChat.setUiElement(UiElements.COMMAND.getUiElement());
+        responseTelegramChat.setUiElementValue(Commands.AUTHORIZE.getCommand());
+        responseTelegramChat.setChatState(DialogStates.EMAIL_VERIFICATION.getDialogState());
+
+        telegramChatResponse.setData(responseTelegramChat);
+
+        mockServerClient
+                .when(request()
+                        .withMethod("GET")
+                        .withPath("/api/v1/otp_code/get/telegram_user_id/" + TELEGRAM_USER_FOR_TESTS.getId()))
+                .respond(response()
+                        .withStatusCode(200)
+                        .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
+                        .withBody(objectMapper.writeValueAsString(verificationCodeApiResponse)));
+
+        mockServerClient
+                .when(request()
+                        .withMethod("POST")
+                        .withPath("/api/v1/chat/add/"))
+                .respond(response()
+                        .withStatusCode(200)
+                        .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
+                        .withBody(objectMapper.writeValueAsString(telegramChatResponse)));
+
+        WebTestClient.ResponseSpec exchangeAuthCommand = client.post()
+                .uri("/api/bot/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(requestBody)
+                .exchange();
+
+        exchangeAuthCommand.expectStatus().is2xxSuccessful();
+
+        SendMessage actual = captorSendMessage();
+
+        //Then
+        assertEquals(expectedMsgText, actual.getText());
+
+    }
     @Test
     @Order(1000)
     public void testWithInternalDatabaseServer() throws JsonProcessingException {
@@ -557,6 +734,7 @@ public class TelegramBotTests {
         envMap.put("data.provide.api.url", mockServerContainer.getEndpoint());
 
     }
+
 
     private Update createTelegramUpdate(String msgText) {
 
