@@ -6,6 +6,8 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 
+import java.util.Objects;
+
 @Service
 @Data
 public class UpdateUtilsService {
@@ -16,6 +18,21 @@ public class UpdateUtilsService {
     }
     public static Long getTelegramUserId(Update update) {
         return getTelegramUser(update).getId();
+    }
+    public static String getTelegramUserFullName(Update update) {
+        StringBuilder result = new StringBuilder();
+        User telegramUser = getTelegramUser(update);
+        String userFirstName = telegramUser.getFirstName();
+        String userLastName = telegramUser.getLastName();
+
+        if (Objects.nonNull(userFirstName) || !userFirstName.isEmpty()) result.append(userFirstName);
+
+        if (Objects.nonNull(userLastName) || !userLastName.isEmpty()) {
+            result.append(" ");
+            result.append(userLastName);
+        }
+
+        return result.toString();
     }
     public static Long getChatId(Update update) {
         return update.getMessage().getChatId();

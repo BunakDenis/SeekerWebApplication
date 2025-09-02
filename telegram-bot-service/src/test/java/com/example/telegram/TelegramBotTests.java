@@ -21,10 +21,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.*;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.mockserver.client.MockServerClient;
@@ -67,6 +64,7 @@ import static org.mockserver.model.HttpResponse.response;
 @AutoConfigureWebTestClient
 @EnableReactiveMethodSecurity
 @Testcontainers
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Slf4j
 public class TelegramBotTests {
 
@@ -145,36 +143,9 @@ public class TelegramBotTests {
     public void afterEach() {
         mockServerClient.reset();
     }
+
     @Test
-    public void testWithInternalDatabaseServer() throws JsonProcessingException {
-
-        //Given
-        Update update = createTelegramUpdate("fff");
-
-        String requestBody = objectMapper.writeValueAsString(update);
-
-        mockServerContainer.stop();
-
-        WebTestClient.ResponseSpec exchange = client.post()
-                .uri("/api/bot/")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(requestBody)
-                .exchange();
-
-        exchange.expectStatus().is2xxSuccessful();
-
-        mockServerContainer.start();
-        mockServerClient = new MockServerClient(
-                mockServerContainer.getHost(),
-                mockServerContainer.getServerPort()
-        );
-
-        Map<String, String> envMap = mockServerContainer.getEnvMap();
-
-        envMap.put("data.provide.api.url", mockServerContainer.getEndpoint());
-
-    }
-    @Test
+    @Order(1)
     public void testUnknownCommand() throws JsonProcessingException {
         //Given
         Update update = createTelegramUpdate("fff");
@@ -211,6 +182,7 @@ public class TelegramBotTests {
         assertEquals(expectedMsgText, actual.getText());
     }
     @Test
+    @Order(2)
     public void testStartCommand() throws Exception {
 
         log.debug("testStartCommand");
@@ -262,6 +234,7 @@ public class TelegramBotTests {
 
     }
     @Test
+    @Order(2)
     public void testAuthCommand() throws JsonProcessingException {
 
         log.debug("testAuthCommand()");
@@ -326,6 +299,7 @@ public class TelegramBotTests {
 
     }
     @Test
+    @Order(3)
     public void testValidInputEmailChatStateInAuthCommand() throws JsonProcessingException {
         //Given
         String testMsg = "test@seeker.com";
@@ -414,6 +388,7 @@ public class TelegramBotTests {
 
     }
     @Test
+    @Order(4)
     public void testNotValidInputEmailChatStateInAuthCommand() throws JsonProcessingException {
         //Given
         String testMsg = "test";
@@ -474,14 +449,13 @@ public class TelegramBotTests {
         assertEquals(expectedMsgText, actual.getText());
 
     }
-
     /*
         TODO
             1. Тесты процедуры валидации кода верификации
             2. Тесты ложного кода верификации
      */
-
     @Test
+    @Order(5)
     public void testSuccessesAuthorizationChatStateInAuthCommand() throws JsonProcessingException {
 
         //Given
@@ -551,6 +525,39 @@ public class TelegramBotTests {
         assertEquals(expectedMsgText, actual.getText());
 
     }
+
+
+    @Test
+    @Order(1000)
+    public void testWithInternalDatabaseServer() throws JsonProcessingException {
+
+        //Given
+        Update update = createTelegramUpdate("fff");
+
+        String requestBody = objectMapper.writeValueAsString(update);
+
+        mockServerContainer.stop();
+
+        WebTestClient.ResponseSpec exchange = client.post()
+                .uri("/api/bot/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(requestBody)
+                .exchange();
+
+        exchange.expectStatus().is2xxSuccessful();
+
+        mockServerContainer.start();
+        mockServerClient = new MockServerClient(
+                mockServerContainer.getHost(),
+                mockServerContainer.getServerPort()
+        );
+
+        Map<String, String> envMap = mockServerContainer.getEnvMap();
+
+        envMap.put("data.provide.api.url", mockServerContainer.getEndpoint());
+
+    }
+
     private Update createTelegramUpdate(String msgText) {
 
         Update result = new Update();

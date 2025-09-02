@@ -123,7 +123,7 @@ public class TelegramUserAuthFilter implements WebFilter {
                                 });
                     })
                 // Ловим любые ошибки в цепочке
-                .doOnError(ex -> log.error("Ошибка обработки update:", ex.getMessage()))
+                .doOnError(ex -> log.error("Ошибка обработки update: {}", ex))
                 .onErrorResume(ex -> {
                     sender.sendMessage(
                             chatId,
