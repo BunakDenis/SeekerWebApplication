@@ -590,7 +590,7 @@ public class TelegramBotTests {
     private SendMessage captorSendMessage() {
         ArgumentCaptor<SendMessage> captor = ArgumentCaptor.forClass(SendMessage.class);
 
-        Mockito.verify(telegramBotMessageSender,Mockito.timeout(5000L)).sendMessage(captor.capture());
+        Mockito.verify(telegramBotMessageSender).sendMessage(captor.capture());
 
         return captor.getValue();
     }
