@@ -2,6 +2,7 @@ package com.example.telegram;
 
 import com.example.data.models.consts.RequestMessageProvider;
 import com.example.data.models.consts.WarnMessageProvider;
+import com.example.data.models.entity.VerificationCode;
 import com.example.data.models.entity.dto.UserDTO;
 import com.example.data.models.entity.dto.VerificationCodeDTO;
 import com.example.data.models.entity.dto.response.ApiResponse;
@@ -28,6 +29,7 @@ import org.mockito.Mockito;
 import org.mockserver.client.MockServerClient;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -49,6 +51,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,6 +74,9 @@ import static org.mockserver.model.HttpResponse.response;
 @Slf4j
 public class TelegramBotTests {
 
+
+    @Value("${default.utc.zone.id}")
+    private String zoneId;
     @Autowired
     private WebTestClient client;
     @Autowired
@@ -130,10 +136,14 @@ public class TelegramBotTests {
                 .includeObject(TELEGRAM_USER.getKeyValue(), TELEGRAM_USER_FOR_TESTS)
                 .build();
 
+        VerificationCode verificationCodeForTests = VERIFICATION_CODE_FOR_TESTS;
+        verificationCodeForTests.setCreatedAt(LocalDateTime.now(ZoneId.of(zoneId)));
+        verificationCodeForTests.setExpiresAt(LocalDateTime.now(ZoneId.of(zoneId)).plusMinutes(30L));
+
         ApiResponse<VerificationCodeDTO> verificationCodeResponse = ApiResponse.<VerificationCodeDTO>builder()
         .status(HttpStatus.OK)
                 .message(RequestMessageProvider.SUCCESSES_MSG)
-                .data(mapperService.toDTO(VERIFICATION_CODE_FOR_TESTS, VerificationCodeDTO.class))
+                .data(mapperService.toDTO(verificationCodeForTests, VerificationCodeDTO.class))
                 .build();
 
         telegramChatResponse.addIncludeObject("telegram_user", TELEGRAM_USER_FOR_TESTS);
