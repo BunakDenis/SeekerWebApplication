@@ -115,7 +115,11 @@ public class VerificationCodeService {
         return encoder.matches(codeForCheck, code.getOtpHash());
     }
     private boolean checkExpiration(VerificationCode code) {
-        return code.getExpiresAt().isAfter(LocalDateTime.now(ZoneId.of(zoneId)));
+        LocalDateTime nowDateTime = LocalDateTime.now(ZoneId.of(zoneId));
+
+        log.debug("Текущая дата = {}", nowDateTime);
+
+        return code.getExpiresAt().isAfter(nowDateTime);
     }
 
 }
