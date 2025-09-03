@@ -18,7 +18,7 @@ public class TelegramBotConstants {
     public static final VerificationCode VERIFICATION_CODE_FOR_TESTS = VerificationCode.builder()
             .id(1L)
             .createdAt(LocalDateTime.now())
-            .expiresAt(LocalDateTime.now().plusMinutes(5L))
+            .expiresAt(LocalDateTime.now().plusMinutes(60L))
             .build();
 
     public static final User TELEGRAM_API_USER_FOR_TESTS = new User(12345L, "Elon", false, "Mask",
