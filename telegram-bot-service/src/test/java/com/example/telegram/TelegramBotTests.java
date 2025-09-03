@@ -6,14 +6,12 @@ import com.example.data.models.entity.dto.UserDTO;
 import com.example.data.models.entity.dto.VerificationCodeDTO;
 import com.example.data.models.entity.dto.response.ApiResponse;
 import com.example.data.models.entity.dto.telegram.TelegramChatDTO;
-import com.example.data.models.enums.ResponseIncludeDataKeys;
 import com.example.telegram.bot.chat.states.DialogStates;
 import com.example.telegram.bot.chat.UiElements;
 import com.example.telegram.bot.commands.Commands;
 import com.example.telegram.bot.message.MessageProvider;
 import com.example.telegram.bot.message.TelegramBotMessageSender;
 import com.example.telegram.bot.service.ModelMapperService;
-import com.example.telegram.bot.service.VerificationCodeService;
 import com.example.telegram.bot.utils.update.UpdateUtilsService;
 import com.example.utils.file.loader.EnvLoader;
 import com.example.utils.generator.GenerationService;
@@ -460,6 +458,8 @@ public class TelegramBotTests {
     @Order(5)
     public void testSuccessesAuthorizationChatStateInAuthCommand() throws JsonProcessingException {
 
+        log.debug("Тесты успешной авторизации юзера");
+
         //Given
         String verificationCode = GenerationService.generateEmailVerificationCode();
         String encodeVerificationCode = passwordEncoder.encode(verificationCode);
@@ -543,6 +543,8 @@ public class TelegramBotTests {
     @Order(6)
     public void testUnSuccessesAuthorizationChatStateInAuthCommandWithExpiredOtpCode() throws JsonProcessingException {
 
+        log.debug("Тесты проверка верификационного кода с истёкшим сроком");
+
         //Given
         String verificationCode = GenerationService.generateEmailVerificationCode();
         String encodeVerificationCode = passwordEncoder.encode(verificationCode);
@@ -625,6 +627,8 @@ public class TelegramBotTests {
     @Order(7)
     public void testUnSuccessesAuthorizationChatStateInAuthCommandWithNotValidOtpCode() throws JsonProcessingException {
 
+        log.debug("Тесты не валидного верификационного кода");
+
         //Given
         String verificationCode = GenerationService.generateEmailVerificationCode();
         String fakeCode = GenerationService.generateEmailVerificationCode();
@@ -704,8 +708,7 @@ public class TelegramBotTests {
         assertEquals(expectedMsgText, actual.getText());
 
     }
-    
-    /*
+
     @Test
     @Order(1000)
     public void testWithInternalDatabaseServer() throws JsonProcessingException {
@@ -736,8 +739,6 @@ public class TelegramBotTests {
         envMap.put("data.provide.api.url", mockServerContainer.getEndpoint());
 
     }
-
-     */
 
     private Update createTelegramUpdate(String msgText) {
 

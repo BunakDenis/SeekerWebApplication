@@ -14,6 +14,12 @@ import java.time.LocalDateTime;
 @Table(name = "verification_codes")
 public class VerificationCode {
 
+/*
+        TODO
+            1. Добавить поле active
+            2. Добавить процедуру проверки строка активности сессии и верификационного кода
+ */
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

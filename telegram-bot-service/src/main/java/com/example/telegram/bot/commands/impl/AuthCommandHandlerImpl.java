@@ -179,7 +179,7 @@ public class AuthCommandHandlerImpl implements CommandHandler {
         String currentUserFullName = UpdateUtilsService.getTelegramUserFullName(update);
 
         return verificationCodeService.checkCode(telegramUserId, verificationCode)
-                        .flatMap(isCodeValid -> {
+                .flatMap(isCodeValid -> {
                             SendMessage result = new SendMessage();
                             result.setChatId(UpdateUtilsService.getStringChatId(update));
 
@@ -201,6 +201,13 @@ public class AuthCommandHandlerImpl implements CommandHandler {
                     ReplyKeyboardMarkup notValidEmailKeyboard = ReplyKeyboardMarkupProvider.getNotValidEmailKeyboard();
                     SendMessage result = new SendMessage();
                     result.setChatId(UpdateUtilsService.getStringChatId(update));
+
+                    log.error("Класс ошибки - {}", error.getClass());
+                    log.error("Ошибка проверки верификационного кода {}", error.getMessage(), error);
+
+                    log.debug("error instanceof NotValidVerificationCodeException = {}", error instanceof NotValidVerificationCodeException);
+                    log.debug("error instanceof ExpiredVerificationCodeException = {}", error instanceof ExpiredVerificationCodeException);
+
 
                     if (error instanceof NotValidVerificationCodeException) {
                         result.setText(NOT_VALID_VERIFICATION_CODE);
