@@ -64,6 +64,46 @@ public class DataProviderClient {
             1. Сделать рефактор Get методов (убрать "get" с ендпоинта)
      */
 
+    public Mono<ApiResponse<UserDTO>> createUser(UserDTO dto) {
+        StringBuilder endpoint = new StringBuilder(getApiUserEndpoint("/add/"));
+
+        ApiRequest<UserDTO> request = new ApiRequest<>(dto);
+
+        return webClient.post()
+                .uri(endpoint.toString())
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(request)
+                .retrieve()
+                .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+                        response -> response.bodyToMono(String.class) // Можно прочитать тело ошибки
+                                .flatMap(errorBody -> {
+                                    log.debug("Получен ответ от Data provider service {}", errorBody);
+                                    return Mono.empty();
+                                }))
+                .bodyToMono(new ParameterizedTypeReference<>() {
+                });
+    }
+    public Mono<ApiResponse<UserDTO>> updateUser(UserDTO dto) {
+        StringBuilder endpoint = new StringBuilder(getApiUserEndpoint("/update/"));
+
+        ApiRequest<UserDTO> request = new ApiRequest<>(dto);
+
+        return webClient.post()
+                .uri(endpoint.toString())
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(request)
+                .retrieve()
+                .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+                        response -> response.bodyToMono(String.class) // Можно прочитать тело ошибки
+                                .flatMap(errorBody -> {
+                                    log.debug("Получен ответ от Data provider service {}", errorBody);
+                                    return Mono.empty();
+                                }))
+                .bodyToMono(new ParameterizedTypeReference<>() {
+                });
+    }
     public Mono<ApiResponse<UserDTO>> getUserById(Long id) {
 
         StringBuilder endpoint = new StringBuilder(getApiUserEndpoint("/get/id/"));
@@ -198,6 +238,23 @@ public class DataProviderClient {
         return webClient.get()
                 .uri(builder -> builder.path(endpoint.toString()).build())
                 .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+                        response -> response.bodyToMono(String.class) // Можно прочитать тело ошибки
+                                .flatMap(errorBody -> {
+                                    log.debug("Получен ответ от Data provider service {}", errorBody);
+                                    return Mono.empty();
+                                }))
+                .bodyToMono(new ParameterizedTypeReference<>() {
+                });
+    }
+    public Mono<ApiResponse<Boolean>> deleteUserById(Long id) {
+        StringBuilder endpoint = new StringBuilder(getApiUserEndpoint("/delete/"));
+        endpoint.append(id);
+
+        return webClient.post()
+                .uri(endpoint.toString())
+                .contentType(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
                         response -> response.bodyToMono(String.class) // Можно прочитать тело ошибки

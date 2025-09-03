@@ -29,6 +29,8 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.util.Objects;
+
 import static com.example.data.models.consts.WarnMessageProvider.*;
 
 
@@ -130,7 +132,15 @@ public class AuthCommandHandlerImpl implements CommandHandler {
                             "для верификации вашей электронной почты, попробуйте пройти верификацию позже."));
 
             // 3) Отправка письма (side-effect) + сохранение кода + возврат итогового сообщения
-            return Mono.fromRunnable(() ->
+            return userService.getUserByTelegramUserId(tgUserId)
+                    .flatMap(user -> {
+                        if (Objects.isNull(user.getEmail())) {
+                            user.setEmail(email);
+                            return userService.update(user);
+                        }
+                        return Mono.just(user);
+                    })
+                    .fromRunnable(() ->
                             emailService.sendSimpleMail(
                                     email,
                                     "Код верификации в " + botName,

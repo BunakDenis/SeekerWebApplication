@@ -739,7 +739,6 @@ public class TelegramBotTests {
 
      */
 
-
     private Update createTelegramUpdate(String msgText) {
 
         Update result = new Update();

@@ -6,12 +6,15 @@ import com.example.data.models.entity.dto.response.ApiResponse;
 import com.example.data.models.enums.ResponseIncludeDataKeys;
 import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
 import com.example.data.models.exception.EntityNotFoundException;
+import com.example.data.models.exception.EntityNotSavedException;
+import com.example.data.models.utils.ApiResponseUtilsService;
 import com.example.database.entity.TelegramUser;
 import com.example.database.entity.User;
 import com.example.database.exception.UserNotFoundException;
 import com.example.database.repo.telegram.UserRepo;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -23,6 +26,7 @@ import static com.example.data.models.utils.ApiResponseUtilsService.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserService {
 
     private final UserRepo repo;
@@ -30,6 +34,23 @@ public class UserService {
     private final ModelMapperService mapper;
 
 
+    public ApiResponse<UserDTO> create(User user) {
+        User save;
+
+        try {
+            save = repo.save(user);
+        } catch (Exception e) {
+            log.error("Ошибка сохранения юзера {}", user);
+            throw new EntityNotSavedException("Ошибка сохранения юзера " + user);
+        }
+
+        return ApiResponseUtilsService.success(mapper.toDTO(save, UserDTO.class));
+
+    }
+
+    public ApiResponse<UserDTO> update(User user) {
+        return create(user);
+    }
     public ApiResponse<UserDTO> getUserById(Long id) {
         Optional<User> userOptional = repo.findById(id);
 
@@ -138,4 +159,8 @@ public class UserService {
         throw new  UserNotFoundException("User with telegram user id " + id + " is not found");
     }
 
+    public ApiResponse<Boolean> delete(Long id) {
+        repo.deleteById(id);
+        return ApiResponseUtilsService.success(true);
+    }
 }

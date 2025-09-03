@@ -23,6 +23,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.util.Objects;
+
 import static com.example.data.models.utils.ApiResponseUtilsService.*;
 
 
@@ -40,6 +42,32 @@ public class TelegramDataController {
     private final MysticSchoolClient mysticSchoolClient;
     private final ModelMapperService mapperService;
 
+    @PostMapping("/user/add/")
+    public ResponseEntity<ApiResponse<UserDTO>> createUser(
+            @RequestBody ApiResponse<UserDTO> request
+    ) {
+        UserDTO dto = request.getData();
+        User user = mapperService.toEntity(dto, User.class);
+
+        ApiResponse<UserDTO> result = ApiResponse.<UserDTO>builder().build();
+
+        if (Objects.nonNull(user)) result = userService.create(user);
+
+        return ResponseEntity.status(result.getStatus()).body(result);
+    }
+    @PostMapping("/user/update/")
+    public ResponseEntity<ApiResponse<UserDTO>> updateUser(
+            @RequestBody ApiRequest<UserDTO> request
+    ) {
+        UserDTO dto = request.getData();
+        User user = mapperService.toEntity(dto, User.class);
+
+        ApiResponse<UserDTO> result = ApiResponse.<UserDTO>builder().build();
+
+        if (Objects.nonNull(user)) result = userService.update(user);
+
+        return ResponseEntity.status(result.getStatus()).body(result);
+    }
     @GetMapping("/user/get/id/{id}")
     public ResponseEntity<ApiResponse<UserDTO>> getUser(
             @PathVariable("id") Long id
@@ -144,6 +172,15 @@ public class TelegramDataController {
                             success(mysticSchoolResponse)
                     );
                 });
+    }
+
+    @PostMapping("/user/delete/{id}")
+    public ResponseEntity<ApiResponse<Boolean>> deleteUser(
+            @PathVariable(name = "id") Long id
+    ) {
+        ApiResponse<Boolean> response = userService.delete(id);
+
+        return ResponseEntity.status(response.getStatus()).body(response);
     }
 
     @GetMapping("/otp_code/get/{id}")

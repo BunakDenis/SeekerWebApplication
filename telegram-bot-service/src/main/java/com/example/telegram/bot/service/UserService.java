@@ -39,6 +39,32 @@ public class UserService implements ReactiveUserDetailsService {
 
     private final ObjectMapper objectMapper;
 
+
+    public Mono<User> create(User user) {
+
+        if (Objects.isNull(user)) return Mono.empty();
+
+        UserDTO dto = mapperService.toDTO(user, UserDTO.class);
+
+        if (Objects.isNull(dto)) return Mono.empty();
+
+        return dataProviderClient.createUser(dto)
+                .flatMap(resp -> Mono.just(mapperService.toEntity(resp.getData(), User.class)));
+
+    }
+
+    public Mono<User> update(User user) {
+
+        if (Objects.isNull(user)) return Mono.empty();
+
+        UserDTO dto = mapperService.toDTO(user, UserDTO.class);
+
+        if (Objects.isNull(dto)) return Mono.empty();
+
+        return dataProviderClient.updateUser(dto)
+                .flatMap(resp -> Mono.just(mapperService.toEntity(resp.getData(), User.class)));
+
+    }
     public Mono<ApiResponse<UserDTO>> getUserById(Long id) {
         return dataProviderClient.getUserById(id);
     }
@@ -67,6 +93,11 @@ public class UserService implements ReactiveUserDetailsService {
 
     public Mono<ApiResponse<UserDTO>> getUserByTelegramUserIdWithUserDetails(Long id) {
         return dataProviderClient.getUserByTelegramUserIdWithUserDetails(id);
+    }
+
+    public Mono<Boolean> delete(Long id) {
+        return dataProviderClient.deleteUserById(id)
+                .flatMap(resp -> Mono.just(resp.getData()));
     }
 
     public User toEntity(ApiResponse<UserDTO> dto) {
