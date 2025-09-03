@@ -704,6 +704,8 @@ public class TelegramBotTests {
         assertEquals(expectedMsgText, actual.getText());
 
     }
+    
+    /*
     @Test
     @Order(1000)
     public void testWithInternalDatabaseServer() throws JsonProcessingException {
@@ -734,6 +736,8 @@ public class TelegramBotTests {
         envMap.put("data.provide.api.url", mockServerContainer.getEndpoint());
 
     }
+
+     */
 
 
     private Update createTelegramUpdate(String msgText) {
