@@ -4,12 +4,17 @@ import com.example.data.models.entity.VerificationCode;
 import com.example.data.models.enums.UserRoles;
 import com.example.data.models.entity.TelegramChat;
 import com.example.data.models.entity.TelegramUser;
+import org.springframework.beans.factory.annotation.Value;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.User;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 public class TelegramBotConstants {
+
+    @Value("${default.utc.zone.id}")
+    private static String zoneId;
 
     public static final com.example.data.models.entity.User USER_FOR_TESTS = new com.example.data.models.entity.User(
             1L, "testUser", "test@exemple.com", UserRoles.ADMIN.getRole(), true, null, null
@@ -17,8 +22,8 @@ public class TelegramBotConstants {
 
     public static final VerificationCode VERIFICATION_CODE_FOR_TESTS = VerificationCode.builder()
             .id(1L)
-            .createdAt(LocalDateTime.now())
-            .expiresAt(LocalDateTime.now().plusMinutes(60L))
+            .createdAt(LocalDateTime.now(ZoneId.of(zoneId)))
+            .expiresAt(LocalDateTime.now(ZoneId.of(zoneId)).plusMinutes(60L))
             .build();
 
     public static final User TELEGRAM_API_USER_FOR_TESTS = new User(12345L, "Elon", false, "Mask",

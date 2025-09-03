@@ -17,6 +17,8 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -115,9 +117,13 @@ public class VerificationCodeService {
         return encoder.matches(codeForCheck, code.getOtpHash());
     }
     private boolean checkExpiration(VerificationCode code) {
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+
         LocalDateTime nowDateTime = LocalDateTime.now(ZoneId.of(zoneId));
 
-        log.debug("Текущая дата = {}", nowDateTime);
+        log.debug("Текущая дата = {}", nowDateTime.format(formatter));
+        log.debug("Срок действия кода до = {}", code.getExpiresAt().format(formatter));
 
         return code.getExpiresAt().isAfter(nowDateTime);
     }
