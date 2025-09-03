@@ -622,7 +622,7 @@ public class TelegramBotTests {
 
     }
     @Test
-    @Order(6)
+    @Order(7)
     public void testUnSuccessesAuthorizationChatStateInAuthCommandWithNotValidOtpCode() throws JsonProcessingException {
 
         //Given

@@ -27,6 +27,11 @@ public class VerificationCodeService {
     private final VerificationCodeRepo verificationCodeRepo;
     private final ModelMapperService modelMapperService;
 
+    /*
+        TODO
+            1. Проверить работу метода save
+     */
+
     public ApiResponse<VerificationCodeDTO> save(VerificationCode code) {
 
         Optional<VerificationCode> save = Optional.of(verificationCodeRepo.save(code));
