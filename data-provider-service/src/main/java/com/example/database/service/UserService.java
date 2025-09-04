@@ -47,7 +47,6 @@ public class UserService {
         return ApiResponseUtilsService.success(mapper.toDTO(save, UserDTO.class));
 
     }
-
     public ApiResponse<UserDTO> update(User user) {
         return create(user);
     }
@@ -59,7 +58,6 @@ public class UserService {
 
         throw new EntityNotFoundException("User with id " + id + " is not found", new User());
     }
-
     public ApiResponse<UserDTO> getUserByUsername(String username) {
         Optional<User> userOptional = repo.findByUsername(username);
 
@@ -68,7 +66,6 @@ public class UserService {
 
         throw new EntityNotFoundException("User with username " + username + " is not found", new User());
     }
-
     public ApiResponse<UserDTO> getUserByEmail(String email) {
 
         Optional<User> userOptional = repo.findByUsername(email);
@@ -78,7 +75,6 @@ public class UserService {
 
         throw new UserNotFoundException("User with email " + email + " is not found");
     }
-
     public ApiResponse<UserDTO> getUserByTelegramUserId(Long id) throws UserNotFoundException {
 
         User user = repo.getUserByTelegramUserId(id);
@@ -87,8 +83,8 @@ public class UserService {
             return success(mapper.toDTO(user, UserDTO.class));
 
         throw new  UserNotFoundException("User with telegram user id " + id + " is not found");
-    }
 
+    }
     @Transactional
     public ApiResponse<UserDTO> getUserByTelegramUserIdWithUserDetails(Long id) throws UserNotFoundException {
 
@@ -106,7 +102,6 @@ public class UserService {
         }
         throw new  UserNotFoundException("User with telegram user id " + id + " is not found");
     }
-
     @Transactional
     public ApiResponse<UserDTO> getUserByTelegramUserIdWithTelegramUser(Long id) throws UserNotFoundException {
 
@@ -133,7 +128,6 @@ public class UserService {
         }
         throw new  UserNotFoundException("User with telegram user id " + id + " is not found");
     }
-
     @Transactional
     public ApiResponse<UserDTO> getUserByTelegramUserIdFull(Long id) throws UserNotFoundException {
 
@@ -158,7 +152,6 @@ public class UserService {
         }
         throw new  UserNotFoundException("User with telegram user id " + id + " is not found");
     }
-
     public ApiResponse<Boolean> delete(Long id) {
         repo.deleteById(id);
         return ApiResponseUtilsService.success(true);

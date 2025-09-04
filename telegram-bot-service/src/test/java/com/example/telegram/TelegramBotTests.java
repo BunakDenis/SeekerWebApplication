@@ -7,6 +7,7 @@ import com.example.data.models.entity.dto.UserDTO;
 import com.example.data.models.entity.dto.VerificationCodeDTO;
 import com.example.data.models.entity.dto.response.ApiResponse;
 import com.example.data.models.entity.dto.telegram.TelegramChatDTO;
+import com.example.data.models.utils.ApiResponseUtilsService;
 import com.example.telegram.bot.chat.states.DialogStates;
 import com.example.telegram.bot.chat.UiElements;
 import com.example.telegram.bot.commands.Commands;
@@ -19,6 +20,7 @@ import com.example.utils.generator.GenerationService;
 import com.example.utils.sender.EmailService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.github.cdimascio.dotenv.Dotenv;
@@ -57,6 +59,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static com.example.data.models.consts.RequestMessageProvider.REQUEST_BODY_IS_EMPTY;
 import static com.example.data.models.enums.ResponseIncludeDataKeys.*;
 import static com.example.telegram.constanst.TelegramBotConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -717,6 +720,45 @@ public class TelegramBotTests {
         //Then
         assertEquals(expectedMsgText, actual.getText());
 
+    }
+
+    @Test
+    @Order(8)
+    public void testResponseWithEmptyBodyRequest() throws JsonProcessingException {
+        log.debug("Тесты ответа с пустым запросом");
+
+        ApiResponse expectedResponse = ApiResponseUtilsService.fail(REQUEST_BODY_IS_EMPTY);
+
+        ObjectWriter objectWriter = objectMapper.writer().withDefaultPrettyPrinter();
+        String expected = objectWriter.writeValueAsString(expectedResponse);
+
+        client.post()
+                .uri("/api/bot/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is4xxClientError()
+                .expectBody()
+                .json(expected);
+    }
+
+    @Test
+    @Order(9)
+    public void testResponseWithEmptyBodyJsonRequest() throws JsonProcessingException {
+        log.debug("Тесты ответа с пустым телом запроса");
+
+        ApiResponse expectedResponse = ApiResponseUtilsService.fail(REQUEST_BODY_IS_EMPTY);
+
+        ObjectWriter objectWriter = objectMapper.writer().withDefaultPrettyPrinter();
+        String expected = objectWriter.writeValueAsString(expectedResponse);
+
+        client.post()
+                .uri("/api/bot/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(objectMapper.writeValueAsString(" "))
+                .exchange()
+                .expectStatus().is4xxClientError()
+                .expectBody()
+                .json(expected);
     }
 
     @Test

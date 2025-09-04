@@ -23,7 +23,7 @@ public class ApiResponse<T> {
     private Map<String, List<Object>> includedList;
     private String debugMsg;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss", timezone = "${default.time.zone.utc}")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm", timezone = "${default.time.zone.utc}")
     private LocalDateTime timestamp;
 
     @JsonIgnore

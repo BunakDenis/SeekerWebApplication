@@ -10,6 +10,8 @@ public class RequestMessageProvider {
 
     public static final String FAILED_TO_SAVE_ENTITY = "Fail save entity {0} to database";
 
+    public static final String REQUEST_BODY_IS_EMPTY = "Request body is empty";
+
     public static String getEntityNotFoundMessage(Object object) {
         return MessageFormat.format(ENTITY_NOT_FOUND_MSG, object.getClass());
     }

@@ -1,12 +1,16 @@
 package com.example.telegram.filter;
 
 
+import com.example.data.models.consts.RequestMessageProvider;
 import com.example.data.models.consts.WarnMessageProvider;
+import com.example.data.models.entity.dto.response.ApiResponse;
+import com.example.data.models.utils.ApiResponseUtilsService;
 import com.example.telegram.bot.message.TelegramBotMessageSender;
 import com.example.telegram.bot.service.AuthService;
 import com.example.telegram.bot.service.ModelMapperService;
 import com.example.telegram.bot.service.TelegramUserService;
 import com.example.telegram.bot.service.UserService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -15,8 +19,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpRequestDecorator;
+import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
@@ -78,10 +86,10 @@ public class TelegramUserAuthFilter implements WebFilter {
                         }
 
                         Long telegramUserId = extractTelegramUserId(body);
-                        if (telegramUserId == null) {
-                            return chain.filter(exchange.mutate()
-                                    .request(decorateRequest(exchange, body, ""))
-                                    .build());
+                        if (Objects.isNull(telegramUserId)) {
+                            return writeJsonErrorResponse(exchange.getResponse(),
+                                    HttpStatus.UNAUTHORIZED,
+                                    ApiResponseUtilsService.fail(RequestMessageProvider.REQUEST_BODY_IS_EMPTY));
                         }
 
                         Long chatId = extractChatId(body);
@@ -122,8 +130,13 @@ public class TelegramUserAuthFilter implements WebFilter {
 
                                 });
                     })
+                .switchIfEmpty(
+                        writeJsonErrorResponse(exchange.getResponse(),
+                                HttpStatus.BAD_REQUEST,
+                                ApiResponseUtilsService.fail(RequestMessageProvider.REQUEST_BODY_IS_EMPTY))
+                )
                 // Ловим любые ошибки в цепочке
-                .doOnError(ex -> log.error("Ошибка обработки update: {}", ex))
+                .doOnError(ex -> log.error("Ошибка обработки update: {}", ex.getMessage(), ex))
                 .onErrorResume(ex -> {
                     sender.sendMessage(
                             chatId,
@@ -194,5 +207,20 @@ public class TelegramUserAuthFilter implements WebFilter {
                 return headers;
             }
         };
+    }
+
+    private Mono<Void> writeJsonErrorResponse(ServerHttpResponse response,
+                                              HttpStatus status,
+                                              ApiResponse body) {
+        response.setStatusCode(status);
+        response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+
+        try {
+            byte[] bytes = objectMapper.writeValueAsBytes(body);
+            DataBuffer buffer = response.bufferFactory().wrap(bytes);
+            return response.writeWith(Mono.just(buffer));
+        } catch (JsonProcessingException e) {
+            return response.setComplete();
+        }
     }
 }
