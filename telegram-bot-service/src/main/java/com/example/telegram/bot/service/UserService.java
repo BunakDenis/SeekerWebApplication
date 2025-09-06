@@ -2,7 +2,6 @@ package com.example.telegram.bot.service;
 
 import com.example.data.models.consts.DefaultEntityValuesConsts;
 import com.example.data.models.entity.dto.UserDetailsDTO;
-import com.example.data.models.enums.ResponseIncludeDataKeys;
 import com.example.data.models.enums.UserRoles;
 import com.example.data.models.entity.dto.UserDTO;
 import com.example.data.models.entity.dto.response.ApiResponse;
@@ -177,7 +176,7 @@ public class UserService implements ReactiveUserDetailsService {
                 });
     }
 
-    public org.springframework.security.core.userdetails.UserDetails createCurrentUser() {
+    public org.springframework.security.core.userdetails.UserDetails getDefaultUser() {
         return org.springframework.security.core.userdetails.User.builder()
                 .username("user")
                 .password("")

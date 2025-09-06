@@ -24,9 +24,6 @@ public class TransientSession {
         @Column(name = "is_active", nullable = false)
         private boolean isActive;
 
-        @Column(name = "transient_expiration_time")
-        private LocalDateTime expirationTime;
-
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "telegram_session_id", referencedColumnName = "id", nullable = false)
         @ToString.Exclude

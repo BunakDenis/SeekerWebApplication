@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Data
@@ -25,5 +26,11 @@ public class TelegramSession {
     @ToString.Exclude
     @JsonIgnore
     private TelegramUser telegramUser;
+
+    @JsonIgnore
+    private List<PersistentSession> persistentSessions;
+
+    @JsonIgnore
+    private List<TransientSession> transientSessions;
 
 }

@@ -4,6 +4,7 @@ import com.example.telegram.dto.responce.ActuatorHealthResponse;
 import com.example.telegram.dto.responce.FileServiceResponse;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -12,7 +13,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 @Service
-@Log4j2
+@Slf4j
 public class UsefulToolsClient {
 
     @Value("${api.useful.tools.url}")

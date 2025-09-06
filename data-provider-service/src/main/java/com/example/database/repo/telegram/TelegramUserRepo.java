@@ -5,6 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface TelegramUserRepo extends JpaRepository<TelegramUser, Long> {
 
-    TelegramUser getTelegramUserById(Long id);
 
 }

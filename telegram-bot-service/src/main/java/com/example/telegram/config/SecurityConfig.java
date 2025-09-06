@@ -1,11 +1,11 @@
 package com.example.telegram.config;
 
 import com.example.telegram.filter.TelegramUserAuthFilter;
-import com.example.telegram.bot.service.TelegramUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
@@ -22,18 +22,18 @@ import org.springframework.security.web.server.util.matcher.PathPatternParserSer
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final TelegramUserService telegramUserService;
-
     @Bean
-    public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http,
-                                                            TelegramUserAuthFilter telegramUserAuthWebFilter) {
+    @Order(1)
+    public SecurityWebFilterChain botSecurityFilterChain(ServerHttpSecurity http,
+                                                         TelegramUserAuthFilter telegramUserAuthFilter) {
         return http
+                .securityMatcher(new PathPatternParserServerWebExchangeMatcher("/api/bot/**"))
+                .securityMatcher(new PathPatternParserServerWebExchangeMatcher("/api/v1/**"))
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                .securityMatcher(new PathPatternParserServerWebExchangeMatcher("/ai/**"))
-                .authorizeExchange((exchanges) -> exchanges
+                .authorizeExchange(exchanges -> exchanges
                         .anyExchange().authenticated()
                 )
-                .addFilterAt(telegramUserAuthWebFilter, SecurityWebFiltersOrder.LAST)
+                .addFilterBefore(telegramUserAuthFilter, SecurityWebFiltersOrder.AUTHENTICATION)
                 .build();
     }
 

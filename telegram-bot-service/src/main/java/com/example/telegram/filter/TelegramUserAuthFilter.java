@@ -3,28 +3,18 @@ package com.example.telegram.filter;
 
 import com.example.data.models.consts.RequestMessageProvider;
 import com.example.data.models.consts.WarnMessageProvider;
-import com.example.data.models.entity.dto.response.ApiResponse;
 import com.example.data.models.utils.ApiResponseUtilsService;
 import com.example.telegram.bot.message.TelegramBotMessageSender;
 import com.example.telegram.bot.service.AuthService;
 import com.example.telegram.bot.service.ModelMapperService;
 import com.example.telegram.bot.service.TelegramUserService;
 import com.example.telegram.bot.service.UserService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.http.server.reactive.ServerHttpRequestDecorator;
-import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
@@ -34,11 +24,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
-import org.telegram.telegrambots.meta.api.objects.Update;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
@@ -51,6 +41,7 @@ public class TelegramUserAuthFilter implements WebFilter {
     private final TelegramUserService telegramUserService;
     private final UserService userService;
     private final AuthService authService;
+    private final ApplicationFiltersService appFilterService;
     private final TelegramBotMessageSender sender;
     private final ObjectMapper objectMapper;
     private final ModelMapperService mapperService;
@@ -70,30 +61,43 @@ public class TelegramUserAuthFilter implements WebFilter {
 
         return DataBufferUtils.join(request.getBody())
                     .flatMap(buffer -> {
-                        String body = StandardCharsets.UTF_8.decode(buffer.toByteBuffer()).toString();
-                        DataBufferUtils.release(buffer);
+
+                        byte[] bytes;
+                        StringBuffer body = new StringBuffer();
+
+                        try {
+                            bytes = buffer.asInputStream().readAllBytes();
+                            ByteBuffer byteBuffer = ByteBuffer.wrap(bytes);
+
+                            body.append(StandardCharsets.UTF_8.decode(byteBuffer));
+                            DataBufferUtils.release(buffer);
+                        } catch (IOException e) {
+                            log.error("Request body is empty");
+                        }
 
                         log.debug("Body от Telegram API: {}", body);
 
                         // Пропускаем запросы с командами /auth и /register
-                        if ("/api/bot/".equals(path) && (body.contains("/authorize") || body.contains("/register"))) {
+                        if (
+                                "/api/bot/".equals(path) &&
+                                        (body.indexOf("/authorize") != -1 || body.indexOf("/register") != -1)) {
 
                             log.debug("Обработка в фильтре запроса \"/authorize\" или \"/register\"");
 
                             return chain.filter(exchange.mutate()
-                                    .request(decorateRequest(exchange, body, ""))
-                                    .build()); // Пропускаем дальше по цепочке
+                                    .request(appFilterService.decorateRequest(exchange, body.toString(), ""))
+                                    .build());
                         }
 
-                        Long telegramUserId = extractTelegramUserId(body);
+                        Long telegramUserId = appFilterService.extractTelegramUserId(body.toString());
                         if (Objects.isNull(telegramUserId)) {
-                            return writeJsonErrorResponse(exchange.getResponse(),
+                            return appFilterService.writeJsonErrorResponse(exchange.getResponse(),
                                     HttpStatus.UNAUTHORIZED,
                                     ApiResponseUtilsService.fail(RequestMessageProvider.REQUEST_BODY_IS_EMPTY));
                         }
 
-                        Long chatId = extractChatId(body);
-                        this.requestBody = body;
+                        Long chatId = appFilterService.extractChatId(body.toString());
+                        this.requestBody = body.toString();
                         this.chatId = chatId;
 
                         return userService.getUserByTelegramUserId(telegramUserId)
@@ -124,20 +128,20 @@ public class TelegramUserAuthFilter implements WebFilter {
                                     log.debug("TelegramUserAuthFilter end.");
 
                                     return chain.filter(exchange.mutate()
-                                                    .request(decorateRequest(exchange, body, sessionId))
+                                                    .request(appFilterService.decorateRequest(exchange, body.toString(), sessionId))
                                                     .build())
                                             .contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth));
 
                                 });
                     })
-                .switchIfEmpty(
-                        writeJsonErrorResponse(exchange.getResponse(),
+                    .switchIfEmpty(
+                            appFilterService.writeJsonErrorResponse(exchange.getResponse(),
                                 HttpStatus.BAD_REQUEST,
                                 ApiResponseUtilsService.fail(RequestMessageProvider.REQUEST_BODY_IS_EMPTY))
-                )
-                // Ловим любые ошибки в цепочке
-                .doOnError(ex -> log.error("Ошибка обработки update: {}", ex.getMessage(), ex))
-                .onErrorResume(ex -> {
+                    )
+                    // Ловим любые ошибки в цепочке
+                    .doOnError(ex -> log.error("Ошибка обработки update: {}", ex.getMessage(), ex))
+                    .onErrorResume(ex -> {
                     sender.sendMessage(
                             chatId,
                             WarnMessageProvider.getSorryMsg(
@@ -151,76 +155,8 @@ public class TelegramUserAuthFilter implements WebFilter {
                     );
 
                     return chain.filter(exchange.mutate()
-                            .request(decorateRequest(exchange, modifiedBody, ""))
+                            .request(appFilterService.decorateRequest(exchange, modifiedBody, ""))
                             .build());
                 });
-    }
-
-    private Long extractTelegramUserId(String body) {
-        try {
-            JsonNode json = objectMapper.readTree(body);
-            if (json.has("message") && json.get("message").has("from")) {
-                return json.get("message").get("from").get("id").asLong();
-            } else if (json.has("callback_query")) {
-                return json.get("callback_query").get("from").get("id").asLong();
-            }
-        } catch (Exception e) {
-            log.error("Ошибка парсинга JSON: {}", e.getMessage());
-        }
-        return null;
-    }
-
-    private Long extractChatId(String body) {
-        try {
-            JsonNode json = objectMapper.readTree(body);
-            if (json.has("message") && json.get("message").has("chat")) {
-                return json.get("message").get("chat").get("id").asLong();
-            } else if (json.has("callback_query")) {
-                return json.get("callback_query").get("chat").get("id").asLong();
-            }
-        } catch (Exception e) {
-            log.error("Ошибка парсинга JSON: {}", e.getMessage());
-        }
-        return null;
-    }
-
-    private ServerHttpRequest decorateRequest(ServerWebExchange exchange, String body, String sessionId) {
-        byte[] bytes = body.getBytes(StandardCharsets.UTF_8);
-
-        return new ServerHttpRequestDecorator(exchange.getRequest()) {
-            @Override
-            public Flux<DataBuffer> getBody() {
-                return Flux.defer(() -> {
-                    DataBuffer buffer = exchange.getResponse().bufferFactory().wrap(bytes);
-                    return Mono.just(buffer);
-                });
-            }
-
-            @Override
-            public HttpHeaders getHeaders() {
-                HttpHeaders headers = new HttpHeaders();
-                headers.putAll(super.getHeaders());
-                if (sessionId != null) {
-                    headers.add("X-Session-Id", sessionId);
-                }
-                headers.setContentLength(bytes.length);
-                return headers;
-            }
-        };
-    }
-
-    private Mono<Void> writeJsonErrorResponse(ServerHttpResponse response,
-                                              HttpStatus status,
-                                              ApiResponse body) {
-        response.setStatusCode(status);
-        response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
-
-        try {
-            byte[] bytes = objectMapper.writeValueAsBytes(body);
-            DataBuffer buffer = response.bufferFactory().wrap(bytes);
-            return response.writeWith(Mono.just(buffer));
-        } catch (JsonProcessingException e) {
-            return response.setComplete();
-        }
     }
 }

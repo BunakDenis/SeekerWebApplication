@@ -4,6 +4,7 @@ import com.example.data.models.consts.RequestMessageProvider;
 import com.example.data.models.entity.dto.response.ApiResponse;
 import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
 import com.example.data.models.exception.EntityNotFoundException;
+import com.example.data.models.utils.ApiResponseUtilsService;
 import com.example.database.entity.TelegramUser;
 import com.example.database.entity.User;
 import com.example.database.repo.telegram.TelegramUserRepo;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
+import java.util.Optional;
 
 import static com.example.data.models.consts.RequestMessageProvider.*;
 import static com.example.data.models.utils.ApiResponseUtilsService.*;
@@ -24,17 +26,32 @@ public class TelegramUserService {
     private final ModelMapperService mapperService;
 
 
-    public ApiResponse<TelegramUserDTO> getUserById(Long id) {
+    public ApiResponse<TelegramUserDTO> save(TelegramUser telegramUser) {
 
-        TelegramUser user = repo.getTelegramUserById(id);
+        TelegramUser savedUser = repo.save(telegramUser);
 
-        if (Objects.nonNull(user))
-            return success(mapperService.toDTO(user, TelegramUserDTO.class));
+        return ApiResponseUtilsService.success(mapperService.toDTO(savedUser, TelegramUserDTO.class));
 
-        throw new EntityNotFoundException(
-                RequestMessageProvider.getEntityNotFoundMessage(User.class),
-                new TelegramUser()
-        );
+    }
+    public ApiResponse<TelegramUserDTO> update(TelegramUser telegramUser) {
+        return save(telegramUser);
+    }
+    public ApiResponse<TelegramUserDTO> getById(Long id) {
+        Optional<TelegramUser> optionalUser = repo.findById(id);
+
+        if (optionalUser.isPresent()) {
+            TelegramUser user = optionalUser.get();
+
+            return ApiResponseUtilsService.success(mapperService.toDTO(user, TelegramUserDTO.class));
+        }
+
+        throw new EntityNotFoundException("Telegram user with id=" + id + " is not found", TelegramUser.class);
+
+    }
+    public ApiResponse<Boolean> delete(Long id) {
+        repo.deleteById(id);
+
+        return ApiResponseUtilsService.success(true);
     }
 
 }

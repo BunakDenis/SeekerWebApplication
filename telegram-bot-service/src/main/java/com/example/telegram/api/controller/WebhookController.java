@@ -6,6 +6,7 @@ import com.example.telegram.bot.service.ModelMapperService;
 import com.example.telegram.bot.service.UserService;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ import java.util.Objects;
 
 @RestController
 @RequestMapping("${telegram.bot.webhook-path}")
-@Log4j2
+@Slf4j
 public class WebhookController {
 
     @Autowired
@@ -51,7 +52,7 @@ public class WebhookController {
 
         log.debug("Метод handleWebhook");
 
-        log.debug(update);
+        log.debug(update.toString());
 
         if (update.getUpdateId() == 0) return Mono.just(ResponseEntity.ok().body("ok"));
 
@@ -60,11 +61,5 @@ public class WebhookController {
                 .doOnNext(auth -> telegramBot.getReactiveHandler().setAuthentication(auth))
                 .then(telegramBot.getReactiveHandler().handleUpdate(update))
                 .map(sent -> ResponseEntity.ok().body("ok"));
-    }
-
-    @GetMapping(path = {"/info", "/info/"})
-    public String getBotInformation() {
-        log.debug("Входящий запрос на ендпоинт - /telegram-bot/info");
-        return "Hi. I am " + telegramBotName;
     }
 }
