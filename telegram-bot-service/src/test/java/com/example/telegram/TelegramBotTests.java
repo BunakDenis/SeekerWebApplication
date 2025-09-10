@@ -192,6 +192,7 @@ public class TelegramBotTests {
 
         //When
         telegramUserAuthFilterMockRequests();
+        telegramUserAuthFilterMockSessionRequest();
 
         mockServerClient
                 .when(request()
@@ -234,6 +235,7 @@ public class TelegramBotTests {
 
         //When
         telegramUserAuthFilterMockRequests();
+        telegramUserAuthFilterMockSessionRequest();
 
         mockServerClient
                 .when(request()
@@ -288,6 +290,27 @@ public class TelegramBotTests {
 
         telegramChatResponse.setData(telegramChatDTO);
 
+        //When
+        telegramUserAuthFilterMockRequests();
+
+        mockServerClient
+                .when(request()
+                        .withMethod("GET")
+                        .withPath("/api/v1/chat/telegram_user/" + telegramChatForTests.getId()))
+                .respond(response()
+                        .withStatusCode(200)
+                        .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
+                        .withBody(objectMapper.writeValueAsString(telegramChatResponse)));
+
+        mockServerClient
+                .when(request()
+                        .withMethod("POST")
+                        .withPath("/api/v1/chat/add/"))
+                .respond(response()
+                        .withStatusCode(200)
+                        .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
+                        .withBody(objectMapper.writeValueAsString(telegramChatResponse)));
+
         JwtTelegramDataImpl jwtDataForPersistentToken = JwtTelegramDataImpl.builder()
                 .userDetails(USER_DETAILS_WITH_TOURIST_ROLE_FOR_TESTS)
                 .expirationTime(0)
@@ -310,9 +333,6 @@ public class TelegramBotTests {
 
         String persistentToken = jwtService.generateToken(jwtDataForPersistentToken);
         String transientToken = jwtService.generateToken(jwtDataForTransientToken);
-
-        //When
-        telegramUserAuthFilterMockRequests();
 
         PersistentSession persistentSession = PersistentSession.builder()
                 .id(45678L)
@@ -366,24 +386,6 @@ public class TelegramBotTests {
                                 objectMapper.writeValueAsString(persistentSessionResponse)
                         )
                 );
-
-        mockServerClient
-                .when(request()
-                        .withMethod("GET")
-                        .withPath("/api/v1/chat/telegram_user/" + telegramChatForTests.getId()))
-                .respond(response()
-                        .withStatusCode(200)
-                        .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
-                        .withBody(objectMapper.writeValueAsString(telegramChatResponse)));
-
-        mockServerClient
-                .when(request()
-                        .withMethod("POST")
-                        .withPath("/api/v1/chat/add/"))
-                .respond(response()
-                        .withStatusCode(200)
-                        .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
-                        .withBody(objectMapper.writeValueAsString(telegramChatResponse)));
 
         WebTestClient.ResponseSpec exchangeAuthCommand = client.post()
                 .uri("/api/bot/")
@@ -504,6 +506,7 @@ public class TelegramBotTests {
         Mockito.when(emailService.isEmailAddressValid(testMsg)).thenReturn(true);
 
         telegramUserAuthFilterMockRequests();
+        telegramUserAuthFilterMockSessionRequest();
 
         mockServerClient
                 .when(request()
@@ -589,6 +592,7 @@ public class TelegramBotTests {
 
         //When
         telegramUserAuthFilterMockRequests();
+        telegramUserAuthFilterMockSessionRequest();
 
         mockServerClient
                 .when(request()
@@ -665,6 +669,7 @@ public class TelegramBotTests {
 
         //When
         telegramUserAuthFilterMockRequests();
+        telegramUserAuthFilterMockSessionRequest();
 
         mockServerClient
                 .when(request()
@@ -749,6 +754,7 @@ public class TelegramBotTests {
 
         //When
         telegramUserAuthFilterMockRequests();
+        telegramUserAuthFilterMockSessionRequest();
 
         mockServerClient
                 .when(request()
@@ -834,6 +840,7 @@ public class TelegramBotTests {
 
         //When
         telegramUserAuthFilterMockRequests();
+        telegramUserAuthFilterMockSessionRequest();
 
         mockServerClient
                 .when(request()
@@ -985,6 +992,83 @@ public class TelegramBotTests {
                         .withStatusCode(200)
                         .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
                         .withBody(objectMapper.writeValueAsString(userDTOApiResponse)));
+    }
+    private void telegramUserAuthFilterMockSessionRequest() throws JsonProcessingException {
+        JwtTelegramDataImpl jwtDataForPersistentToken = JwtTelegramDataImpl.builder()
+                .userDetails(USER_DETAILS_WITH_TOURIST_ROLE_FOR_TESTS)
+                .expirationTime(DateTimeService.convertDaysToMillis(persistentSessionExpirationTime))
+                .subjects(
+                        Map.of(
+                                JWTDataSubjectKeys.TELEGRAM_USER_ID.getSubjectKey(), TELEGRAM_USER_FOR_TESTS.getId()
+                        )
+                )
+                .build();
+
+        JwtTelegramDataImpl jwtDataForTransientToken = JwtTelegramDataImpl.builder()
+                .userDetails(USER_DETAILS_WITH_TOURIST_ROLE_FOR_TESTS)
+                .expirationTime(DateTimeService.convertMinutesToMillis(transientSessionExpirationTime))
+                .subjects(
+                        Map.of(
+                                JWTDataSubjectKeys.TELEGRAM_USER_ID.getSubjectKey(), TELEGRAM_USER_FOR_TESTS.getId()
+                        )
+                )
+                .build();
+
+        String persistentToken = jwtService.generateToken(jwtDataForPersistentToken);
+        String transientToken = jwtService.generateToken(jwtDataForTransientToken);
+
+        PersistentSession persistentSession = PersistentSession.builder()
+                .id(45678L)
+                .data(persistentToken)
+                .isActive(true)
+                .telegramSession(TELEGRAM_SESSION_FOR_TESTS)
+                .build();
+
+        TransientSession transientSession = TransientSession.builder()
+                .id(56789L)
+                .data(transientToken)
+                .isActive(true)
+                .telegramSession(TELEGRAM_SESSION_FOR_TESTS)
+                .build();
+
+        TelegramSessionDTO telegramSessionDTO =
+                mapperService.toDTO(TELEGRAM_SESSION_FOR_TESTS, TelegramSessionDTO.class);
+        PersistentSessionDTO persistentSessionDTO = mapperService.toDTO(persistentSession, PersistentSessionDTO.class);
+        TransientSessionDTO transientSessionDTO = mapperService.toDTO(transientSession, TransientSessionDTO.class);
+
+
+        ApiResponse<TelegramSessionDTO> telegramSessionResponse = ApiResponse.<TelegramSessionDTO>builder()
+                .data(telegramSessionDTO)
+                .includeObject(TELEGRAM_USER.getKeyValue(), TELEGRAM_USER_FOR_TESTS)
+                .includeList(PERSISTENT_SESSION.getKeyValue(), List.of(persistentSessionDTO))
+                .includeList(TRANSIENT_SESSION.getKeyValue(), List.of(transientSessionDTO))
+                .build();
+
+        ApiResponse<PersistentSessionDTO> persistentSessionResponse = ApiResponse.<PersistentSessionDTO>builder()
+                .data(persistentSessionDTO)
+                .build();
+
+        mockServerClient
+                .when(request()
+                        .withMethod("GET")
+                        .withPath("/api/v1/session/telegram_user_id/" + TELEGRAM_API_USER_FOR_TESTS.getId()))
+                .respond(response()
+                        .withStatusCode(200)
+                        .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
+                        .withBody(objectMapper.writeValueAsString(telegramSessionResponse)));
+
+        mockServerClient
+                .when(request()
+                        .withMethod("POST")
+                        .withPath("/api/v1/persistent-session/add/")
+                )
+                .respond(response()
+                        .withStatusCode(200)
+                        .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
+                        .withBody(
+                                objectMapper.writeValueAsString(persistentSessionResponse)
+                        )
+                );
     }
     private SendMessage captorSendMessage() {
         ArgumentCaptor<SendMessage> captor = ArgumentCaptor.forClass(SendMessage.class);
