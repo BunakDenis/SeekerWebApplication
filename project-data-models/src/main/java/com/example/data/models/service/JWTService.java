@@ -32,7 +32,6 @@ public class JWTService {
     private String zoneId;
     private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DateTimeService.DATE_TIME_FORMAT);
 
-
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
