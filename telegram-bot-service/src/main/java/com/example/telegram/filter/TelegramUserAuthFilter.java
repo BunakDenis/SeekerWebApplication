@@ -1,15 +1,15 @@
 package com.example.telegram.filter;
 
 
+import com.example.data.models.consts.ExceptionMessageProvider;
 import com.example.data.models.consts.RequestMessageProvider;
 import com.example.data.models.consts.WarnMessageProvider;
+import com.example.data.models.exception.ExpiredTelegramSessionsException;
 import com.example.data.models.utils.ApiResponseUtilsService;
 import com.example.telegram.bot.message.TelegramBotMessageSender;
-import com.example.telegram.bot.service.AuthService;
-import com.example.telegram.bot.service.ModelMapperService;
-import com.example.telegram.bot.service.TelegramUserService;
-import com.example.telegram.bot.service.UserService;
+import com.example.telegram.bot.service.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.buffer.DataBufferUtils;
@@ -20,6 +20,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
@@ -39,6 +40,7 @@ public class TelegramUserAuthFilter implements WebFilter {
 
 
     private final TelegramUserService telegramUserService;
+    private final TelegramSessionService telegramSessionService;
     private final UserService userService;
     private final AuthService authService;
     private final ApplicationFiltersService appFilterService;
@@ -100,26 +102,8 @@ public class TelegramUserAuthFilter implements WebFilter {
                         this.requestBody = body.toString();
                         this.chatId = chatId;
 
-                        return userService.getUserByTelegramUserId(telegramUserId)
-                                .flatMap(user -> {
-                                    log.debug("User {}", user);
-                                    return userService.findByUsername(user.getUsername());
-                                })
-                                .flatMap(userDetails -> {
-                                    Authentication auth = new UsernamePasswordAuthenticationToken(
-                                            userDetails,
-                                            null,
-                                            userDetails.getAuthorities()
-                                    );
-
-                                    log.debug("Authentication = {}", auth);
-                                    return Mono.just(auth);
-                                })
-                                .filter(Objects::nonNull)
+                        return authService.authenticate(telegramUserId)
                                 .flatMap(auth -> {
-
-                                    // sessionId в хедер
-                                    String sessionId = String.valueOf(12345L);
 
                                     SecurityContext emptyContext = SecurityContextHolder.createEmptyContext();
 
@@ -128,8 +112,11 @@ public class TelegramUserAuthFilter implements WebFilter {
                                     log.debug("TelegramUserAuthFilter end.");
 
                                     return chain.filter(exchange.mutate()
-                                                    .request(appFilterService.decorateRequest(exchange, body.toString(), sessionId))
-                                                    .build())
+                                                    .request(
+                                                            appFilterService.decorateRequest(exchange, body.toString(), "")
+                                                    )
+                                                    .build()
+                                            )
                                             .contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth));
 
                                 });
@@ -140,19 +127,34 @@ public class TelegramUserAuthFilter implements WebFilter {
                                 ApiResponseUtilsService.fail(RequestMessageProvider.REQUEST_BODY_IS_EMPTY))
                     )
                     // Ловим любые ошибки в цепочке
-                    .doOnError(ex -> log.error("Ошибка обработки update: {}", ex.getMessage(), ex))
+                    .doOnError(ex -> log.error("Ошибка в TelegramUserAuthFilter - {}", ex.getMessage(), ex))
                     .onErrorResume(ex -> {
-                    sender.sendMessage(
-                            chatId,
-                            WarnMessageProvider.getSorryMsg(
-                                    "бот временно недоступен, попробуйте написать позже!"
-                            )
-                    );
 
-                    String modifiedBody = requestBody.replaceFirst(
-                            "\"update_id\"\\s*:\\s*\\d+",
-                            "\"update_id\":0"
-                    );
+                        String modifiedBody = requestBody;
+
+                        log.debug("Класс ошибки {}", ex.getClass());
+
+                        if (ex instanceof ExpiredJwtException) {
+                            log.debug("Отправляю сообщение юзеру об необходимости повторной авторизации");
+                            sender.sendMessage(
+                                    chatId,
+                                    WarnMessageProvider.RE_AUTHORIZATION_MSG
+                            );
+                        } else {
+
+                            sender.sendMessage(
+                                    chatId,
+                                    WarnMessageProvider.getSorryMsg(
+                                            "бот временно недоступен, попробуйте написать позже!"
+                                    )
+                            );
+
+                            modifiedBody = requestBody.replaceFirst(
+                                    "\"update_id\"\\s*:\\s*\\d+",
+                                    "\"update_id\":0"
+                            );
+
+                        }
 
                     return chain.filter(exchange.mutate()
                             .request(appFilterService.decorateRequest(exchange, modifiedBody, ""))

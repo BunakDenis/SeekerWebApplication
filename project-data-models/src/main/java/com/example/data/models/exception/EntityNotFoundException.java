@@ -9,6 +9,7 @@ public class EntityNotFoundException extends IllegalArgumentException{
 
     public EntityNotFoundException(String msg, Object object) {
         super(msg);
+        this.object = object;
     }
 
     /*

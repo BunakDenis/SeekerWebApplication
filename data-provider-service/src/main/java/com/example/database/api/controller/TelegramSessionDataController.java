@@ -59,14 +59,14 @@ public class TelegramSessionDataController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @GetMapping(path = {"/session/telegramUserId/{telegramUserId}"})
+    @GetMapping(path = {"/session/telegram_user_id/{telegramUserId}"})
     public ResponseEntity<ApiResponse<TelegramSessionDTO>> getSessionByTelegramUserId(
             @PathVariable(name = "telegramUserId") Long telegramUserId
     ) {
 
         log.debug("Запрос на получение TelegramSession по telegramUserId {}", telegramUserId);
 
-        ApiResponse<TelegramSessionDTO> response = sessionService.findByTelegramUserId(telegramUserId);
+        ApiResponse<TelegramSessionDTO> response = sessionService.getByTelegramUserId(telegramUserId);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
 

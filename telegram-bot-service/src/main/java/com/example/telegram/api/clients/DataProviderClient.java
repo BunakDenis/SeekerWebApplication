@@ -3,12 +3,10 @@ package com.example.telegram.api.clients;
 
 import com.example.data.models.entity.dto.VerificationCodeDTO;
 import com.example.data.models.entity.dto.response.CheckUserResponse;
-import com.example.data.models.entity.dto.telegram.TelegramSessionDTO;
+import com.example.data.models.entity.dto.telegram.*;
 import com.example.data.models.entity.dto.UserDTO;
-import com.example.data.models.entity.dto.telegram.TelegramChatDTO;
 import com.example.data.models.entity.dto.request.ApiRequest;
 import com.example.data.models.entity.dto.response.ApiResponse;
-import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
 import com.example.data.models.enums.ResponseIncludeDataKeys;
 import com.example.data.models.exception.ApiException;
 import com.example.data.models.entity.TelegramChat;
@@ -29,6 +27,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import static com.example.telegram.api.clients.DataProviderEndpointsConsts.*;
 
 import reactor.core.publisher.Mono;
+
+import java.security.Permissions;
 
 @Service
 @RequiredArgsConstructor
@@ -61,11 +61,6 @@ public class DataProviderClient {
                 }))
                 .build();
     }
-
-    /*
-        TODO
-            1. Сделать рефактор Get методов (убрать "get" с ендпоинта)
-     */
 
     public Mono<ApiResponse<UserDTO>> createUser(UserDTO dto) {
         StringBuilder endpoint = new StringBuilder(getApiUserEndpoint("add/"));
@@ -370,7 +365,7 @@ public class DataProviderClient {
     }
     public Mono<ApiResponse<TelegramSessionDTO>> getTelegramSessionByTelegramUserId(Long id) {
 
-        StringBuilder endpoint = new StringBuilder(getApiSessionEndpoint("telegramUserId/"));
+        StringBuilder endpoint = new StringBuilder(getApiSessionEndpoint("telegram_user_id/"));
         endpoint.append(id);
 
         log.debug("Отправляю запрос к Data provide service для получения TelegramSession по telegram_user_id {}", id);
@@ -379,6 +374,76 @@ public class DataProviderClient {
         return webClient.get()
                 .uri(endpoint.toString())
                 .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<>() {
+                });
+    }
+    public Mono<ApiResponse<TransientSessionDTO>> saveTransientSession(TransientSessionDTO dto) {
+
+        ApiRequest<TransientSessionDTO> response = new ApiRequest<>(dto);
+
+        return webClient.post()
+                .uri(getApiTransientSessionEndpoint("add/"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(response)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<>() {
+                });
+    }
+    public Mono<ApiResponse<TransientSessionDTO>> updateTransientSession(TransientSessionDTO dto) {
+
+        ApiRequest<TransientSessionDTO> response = new ApiRequest<>(dto);
+
+        return webClient.post()
+                .uri(getApiTransientSessionEndpoint("update/"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(response)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<>() {
+                });
+    }
+    public Mono<ApiResponse<Boolean>> deleteTransientSession(Long id) {
+
+        return webClient.post()
+                .uri(getApiTransientSessionEndpoint("delete/" + id))
+                .contentType(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<>() {
+                });
+    }
+    public Mono<ApiResponse<PersistentSessionDTO>> savePersistentSession(PersistentSessionDTO dto) {
+
+        ApiRequest<PersistentSessionDTO> response = new ApiRequest<>(dto);
+
+        return webClient.post()
+                .uri(getApiPersistentSessionEndpoint("add/"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(response)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<>() {
+                });
+    }
+    public Mono<ApiResponse<PersistentSessionDTO>> updatePersistentSession(PersistentSessionDTO dto) {
+
+        ApiRequest<PersistentSessionDTO> response = new ApiRequest<>(dto);
+
+        return webClient.post()
+                .uri(getApiPersistentSessionEndpoint("update/"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(response)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<>() {
+                });
+    }
+    public Mono<ApiResponse<Boolean>> deletePersistentSession(Long id) {
+
+        return webClient.post()
+                .uri(getApiPersistentSessionEndpoint("delete/" + id))
+                .contentType(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<>() {
                 });

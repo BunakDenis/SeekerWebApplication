@@ -2,6 +2,7 @@ package com.example.telegram.bot.service;
 
 
 import com.example.data.models.entity.TransientSession;
+import com.example.data.models.entity.dto.telegram.TransientSessionDTO;
 import com.example.data.models.enums.ResponseIncludeDataKeys;
 import com.example.telegram.api.clients.DataProviderClient;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +21,43 @@ public class TransientSessionService {
 
     private final ModelMapperService mapperService;
 
+    public Mono<TransientSession> save(TransientSession session) {
+
+        TransientSessionDTO dto = mapperService.toDTO(session, TransientSessionDTO.class);
+
+        return dataClient.saveTransientSession(dto)
+                .flatMap(resp -> {
+
+                    if (Objects.nonNull(resp.getData())) {
+                        TransientSessionDTO respDTO = resp.getData();
+
+                        return Mono.just(mapperService.toEntity(respDTO, TransientSession.class));
+                    } else {
+                        return Mono.empty();
+                    }
+                });
+
+    }
+    public Mono<TransientSession> update(TransientSession session) {
+
+        TransientSessionDTO dto = mapperService.toDTO(session, TransientSessionDTO.class);
+
+        return dataClient.saveTransientSession(dto)
+                .flatMap(resp -> {
+
+                    if (Objects.nonNull(resp.getData())) {
+                        TransientSessionDTO respDTO = resp.getData();
+
+                        return Mono.just(mapperService.toEntity(respDTO, TransientSession.class));
+                    } else {
+                        return Mono.empty();
+                    }
+                });
+    }
+    public Mono<Boolean> delete(Long id) {
+        return dataClient.deleteTransientSession(id)
+                .flatMap(resp -> Mono.just(resp.getData()));
+    }
     public Mono<TransientSession> getActiveSessionByTGUserId(Long id) {
 
         return dataClient.getTelegramSessionByTelegramUserId(id)

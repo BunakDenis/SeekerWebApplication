@@ -10,6 +10,7 @@ import com.example.data.models.exception.EntityNotFoundException;
 import com.example.data.models.exception.EntityNotSavedException;
 import com.example.database.entity.PersistentSession;
 import com.example.database.entity.TelegramSession;
+import com.example.database.entity.TelegramUser;
 import com.example.database.entity.TransientSession;
 import com.example.database.repo.telegram.TelegramSessionRepo;
 import com.example.database.service.ModelMapperService;
@@ -31,6 +32,7 @@ public class TelegramSessionService {
     private final TelegramSessionRepo repo;
     private final ModelMapperService mapperService;
 
+
     public ApiResponse<TelegramSessionDTO> create(TelegramSession session) {
 
         Optional<TelegramSession> save = Optional.of(repo.save(session));
@@ -50,9 +52,16 @@ public class TelegramSessionService {
 
         return response;
     }
+    public ApiResponse<TelegramSessionDTO> getSessionById(Long id) {
+        Optional<TelegramSession> session = repo.findById(id);
 
+        if (session.isPresent())
+            return success(mapperService.toDTO(session.get(), TelegramSessionDTO.class));
+
+        throw new EntityNotFoundException(TelegramSession.class + " not found", new TelegramSession());
+    }
     @Transactional
-    public ApiResponse<TelegramSessionDTO> findByTelegramUserId(Long telegramUserId) {
+    public ApiResponse<TelegramSessionDTO> getByTelegramUserId(Long telegramUserId) {
 
         Optional<TelegramSession> session = Optional.of(repo.getTelegramSessionByTelegramUserId(telegramUserId));
 
@@ -61,6 +70,7 @@ public class TelegramSessionService {
             TelegramSession telegramSession = session.get();
             TelegramSessionDTO telegramSessionDTO = mapperService.toDTO(telegramSession, TelegramSessionDTO.class);
 
+            TelegramUser telegramUser = telegramSession.getTelegramUser();
             List<PersistentSession> persistentSessions = telegramSession.getPersistentSessions();
             List<TransientSession> transientSessions = telegramSession.getTransientSessions();
 
@@ -75,6 +85,10 @@ public class TelegramSessionService {
 
             ApiResponse<TelegramSessionDTO> response = success(telegramSessionDTO);
 
+            response.addIncludeObject(
+                    ResponseIncludeDataKeys.TELEGRAM_USER.getKeyValue(),
+                    mapperService.toDTO(telegramUser, TelegramUser.class)
+            );
             response.addIncludeListObjects(ResponseIncludeDataKeys.PERSISTENT_SESSION.getKeyValue(), prSessionDTOList);
             response.addIncludeListObjects(ResponseIncludeDataKeys.TRANSIENT_SESSION.getKeyValue(), trSessionDTOList);
 
@@ -83,14 +97,6 @@ public class TelegramSessionService {
 
         throw new EntityNotFoundException(TelegramSession.class + " not found", new TelegramSession());
 
-    }
-    public ApiResponse<TelegramSessionDTO> getSessionById(Long id) {
-        Optional<TelegramSession> session = repo.findById(id);
-
-        if (session.isPresent())
-            return success(mapperService.toDTO(session.get(), TelegramSessionDTO.class));
-
-        throw new EntityNotFoundException(TelegramSession.class + " not found", new TelegramSession());
     }
     public ApiResponse<Boolean> delete(Long id) {
 

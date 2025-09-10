@@ -11,54 +11,90 @@ import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.core.userdetails.UserDetails;
 */
 
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextImpl;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class AuthService {
 
+
     private final UserService userService;
+    private final TelegramSessionService telegramSessionService;
+
 
     /**
      * Помещает Authentication с нашим User в контекст реактивного потока.
-     * Возвращает Mono<Void> который можно вписать в chain.filter(...).contextWrite(...)
+     * Возвращает Mono<Authentication> который можно вписать в chain.filter(...).contextWrite(...)
      */
-    /*
-    public Mono<Void> authenticate(UserDetails user) {
+    public Mono<Authentication> authenticate(Long telegramUserId) {
 
-        log.debug("Начало метода authenticate user - {}", user);
+        log.debug("Начало метода authenticate");
 
-        if (user == null) {
-            return Mono.empty();
-        }
+        return userService.getUserByTelegramUserId(telegramUserId)
+                .flatMap(user -> {
+                    log.debug("User {}", user);
+                    return userService.findByUsername(user.getUsername());
+                })
+                .flatMap(userDetails ->
+                        Mono.zip(
+                                telegramSessionService.checkSessionsExpired(telegramUserId, userDetails),
+                                Mono.just(userDetails))
+                )
+                .flatMap(tuple -> {
 
-        // Указываем principal как сам доменный User (или DTO), чтобы @AuthenticationPrincipal возвращал его
-        Authentication auth = new UsernamePasswordAuthenticationToken(
-                user,                  // <-- principal = UserDetails
-                true,
-                user.getAuthorities()
-        );
+                    Boolean isSessionsExpired = tuple.getT1();
+                    UserDetails userDetails = tuple.getT2();
 
-        SecurityContext context = new SecurityContextImpl(auth);
+                    if (!isSessionsExpired) return Mono.just(userDetails);
 
-        log.debug("Конец метода authenticate. Context = {}", context);
+                    return Mono.just(userService.getDefaultUser());
 
-        // Возврат Mono<Void> не обязателен, но удобно
-        return Mono.<Void>empty()
-                .contextWrite(ReactiveSecurityContextHolder.withSecurityContext(Mono.just(context)));
+                })
+                .flatMap(userDetails -> {
+
+                    Authentication auth = new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities()
+                    );
+
+                    log.debug("Authentication = {}", auth);
+                    return Mono.just(auth);
+                })
+                .filter(Objects::nonNull)
+                .flatMap(auth -> {
+
+                    SecurityContext emptyContext = SecurityContextHolder.createEmptyContext();
+
+                    emptyContext.setAuthentication(auth);
+
+                    log.debug("TelegramUserAuthFilter end.");
+
+                    return Mono.just(auth);
+
+                });
     }
-*/
+
     /**
      * Удобная проверка - авторизован ли кто-то сейчас.
      */
-    /*
     public Mono<Boolean> isAuthenticated() {
+
+        log.debug("Начало метода isAuthenticated");
+
         return ReactiveSecurityContextHolder.getContext()
                 .map(SecurityContext::getAuthentication)
                 .map(auth -> auth != null && auth.isAuthenticated());
     }
-
-     */
 }

@@ -2,11 +2,19 @@ package com.example.telegram;
 
 import com.example.data.models.consts.RequestMessageProvider;
 import com.example.data.models.consts.WarnMessageProvider;
+import com.example.data.models.entity.PersistentSession;
+import com.example.data.models.entity.TransientSession;
 import com.example.data.models.entity.VerificationCode;
 import com.example.data.models.entity.dto.UserDTO;
 import com.example.data.models.entity.dto.VerificationCodeDTO;
+import com.example.data.models.entity.dto.jwt.JwtTelegramDataImpl;
 import com.example.data.models.entity.dto.response.ApiResponse;
+import com.example.data.models.entity.dto.telegram.PersistentSessionDTO;
 import com.example.data.models.entity.dto.telegram.TelegramChatDTO;
+import com.example.data.models.entity.dto.telegram.TelegramSessionDTO;
+import com.example.data.models.entity.dto.telegram.TransientSessionDTO;
+import com.example.data.models.enums.JWTDataSubjectKeys;
+import com.example.data.models.service.JWTService;
 import com.example.data.models.utils.ApiResponseUtilsService;
 import com.example.telegram.bot.chat.states.DialogStates;
 import com.example.telegram.bot.chat.UiElements;
@@ -14,7 +22,9 @@ import com.example.telegram.bot.commands.Commands;
 import com.example.telegram.bot.message.MessageProvider;
 import com.example.telegram.bot.message.TelegramBotMessageSender;
 import com.example.telegram.bot.service.ModelMapperService;
+import com.example.telegram.bot.service.TelegramSessionService;
 import com.example.telegram.bot.utils.update.UpdateUtilsService;
+import com.example.utils.datetime.DateTimeService;
 import com.example.utils.file.loader.EnvLoader;
 import com.example.utils.generator.GenerationService;
 import com.example.utils.sender.EmailService;
@@ -24,6 +34,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.github.cdimascio.dotenv.Dotenv;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.mockito.ArgumentCaptor;
@@ -80,8 +91,14 @@ public class TelegramBotTests {
 
     @Value("${default.utc.zone.id}")
     private String zoneId;
+    @Value("${persistent.auth.expiration.time}")
+    private long persistentSessionExpirationTime;
+    @Value("${transient.auth.expiration.time}")
+    private long transientSessionExpirationTime;
     @Autowired
     private WebTestClient client;
+    @Autowired
+    private JWTService jwtService;
     @Autowired
     private PasswordEncoder passwordEncoder;
     private static Dotenv dotenv;
@@ -161,7 +178,6 @@ public class TelegramBotTests {
     public void afterEach() {
         mockServerClient.reset();
     }
-
     @Test
     @Order(1)
     public void testUnknownCommand() throws JsonProcessingException {
@@ -252,7 +268,153 @@ public class TelegramBotTests {
 
     }
     @Test
-    @Order(2)
+    @Order(8)
+    public void testTestCommandWithExpiredTransientToken() throws JsonProcessingException {
+
+        log.debug("Тесты долгосрочной сессии с истёкшим сроком");
+
+        //Given
+        String expectedMsg = WarnMessageProvider.RE_AUTHORIZATION_MSG;
+
+        Update update = createTelegramUpdate("/start");
+
+        String requestBody = objectMapper.writeValueAsString(update);
+
+        ApiResponse<TelegramChatDTO> telegramChatResponse = responses.get(TELEGRAM_CHAT.getKeyValue());
+
+        TelegramChatDTO telegramChatDTO = telegramChatResponse.getData();
+        telegramChatDTO.setUiElement(UiElements.COMMAND.getUiElement());
+        telegramChatDTO.setUiElementValue(Commands.START.getCommand());
+
+        telegramChatResponse.setData(telegramChatDTO);
+
+        JwtTelegramDataImpl jwtDataForPersistentToken = JwtTelegramDataImpl.builder()
+                .userDetails(USER_DETAILS_WITH_TOURIST_ROLE_FOR_TESTS)
+                .expirationTime(0)
+                .subjects(
+                        Map.of(
+                                JWTDataSubjectKeys.TELEGRAM_USER_ID.getSubjectKey(), TELEGRAM_USER_FOR_TESTS.getId()
+                        )
+                )
+                .build();
+
+        JwtTelegramDataImpl jwtDataForTransientToken = JwtTelegramDataImpl.builder()
+                .userDetails(USER_DETAILS_WITH_TOURIST_ROLE_FOR_TESTS)
+                .expirationTime(0)
+                .subjects(
+                        Map.of(
+                                JWTDataSubjectKeys.TELEGRAM_USER_ID.getSubjectKey(), TELEGRAM_USER_FOR_TESTS.getId()
+                        )
+                )
+                .build();
+
+        String persistentToken = jwtService.generateToken(jwtDataForPersistentToken);
+        String transientToken = jwtService.generateToken(jwtDataForTransientToken);
+
+        //When
+        telegramUserAuthFilterMockRequests();
+
+        PersistentSession persistentSession = PersistentSession.builder()
+                .id(45678L)
+                .data(persistentToken)
+                .isActive(true)
+                .telegramSession(TELEGRAM_SESSION_FOR_TESTS)
+                .build();
+
+        TransientSession transientSession = TransientSession.builder()
+                .id(56789L)
+                .data(transientToken)
+                .isActive(true)
+                .telegramSession(TELEGRAM_SESSION_FOR_TESTS)
+                .build();
+
+        TelegramSessionDTO telegramSessionDTO =
+                mapperService.toDTO(TELEGRAM_SESSION_FOR_TESTS, TelegramSessionDTO.class);
+        PersistentSessionDTO persistentSessionDTO = mapperService.toDTO(persistentSession, PersistentSessionDTO.class);
+        TransientSessionDTO transientSessionDTO = mapperService.toDTO(transientSession, TransientSessionDTO.class);
+
+
+        ApiResponse<TelegramSessionDTO> telegramSessionResponse = ApiResponse.<TelegramSessionDTO>builder()
+                .data(telegramSessionDTO)
+                .includeObject(TELEGRAM_USER.getKeyValue(), TELEGRAM_USER_FOR_TESTS)
+                .includeList(PERSISTENT_SESSION.getKeyValue(), List.of(persistentSessionDTO))
+                .includeList(TRANSIENT_SESSION.getKeyValue(), List.of(transientSessionDTO))
+                .build();
+
+        ApiResponse<PersistentSessionDTO> persistentSessionResponse = ApiResponse.<PersistentSessionDTO>builder()
+                .data(persistentSessionDTO)
+                .build();
+
+        mockServerClient
+                .when(request()
+                        .withMethod("GET")
+                        .withPath("/api/v1/session/telegram_user_id/" + TELEGRAM_API_USER_FOR_TESTS.getId()))
+                .respond(response()
+                        .withStatusCode(200)
+                        .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
+                        .withBody(objectMapper.writeValueAsString(telegramSessionResponse)));
+
+        mockServerClient
+                .when(request()
+                        .withMethod("POST")
+                        .withPath("/api/v1/persistent-session/add/")
+                )
+                .respond(response()
+                        .withStatusCode(200)
+                        .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
+                        .withBody(
+                                objectMapper.writeValueAsString(persistentSessionResponse)
+                        )
+                );
+
+        mockServerClient
+                .when(request()
+                        .withMethod("GET")
+                        .withPath("/api/v1/chat/telegram_user/" + telegramChatForTests.getId()))
+                .respond(response()
+                        .withStatusCode(200)
+                        .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
+                        .withBody(objectMapper.writeValueAsString(telegramChatResponse)));
+
+        mockServerClient
+                .when(request()
+                        .withMethod("POST")
+                        .withPath("/api/v1/chat/add/"))
+                .respond(response()
+                        .withStatusCode(200)
+                        .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
+                        .withBody(objectMapper.writeValueAsString(telegramChatResponse)));
+
+        WebTestClient.ResponseSpec exchangeAuthCommand = client.post()
+                .uri("/api/bot/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(requestBody)
+                .exchange();
+
+        exchangeAuthCommand.expectStatus().is2xxSuccessful();
+
+        ArgumentCaptor<SendMessage> sendMessageCaptor = ArgumentCaptor.forClass(SendMessage.class);
+        ArgumentCaptor<Long> chatIdCaptor = ArgumentCaptor.forClass(Long.class);
+        ArgumentCaptor<String> messageTextCaptor = ArgumentCaptor.forClass(String.class);
+
+
+        Mockito.verify(telegramBotMessageSender)
+                .sendMessage(chatIdCaptor.capture(), messageTextCaptor.capture());
+
+        Mockito.verify(telegramBotMessageSender)
+                .sendMessage(sendMessageCaptor.capture());
+
+        String actualMessage = messageTextCaptor.getValue();
+
+        //Then
+        assertThrows(ExpiredJwtException.class, () -> {
+            jwtService.validateToken(persistentToken, USER_DETAILS_WITH_TOURIST_ROLE_FOR_TESTS);
+        });
+        assertEquals(expectedMsg, actualMessage);
+
+    }
+    @Test
+    @Order(3)
     public void testAuthCommand() throws JsonProcessingException {
 
         log.debug("testAuthCommand()");
@@ -721,9 +883,8 @@ public class TelegramBotTests {
         assertEquals(expectedMsgText, actual.getText());
 
     }
-
     @Test
-    @Order(8)
+    @Order(9)
     public void testResponseWithEmptyBodyRequest() throws JsonProcessingException {
         log.debug("Тесты ответа с пустым запросом");
 
@@ -740,9 +901,8 @@ public class TelegramBotTests {
                 .expectBody()
                 .json(expected);
     }
-
     @Test
-    @Order(9)
+    @Order(10)
     public void testResponseWithEmptyBodyJsonRequest() throws JsonProcessingException {
         log.debug("Тесты ответа с пустым телом запроса");
 
@@ -760,7 +920,6 @@ public class TelegramBotTests {
                 .expectBody()
                 .json(expected);
     }
-
     @Test
     @Order(1000)
     public void testWithInternalDatabaseServer() throws JsonProcessingException {
@@ -789,7 +948,6 @@ public class TelegramBotTests {
         Map<String, String> envMap = mockServerContainer.getEnvMap();
 
         envMap.put("data.provide.api.url", mockServerContainer.getEndpoint());
-
     }
 
     private Update createTelegramUpdate(String msgText) {

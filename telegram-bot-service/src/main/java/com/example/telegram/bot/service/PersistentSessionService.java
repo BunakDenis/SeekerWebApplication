@@ -3,6 +3,7 @@ package com.example.telegram.bot.service;
 import com.example.data.models.entity.PersistentSession;
 import com.example.data.models.entity.TransientSession;
 import com.example.data.models.entity.dto.telegram.PersistentSessionDTO;
+import com.example.data.models.entity.dto.telegram.TransientSessionDTO;
 import com.example.data.models.enums.ResponseIncludeDataKeys;
 import com.example.telegram.api.clients.DataProviderClient;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +21,39 @@ public class PersistentSessionService {
     private final DataProviderClient dataClient;
     private final ModelMapperService mapperService;
 
+    public Mono<PersistentSession> save(PersistentSession session) {
+
+        PersistentSessionDTO dto = mapperService.toDTO(session, PersistentSessionDTO.class);
+
+        return dataClient.savePersistentSession(dto)
+                .flatMap(resp -> {
+
+                    if (Objects.nonNull(resp.getData())) {
+                        PersistentSessionDTO respDTO = resp.getData();
+
+                        return Mono.just(mapperService.toEntity(respDTO, PersistentSession.class));
+                    } else {
+                        return Mono.empty();
+                    }
+                });
+
+    }
+    public Mono<PersistentSession> update(PersistentSession session) {
+
+        PersistentSessionDTO dto = mapperService.toDTO(session, PersistentSessionDTO.class);
+
+        return dataClient.savePersistentSession(dto)
+                .flatMap(resp -> {
+
+                    if (Objects.nonNull(resp.getData())) {
+                        PersistentSessionDTO respDTO = resp.getData();
+
+                        return Mono.just(mapperService.toEntity(respDTO, PersistentSession.class));
+                    } else {
+                        return Mono.empty();
+                    }
+                });
+    }
     public Mono<PersistentSession> getActiveSessionByTGUserId(Long id) {
 
         return dataClient.getTelegramSessionByTelegramUserId(id)
@@ -38,6 +73,10 @@ public class PersistentSessionService {
                     return Mono.just(persistentSessions.get(persistentSessions.size() - 1));
 
                 });
+    }
+    public Mono<Boolean> delete(Long id) {
+        return dataClient.deletePersistentSession(id)
+                .flatMap(resp -> Mono.just(resp.getData()));
     }
 
 }

@@ -3,6 +3,7 @@ package com.example.data.models.service;
 
 import com.example.data.models.entity.dto.jwt.JwtData;
 import com.example.data.models.entity.dto.jwt.JwtTelegramDataImpl;
+import com.example.utils.datetime.DateTimeService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -14,6 +15,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.function.Function;
 
@@ -24,13 +28,30 @@ public class JWTService {
 
     @Value("${token.signing.key}")
     private String key;
+    @Value("${default.utc.zone.id}")
+    private String zoneId;
+    private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DateTimeService.DATE_TIME_FORMAT);
 
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
-    public Date extractExpiration(String token) {
-        return extractClaim(token, Claims::getExpiration);
+    public LocalDateTime extractExpiration(String token) {
+
+        Date date = extractClaim(token, Claims::getExpiration);
+
+        return date
+                .toInstant().atZone(ZoneId.of(zoneId))
+                .toLocalDateTime();
+    }
+    public String extractExpirationByString(String token) {
+
+        Date date = extractClaim(token, Claims::getExpiration);
+
+        return date
+                .toInstant().atZone(ZoneId.of(zoneId))
+                .toLocalDateTime()
+                .format(formatter);
     }
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
@@ -44,7 +65,8 @@ public class JWTService {
                 .getPayload();
     }
     private Boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
+        return extractExpiration(token)
+                .isBefore(LocalDateTime.now(ZoneId.of(zoneId)));
     }
     public String generateToken(JwtData jwtData) {
         return createToken(jwtData);

@@ -1,17 +1,21 @@
 package com.example.telegram.constanst;
 
-import com.example.data.models.entity.VerificationCode;
+import com.example.data.models.entity.*;
 import com.example.data.models.enums.UserRoles;
-import com.example.data.models.entity.TelegramChat;
-import com.example.data.models.entity.TelegramUser;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.telegram.telegrambots.meta.api.objects.Chat;
-import org.telegram.telegrambots.meta.api.objects.User;
 
 import java.time.LocalDateTime;
 
 public class TelegramBotConstants {
 
-    public static final com.example.data.models.entity.User USER_FOR_TESTS = new com.example.data.models.entity.User(
+    public static final UserDetails USER_DETAILS_WITH_TOURIST_ROLE_FOR_TESTS = org.springframework.security.core.userdetails.User.builder()
+            .username("user")
+            .password("")
+            .roles(UserRoles.TOURIST.getRole())
+            .build();
+
+    public static final User USER_FOR_TESTS = new User(
             1L, "testUser", "test@exemple.com", UserRoles.ADMIN.getRole(), true, null, null
     );
 
@@ -21,13 +25,20 @@ public class TelegramBotConstants {
             .expiresAt(LocalDateTime.now())
             .build();
 
-    public static final User TELEGRAM_API_USER_FOR_TESTS = new User(12345L, "Elon", false, "Mask",
+    public static final org.telegram.telegrambots.meta.api.objects.User TELEGRAM_API_USER_FOR_TESTS =
+            new org.telegram.telegrambots.meta.api.objects.User(12345L, "Elon", false, "Mask",
             "max", "ru",
             null, null, null, null, null);
 
     public static final TelegramUser TELEGRAM_USER_FOR_TESTS = TelegramUser.builder()
             .id(12345L)
             .username("max")
+            .isActive(true)
+            .build();
+
+    public static final TelegramSession TELEGRAM_SESSION_FOR_TESTS = TelegramSession.builder()
+            .id(23456L)
+            .telegramUser(TELEGRAM_USER_FOR_TESTS)
             .isActive(true)
             .build();
 
