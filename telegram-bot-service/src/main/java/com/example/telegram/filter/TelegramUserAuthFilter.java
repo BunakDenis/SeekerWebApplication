@@ -33,15 +33,12 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
-@Slf4j
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class TelegramUserAuthFilter implements WebFilter {
 
 
-    private final TelegramUserService telegramUserService;
-    private final TelegramSessionService telegramSessionService;
-    private final UserService userService;
     private final AuthService authService;
     private final ApplicationFiltersService appFilterService;
     private final TelegramBotMessageSender sender;
@@ -62,11 +59,13 @@ public class TelegramUserAuthFilter implements WebFilter {
         log.debug("Request URI path = {}", path);
 
         return DataBufferUtils.join(request.getBody())
+                    //Базовая проверка запроса
                     .flatMap(buffer -> {
 
                         byte[] bytes;
                         StringBuffer body = new StringBuffer();
 
+                        //Записываем buffer body в StringBuffer
                         try {
                             bytes = buffer.asInputStream().readAllBytes();
                             ByteBuffer byteBuffer = ByteBuffer.wrap(bytes);
@@ -91,6 +90,7 @@ public class TelegramUserAuthFilter implements WebFilter {
                                     .build());
                         }
 
+                        //Проверяем body на наличие telegram_user_id
                         Long telegramUserId = appFilterService.extractTelegramUserId(body.toString());
                         if (Objects.isNull(telegramUserId)) {
                             return appFilterService.writeJsonErrorResponse(exchange.getResponse(),
@@ -101,6 +101,7 @@ public class TelegramUserAuthFilter implements WebFilter {
                         Long chatId = appFilterService.extractChatId(body.toString());
                         this.requestBody = body.toString();
                         this.chatId = chatId;
+
 
                         return authService.authenticate(telegramUserId)
                                 .flatMap(auth -> {
@@ -121,6 +122,7 @@ public class TelegramUserAuthFilter implements WebFilter {
 
                                 });
                     })
+                    //Если нет body возвращаем request с кодом 404
                     .switchIfEmpty(
                             appFilterService.writeJsonErrorResponse(exchange.getResponse(),
                                 HttpStatus.BAD_REQUEST,
@@ -134,6 +136,8 @@ public class TelegramUserAuthFilter implements WebFilter {
 
                         log.debug("Класс ошибки {}", ex.getClass());
 
+                        //Если persistent просрочена отправляем юзеру сообщения об необходимости повторной авторизации
+                        //При прочих ошибках отправляем SorryMsg
                         if (ex instanceof ExpiredJwtException) {
                             log.debug("Отправляю сообщение юзеру об необходимости повторной авторизации");
                             sender.sendMessage(

@@ -1,5 +1,6 @@
 package com.example.telegram.bot.service;
 
+import com.example.telegram.bot.message.TelegramBotMessageSender;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 /*
@@ -31,9 +32,11 @@ public class AuthService {
 
     private final UserService userService;
     private final TelegramSessionService telegramSessionService;
+    private final TelegramBotMessageSender sender;
 
 
     /**
+     * Авторизация юзера через TelegramUserAuthFilter
      * Помещает Authentication с нашим User в контекст реактивного потока.
      * Возвращает Mono<Authentication> который можно вписать в chain.filter(...).contextWrite(...)
      */
@@ -84,6 +87,14 @@ public class AuthService {
                     return Mono.just(auth);
 
                 });
+    }
+
+    /**
+     * Авторизация юзера в телеграм боте через команду "/authorize"
+     */
+    public Mono<Boolean> authorize(String email) {
+        return userService.checkUserInMysticSchoolDB(email)
+                .flatMap(resp -> Mono.just(resp.isFound()));
     }
 
     /**

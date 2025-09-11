@@ -34,6 +34,7 @@ import java.util.Map;
 @Slf4j
 public class TelegramSessionService {
 
+
     @Value("${default.utc.zone.id}")
     private String zoneId;
     @Value("${persistent.auth.expiration.time}")
@@ -124,7 +125,9 @@ public class TelegramSessionService {
                         return checkTransientSession(userDetails, tgSession);
                     }
                     return Mono.just(false);
-                });
+                })
+                .doOnError(err -> log.debug("Ошибка получения Telegram session {}", err.getMessage()))
+                .onErrorResume(err -> Mono.just(false));
     }
     private Mono<Boolean> checkPersistentSession(UserDetails userDetails, TelegramSession session) {
 

@@ -7,16 +7,12 @@ import com.example.data.models.entity.dto.telegram.*;
 import com.example.data.models.entity.dto.UserDTO;
 import com.example.data.models.entity.dto.request.ApiRequest;
 import com.example.data.models.entity.dto.response.ApiResponse;
-import com.example.data.models.enums.ResponseIncludeDataKeys;
 import com.example.data.models.exception.ApiException;
 import com.example.data.models.entity.TelegramChat;
 import com.example.telegram.bot.service.ModelMapperService;
-import io.swagger.annotations.Api;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
-import org.mockserver.serialization.model.VerificationDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
@@ -28,8 +24,6 @@ import static com.example.telegram.api.clients.DataProviderEndpointsConsts.*;
 
 import reactor.core.publisher.Mono;
 
-import java.security.Permissions;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -39,6 +33,10 @@ public class DataProviderClient {
     private String dataProviderURL;
     @Value("${data.provide.api.version}")
     private String apiVersion;
+    @Value("${api.key.header.name}")
+    private String apiKeyHeaderName;
+    @Value("${telegram.api.key}")
+    private String apiKey;
     private WebClient webClient;
     private final ModelMapperService mapperService;
 
@@ -51,6 +49,7 @@ public class DataProviderClient {
 
         this.webClient = WebClient.builder()
                 .baseUrl(baseURL)
+                .defaultHeader(apiKeyHeaderName, apiKey)
                 .filter(ExchangeFilterFunction.ofRequestProcessor(clientRequest -> {
                     log.debug("Request URL: {}", clientRequest.url());
                     return Mono.just(clientRequest);
@@ -228,13 +227,30 @@ public class DataProviderClient {
                 .bodyToMono(new ParameterizedTypeReference<>() {
                 });
     }
-    public Mono<ApiResponse<CheckUserResponse>> checkTelegramUserAuthentication(Long telegramUserId) {
+    public Mono<ApiResponse<CheckUserResponse>> checkUserAuthInMysticSchoolDbByTgUserId(Long telegramUserId) {
 
         StringBuilder endpoint = new StringBuilder(getApiUserEndpoint("check/auth/"));
         endpoint.append(telegramUserId);
 
         return webClient.get()
                 .uri(builder -> builder.path(endpoint.toString()).build())
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+                        response -> response.bodyToMono(String.class) // Можно прочитать тело ошибки
+                                .flatMap(errorBody -> {
+                                    log.debug("Получен ответ от Data provider service {}", errorBody);
+                                    return Mono.empty();
+                                }))
+                .bodyToMono(new ParameterizedTypeReference<>() {
+                });
+    }
+    public Mono<ApiResponse<CheckUserResponse>> checkUserAuthInMysticSchoolDbByUserEmail(String email) {
+
+        StringBuilder endpoint = new StringBuilder(getApiUserEndpoint("check/auth/"));
+
+        return webClient.get()
+                .uri(builder -> builder.path(endpoint.toString()).queryParam("email", email).build())
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),

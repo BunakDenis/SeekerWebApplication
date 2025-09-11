@@ -4,6 +4,7 @@ package com.example.database.api.controller;
 import com.example.data.models.entity.dto.UserDTO;
 import com.example.data.models.entity.dto.request.ApiRequest;
 import com.example.data.models.entity.dto.response.ApiResponse;
+import com.example.data.models.entity.dto.response.CheckUserResponse;
 import com.example.database.api.client.MysticSchoolClient;
 import com.example.database.entity.User;
 import com.example.database.service.ModelMapperService;
@@ -55,7 +56,7 @@ public class UserDataController {
 
         return ResponseEntity.status(result.getStatus()).body(result);
     }
-    @GetMapping("/user/get/id/{id}")
+    @GetMapping("/user/id/{id}")
     public ResponseEntity<ApiResponse<UserDTO>> getUser(
             @PathVariable("id") Long id
     ) {
@@ -67,7 +68,7 @@ public class UserDataController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @GetMapping("/user/get/username/{username}")
+    @GetMapping("/user/username/{username}")
     public ResponseEntity<ApiResponse<UserDTO>> getUserByUsername(
             @PathVariable("username") String username
     ) {
@@ -79,7 +80,7 @@ public class UserDataController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @GetMapping("/user/get/email/{email}")
+    @GetMapping("/user/email/{email}")
     public ResponseEntity<ApiResponse<UserDTO>> getUserByEmail(
             @PathVariable("email") String email
     ) {
@@ -91,7 +92,7 @@ public class UserDataController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @GetMapping("/user/get/telegram_user_id/{id}")
+    @GetMapping("/user/telegram_user_id/{id}")
     public ResponseEntity<ApiResponse<UserDTO>> getUserByTelegramUserId(
             @PathVariable("id") Long id
     ) {
@@ -103,7 +104,7 @@ public class UserDataController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @GetMapping("/user/user_details/get/telegram_user_id/{id}")
+    @GetMapping("/user/user_details/telegram_user_id/{id}")
     public ResponseEntity<ApiResponse<UserDTO>> getUserByTelegramUserIdWithUserDetails(
             @PathVariable("id") Long id
     ) {
@@ -115,8 +116,8 @@ public class UserDataController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @GetMapping("/user/telegram_user/get/telegram_user_id/{id}")
-    public ResponseEntity<ApiResponse<UserDTO>> getUserByTelegramUserIdWithTelegramUser(
+    @GetMapping("/user/telegram_user/telegram_user_id/{id}")
+    public ResponseEntity<ApiResponse<UserDTO>> getUserWithTelegramUserByTelegramUserId(
             @PathVariable("id") Long id
     ) {
 
@@ -127,7 +128,7 @@ public class UserDataController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @GetMapping("/user/full/get/telegram_user_id/{id}")
+    @GetMapping("/user/full/telegram_user_id/{id}")
     public ResponseEntity<ApiResponse<UserDTO>> getUserByTelegramUserIdFull(
             @PathVariable("id") Long id
     ) {
@@ -140,7 +141,7 @@ public class UserDataController {
     }
 
     @GetMapping("/user/check/auth/{id}")
-    public Mono<ResponseEntity<ApiResponse>> checkUserAuthentication(
+    public Mono<ResponseEntity<ApiResponse>> checkUserAuthenticationInMysticSchoolDbByTgUserId(
             @PathVariable("id") Long id
     ) {
 
@@ -158,6 +159,23 @@ public class UserDataController {
                     return ResponseEntity.status(HttpStatus.OK).body(
                             success(mysticSchoolResponse)
                     );
+                });
+    }
+
+    @GetMapping("/user/check/auth/")
+    public Mono<ResponseEntity<CheckUserResponse>> checkUserAuthenticationInMysticSchoolDbByUserEmail(
+            @RequestParam("email") String email
+    ) {
+
+        log.debug("Запрос на проверку авторизации юзера с email {}", email);
+
+        return mysticSchoolClient.checkUserAuthentication(email)
+                .flatMap(mysticSchoolResponse -> {
+
+                    log.debug(mysticSchoolResponse.toString());
+
+                    return Mono.just(ResponseEntity.status(HttpStatus.OK).body(mysticSchoolResponse));
+
                 });
     }
 

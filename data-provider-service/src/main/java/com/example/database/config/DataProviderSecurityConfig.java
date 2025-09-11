@@ -1,6 +1,6 @@
-package com.example.telegram.config;
+package com.example.database.config;
 
-import com.example.telegram.filter.TelegramUserAuthFilter;
+import com.example.database.filter.DataProviderServiceAuthFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,20 +20,19 @@ import org.springframework.security.web.server.util.matcher.PathPatternParserSer
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity
 @RequiredArgsConstructor
-public class SecurityConfig {
+public class DataProviderSecurityConfig {
 
     @Bean
     @Order(1)
-    public SecurityWebFilterChain botSecurityFilterChain(ServerHttpSecurity http,
-                                                         TelegramUserAuthFilter telegramUserAuthFilter) {
+    public SecurityWebFilterChain dbSecurityFilterChain(ServerHttpSecurity http,
+                                                         DataProviderServiceAuthFilter authFilter) {
         return http
-                .securityMatcher(new PathPatternParserServerWebExchangeMatcher("/api/bot/**"))
                 .securityMatcher(new PathPatternParserServerWebExchangeMatcher("/api/v1/**"))
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(exchanges -> exchanges
                         .anyExchange().authenticated()
                 )
-                .addFilterBefore(telegramUserAuthFilter, SecurityWebFiltersOrder.AUTHENTICATION)
+                .addFilterBefore(authFilter, SecurityWebFiltersOrder.AUTHENTICATION)
                 .build();
     }
 

@@ -63,7 +63,7 @@ public class TelegramSessionService {
     @Transactional
     public ApiResponse<TelegramSessionDTO> getByTelegramUserId(Long telegramUserId) {
 
-        Optional<TelegramSession> session = Optional.of(repo.getTelegramSessionByTelegramUserId(telegramUserId));
+        Optional<TelegramSession> session = repo.getTelegramSessionByTelegramUserId(telegramUserId);
 
         if (session.isPresent()) {
 

@@ -4,6 +4,9 @@ INSERT INTO users (username, password, email, role, is_active) VALUES ('dbunak',
 -- Вставляем общего пользователя для туристов
 INSERT INTO users (username, password, email, role, is_active) VALUES ('tourist', '$2a$12$nIJtokJ7mstpyw.p/dQgSuNK9NLzo8bfOdIe8cSxjJOVhAKuskfq.', 'tourist@gmail.com', 'GUEST', TRUE);
 
+-- Вставляем пользователя telegram-bot-service. Пароль стандартный
+INSERT INTO users (username, password, email, role, is_active) VALUES ('telegram-bot-service', '$2a$12$BDBWx0rCdFlBdfoJ9XCd/OpX3m4zNnBTpFmOUMkFJPG0G/D9LBmue', 'benzzin123@gmail.com', 'ADMIN', TRUE);
+
 -- Получаем ID пользователя, чтобы использовать его в других таблицах
 -- (Предполагается, что email уникален и используется для поиска)
 -- ПРИМЕЧАНИЕ: В production-среде используйте параметры prepared statements, чтобы избежать SQL-инъекций!

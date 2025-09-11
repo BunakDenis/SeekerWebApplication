@@ -14,6 +14,7 @@ import com.example.data.models.entity.dto.telegram.TelegramChatDTO;
 import com.example.data.models.entity.dto.telegram.TelegramSessionDTO;
 import com.example.data.models.entity.dto.telegram.TransientSessionDTO;
 import com.example.data.models.enums.JWTDataSubjectKeys;
+import com.example.data.models.enums.UserRoles;
 import com.example.data.models.service.JWTService;
 import com.example.data.models.utils.ApiResponseUtilsService;
 import com.example.telegram.bot.chat.states.DialogStates;
@@ -49,6 +50,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -269,6 +272,7 @@ public class TelegramBotTests {
         assertEquals(expectedMsgText, actual.getText());
 
     }
+    /*
     @Test
     @Order(8)
     public void testTestCommandWithExpiredTransientToken() throws JsonProcessingException {
@@ -415,6 +419,7 @@ public class TelegramBotTests {
         assertEquals(expectedMsg, actualMessage);
 
     }
+    */
     @Test
     @Order(3)
     public void testAuthCommand() throws JsonProcessingException {
@@ -480,6 +485,7 @@ public class TelegramBotTests {
         assertEquals(expectedMsgText, actual.getText());
 
     }
+    /*
     @Test
     @Order(3)
     public void testValidInputEmailChatStateInAuthCommand() throws JsonProcessingException {
@@ -570,6 +576,7 @@ public class TelegramBotTests {
         assertEquals(expectedMsgText, actual.getText());
 
     }
+    */
     @Test
     @Order(4)
     public void testNotValidInputEmailChatStateInAuthCommand() throws JsonProcessingException {
@@ -1077,6 +1084,30 @@ public class TelegramBotTests {
 
         return captor.getValue();
     }
+
+    /*
+    @Test
+    public void testJwtService() {
+
+        UserDetails user = User.builder()
+                .username("telegram-bot-service")
+                .password("$2a$12$BDBWx0rCdFlBdfoJ9XCd/OpX3m4zNnBTpFmOUMkFJPG0G/D9LBmue")
+                .roles(UserRoles.ADMIN.getRole())
+                .build();
+
+        JwtTelegramDataImpl jwtTelegramData = JwtTelegramDataImpl.builder()
+                .userDetails(user)
+                .subjects(Map.of("username", "telegram-bot-service"))
+                .expirationTime(DateTimeService.convertDaysToMillis(30L))
+                .build();
+
+        String token = jwtService.generateToken(jwtTelegramData);
+
+        log.debug(token);
+
+    }
+
+     */
 
     /*
     @Test

@@ -12,6 +12,7 @@ import com.example.data.models.entity.TelegramChat;
 import com.example.telegram.bot.keyboard.ReplyKeyboardMarkupProvider;
 import com.example.telegram.bot.message.MessageProvider;
 import com.example.telegram.bot.commands.Commands;
+import com.example.telegram.bot.service.AuthService;
 import com.example.telegram.bot.service.TelegramChatService;
 import com.example.telegram.bot.service.UserService;
 import com.example.telegram.bot.service.VerificationCodeService;
@@ -42,6 +43,7 @@ public class AuthCommandHandlerImpl implements CommandHandler {
 
     @Value("${telegram.bot.name}")
     private String botName;
+    private final AuthService authService;
     private final UserService userService;
     private final TelegramChatService chatService;
     private final VerificationCodeService verificationCodeService;
@@ -122,6 +124,24 @@ public class AuthCommandHandlerImpl implements CommandHandler {
                 return Mono.just(new SendMessage(String.valueOf(chatId), getNotValidEmailAddress(email)));
             }
 
+            log.debug("Метод emailCheckingStateHandler");
+
+            return authService.authorize(email)
+                    .flatMap(isFound -> isFound ?
+                                Mono.just(
+                                        new SendMessage(
+                                                String.valueOf(chatId),
+                                                "Поздравляю Вы зарегистрированы на сайте Школы \"Восходящий поток\""
+                                        )
+                                ) :
+                                Mono.just(
+                                        new SendMessage(
+                                                String.valueOf(chatId),
+                                                "Поздравляю Вы зарегистрированы на сайте Школы \"Восходящий поток\""
+                                        )
+                                )
+                    );
+/*
             // 2) Генерация и подготовка сообщений
             final String code = GenerationService.generateEmailVerificationCode();
 
@@ -167,6 +187,8 @@ public class AuthCommandHandlerImpl implements CommandHandler {
                     )
                     .thenReturn(okMsg)
                     .onErrorReturn(sorryMsg);
+
+ */
         });
     }
     private Mono<SendMessage> verificationCodeValidatingStateHandler(Update update, TelegramChat chat) {

@@ -2,6 +2,7 @@ package com.example.telegram.bot.service;
 
 import com.example.data.models.consts.DefaultEntityValuesConsts;
 import com.example.data.models.entity.dto.UserDetailsDTO;
+import com.example.data.models.entity.dto.response.CheckUserResponse;
 import com.example.data.models.enums.UserRoles;
 import com.example.data.models.entity.dto.UserDTO;
 import com.example.data.models.entity.dto.response.ApiResponse;
@@ -51,7 +52,6 @@ public class UserService implements ReactiveUserDetailsService {
                 .flatMap(resp -> Mono.just(mapperService.toEntity(resp.getData(), User.class)));
 
     }
-
     public Mono<User> update(User user) {
 
         if (Objects.isNull(user)) return Mono.empty();
@@ -92,6 +92,13 @@ public class UserService implements ReactiveUserDetailsService {
 
     public Mono<ApiResponse<UserDTO>> getUserByTelegramUserIdWithUserDetails(Long id) {
         return dataProviderClient.getUserByTelegramUserIdWithUserDetails(id);
+    }
+    public Mono<CheckUserResponse> checkUserInMysticSchoolDB(String email) {
+        return dataProviderClient.checkUserAuthInMysticSchoolDbByUserEmail(email)
+                .flatMap(resp -> Mono.just(resp.getData()))
+                .doOnError(err -> log.error("Ошибка проверки юзера по email=" + email +
+                        "\nТекст ошибки - {}", err.getMessage()))
+                .onErrorResume(err -> Mono.empty());
     }
 
     public Mono<Boolean> delete(Long id) {

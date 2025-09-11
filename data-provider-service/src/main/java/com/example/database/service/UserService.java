@@ -1,10 +1,12 @@
 package com.example.database.service;
 
+import com.example.data.models.consts.DefaultEntityValuesConsts;
 import com.example.data.models.entity.dto.UserDTO;
 import com.example.data.models.entity.dto.UserDetailsDTO;
 import com.example.data.models.entity.dto.response.ApiResponse;
 import com.example.data.models.enums.ResponseIncludeDataKeys;
 import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
+import com.example.data.models.enums.UserRoles;
 import com.example.data.models.exception.EntityNotFoundException;
 import com.example.data.models.exception.EntityNotSavedException;
 import com.example.data.models.utils.ApiResponseUtilsService;
@@ -15,7 +17,12 @@ import com.example.database.repo.telegram.UserRepo;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +34,7 @@ import static com.example.data.models.utils.ApiResponseUtilsService.*;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class UserService {
+public class UserService implements UserDetailsService {
 
     private final UserRepo repo;
 
@@ -155,5 +162,31 @@ public class UserService {
     public ApiResponse<Boolean> delete(Long id) {
         repo.deleteById(id);
         return ApiResponseUtilsService.success(true);
+    }
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+
+        log.debug("loadUserByUsername for username {}", username);
+
+        User user = new User();
+
+        ApiResponse<UserDTO> userDto = getUserByUsername(username);
+
+        log.debug(userDto.toString());
+
+        if (Objects.nonNull(userDto.getData())) user = mapper.toEntity(userDto.getData(), User.class);
+
+        return org.springframework.security.core.userdetails.User.builder()
+                .username(user.getUsername())
+                .password(user.getPassword())
+                .roles(user.getRole())
+                .build();
+    }
+    public UserDetails getDefaultUser() {
+        return org.springframework.security.core.userdetails.User.builder()
+                .username("user")
+                .password("")
+                .roles(UserRoles.TOURIST.getRole())
+                .build();
     }
 }

@@ -48,9 +48,10 @@ public class TelegramChatsService {
     @Transactional
     public ApiResponse<TelegramChatDTO> getTelegramChatByIdWithTelegramUser(Long id) {
 
-        List<TelegramChat> all = chatRepo.getAllById(id);
+        List<TelegramChat> all = chatRepo.findByTelegramUserIdWithTelegramUser(id);
 
         TelegramChat chat = all.get(all.size() - 1);
+        log.debug(chat.getTelegramUser().toString());
         TelegramUser telegramUser = chat.getTelegramUser();
         TelegramUserDTO telegramUserDTO = mapperService.toDTO(telegramUser, TelegramUserDTO.class);
 

@@ -37,6 +37,8 @@ public class TelegramBotReactiveHandler {
 
     public Mono<Boolean> handleUpdate(Update update) {
 
+        log.info("Метод handleUpdate");
+
         long chatId = UpdateUtilsService.getChatId(update);
 
         return telegramChatService.getTelegramChatByIdWithTelegramUser(chatId)
@@ -69,6 +71,9 @@ public class TelegramBotReactiveHandler {
     }
 
     private Mono<Boolean> handleMessage(Update update, TelegramChat lastChat) {
+
+        log.info("Метод handleMessage");
+
         Message message = update.getMessage();
 
         String msgText = message.getText();
