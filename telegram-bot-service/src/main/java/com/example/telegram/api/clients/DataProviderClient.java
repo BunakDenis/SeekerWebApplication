@@ -1,6 +1,7 @@
 package com.example.telegram.api.clients;
 
 
+import com.example.data.models.entity.TelegramUser;
 import com.example.data.models.entity.dto.VerificationCodeDTO;
 import com.example.data.models.entity.dto.response.CheckUserResponse;
 import com.example.data.models.entity.dto.telegram.*;
@@ -279,6 +280,36 @@ public class DataProviderClient {
                 .bodyToMono(new ParameterizedTypeReference<>() {
                 });
     }
+    public Mono<ApiResponse<TelegramUserDTO>> createTelegramUser(TelegramUserDTO dto) {
+
+        StringBuilder endpoint = new StringBuilder(getApiTelegramUserEndpoint("add/"));
+
+        ApiRequest request = new ApiRequest(dto);
+
+        return webClient.post()
+                .uri(endpoint.toString())
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<>() {
+                });
+    }
+    public Mono<ApiResponse<TelegramUserDTO>> updateTelegramUser(TelegramUserDTO dto) {
+
+        StringBuilder endpoint = new StringBuilder(getApiTelegramUserEndpoint("update/"));
+
+        ApiRequest request = new ApiRequest(dto);
+
+        return webClient.post()
+                .uri(endpoint.toString())
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<>() {
+                });
+    }
     public Mono<ApiResponse<TelegramUserDTO>> getTelegramUserById(Long id) {
 
         StringBuilder endpoint = new StringBuilder(getApiTelegramUserEndpoint(""));
@@ -294,6 +325,15 @@ public class DataProviderClient {
                                     log.debug("Получен ответ от Data provider service {}", errorBody);
                                     return Mono.empty();
                                 }))
+                .bodyToMono(new ParameterizedTypeReference<>() {
+                });
+    }
+    public Mono<ApiResponse<Boolean>> deleteTelegramUser(Long id) {
+
+        return webClient.post()
+                .uri(getApiTelegramUserEndpoint("delete/" + id))
+                .contentType(MediaType.APPLICATION_JSON)
+                .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<>() {
                 });
     }

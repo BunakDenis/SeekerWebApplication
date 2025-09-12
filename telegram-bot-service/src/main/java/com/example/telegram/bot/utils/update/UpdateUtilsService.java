@@ -2,6 +2,7 @@ package com.example.telegram.bot.utils.update;
 
 import lombok.Data;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
@@ -33,6 +34,15 @@ public class UpdateUtilsService {
         }
 
         return result.toString();
+    }
+    public static String getTelegramUsername(Update update) {
+
+        User telegramUser = getTelegramUser(update);
+
+        String userName = telegramUser.getUserName();
+
+        return userName.isEmpty() ? getTelegramUserFullName(update) : userName;
+
     }
     public static Long getChatId(Update update) {
         return update.getMessage().getChatId();

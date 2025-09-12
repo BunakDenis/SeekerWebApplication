@@ -121,13 +121,15 @@ public class TelegramSessionService {
                     TelegramSession tgSession = tuple.getT1();
                     Boolean isPrSessionExpired = tuple.getT2();
 
-                    if (!isPrSessionExpired) {
-                        return checkTransientSession(userDetails, tgSession);
-                    }
-                    return Mono.just(false);
-                })
+                    return Boolean.TRUE.equals(isPrSessionExpired) ?
+                            Mono.just(false) :
+                            checkTransientSession(userDetails, tgSession);
+                });
+        /*
                 .doOnError(err -> log.debug("Ошибка получения Telegram session {}", err.getMessage()))
                 .onErrorResume(err -> Mono.just(false));
+
+         */
     }
     private Mono<Boolean> checkPersistentSession(UserDetails userDetails, TelegramSession session) {
 

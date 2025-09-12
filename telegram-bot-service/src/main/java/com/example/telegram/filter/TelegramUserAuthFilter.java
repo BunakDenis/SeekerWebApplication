@@ -8,6 +8,8 @@ import com.example.data.models.exception.ExpiredTelegramSessionsException;
 import com.example.data.models.utils.ApiResponseUtilsService;
 import com.example.telegram.bot.message.TelegramBotMessageSender;
 import com.example.telegram.bot.service.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
+import org.telegram.telegrambots.meta.api.objects.Update;
 import reactor.core.publisher.Mono;
 
 
@@ -98,12 +101,21 @@ public class TelegramUserAuthFilter implements WebFilter {
                                     ApiResponseUtilsService.fail(RequestMessageProvider.REQUEST_BODY_IS_EMPTY));
                         }
 
+                        Update update = new Update();
+
+                        try {
+                            JsonNode jsonNode = objectMapper.readTree(body.toString());
+                            update = objectMapper.treeToValue(jsonNode, Update.class);
+                        } catch (JsonProcessingException e) {
+                            throw new RuntimeException(e);
+                        }
+
                         Long chatId = appFilterService.extractChatId(body.toString());
                         this.requestBody = body.toString();
                         this.chatId = chatId;
 
 
-                        return authService.authenticate(telegramUserId)
+                        return authService.authenticate(update)
                                 .flatMap(auth -> {
 
                                     SecurityContext emptyContext = SecurityContextHolder.createEmptyContext();

@@ -19,7 +19,7 @@ public class TelegramSession {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "telegram_user_id", referencedColumnName = "id", nullable = false)
     @ToString.Exclude
     private TelegramUser telegramUser;

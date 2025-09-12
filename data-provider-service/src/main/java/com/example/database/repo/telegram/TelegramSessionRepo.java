@@ -10,8 +10,7 @@ import java.util.Optional;
 public interface TelegramSessionRepo extends JpaRepository<TelegramSession, Long> {
 
     @Query("SELECT s FROM TelegramSession s " +
-            "JOIN s.telegramUser tu " +
-            "JOIN tu.user u " +
+            "JOIN FETCH s.telegramUser tu " +
             "WHERE tu.id = :telegramUserId")
     Optional<TelegramSession> getTelegramSessionByTelegramUserId(@Param("telegramUserId") Long telegramUserId);
 

@@ -33,10 +33,9 @@ import static com.example.data.models.enums.ResponseIncludeDataKeys.USER_DETAILS
 @Slf4j
 public class UserService implements ReactiveUserDetailsService {
 
+
     private final DataProviderClient dataProviderClient;
-
     private final ModelMapperService mapperService;
-
     private final ObjectMapper objectMapper;
 
 
@@ -67,11 +66,9 @@ public class UserService implements ReactiveUserDetailsService {
     public Mono<ApiResponse<UserDTO>> getUserById(Long id) {
         return dataProviderClient.getUserById(id);
     }
-
     public Mono<ApiResponse<UserDTO>> getUserByUsername(String username) {
         return dataProviderClient.getUserByUsername(username);
     }
-
     public Mono<User> getUserByEmail(String email) {
         return dataProviderClient.getUserByEmail(email)
                 .flatMap(resp -> {
@@ -81,15 +78,20 @@ public class UserService implements ReactiveUserDetailsService {
                     return Mono.just(User.builder().build());
                 });
     }
-
+    public Mono<User> getDefaultUser() {
+        return dataProviderClient.getUserByUsername(DefaultEntityValuesConsts.USER_USERNAME_DEFAULT)
+                .flatMap(resp -> Mono.just(
+                        mapperService.toEntity(resp.getData(), User.class)
+                        )
+                );
+    }
     public Mono<User> getUserByTelegramUserId(Long id) {
         return dataProviderClient.getUserByTelegramUserId(id)
                 .flatMap(resp -> Objects.nonNull(resp.getData()) ?
                             Mono.just(mapperService.toEntity(resp.getData(), User.class)) :
-                            Mono.just(new User())
+                            Mono.empty()
                 );
     }
-
     public Mono<ApiResponse<UserDTO>> getUserByTelegramUserIdWithUserDetails(Long id) {
         return dataProviderClient.getUserByTelegramUserIdWithUserDetails(id);
     }
@@ -100,12 +102,10 @@ public class UserService implements ReactiveUserDetailsService {
                         "\nТекст ошибки - {}", err.getMessage()))
                 .onErrorResume(err -> Mono.empty());
     }
-
     public Mono<Boolean> delete(Long id) {
         return dataProviderClient.deleteUserById(id)
                 .flatMap(resp -> Mono.just(resp.getData()));
     }
-
     public User toEntity(ApiResponse<UserDTO> dto) {
 
         UserDetails userDetails = new UserDetails();
@@ -182,8 +182,7 @@ public class UserService implements ReactiveUserDetailsService {
                             .build());
                 });
     }
-
-    public org.springframework.security.core.userdetails.UserDetails getDefaultUser() {
+    public org.springframework.security.core.userdetails.UserDetails getDefaultUserDetails() {
         return org.springframework.security.core.userdetails.User.builder()
                 .username("user")
                 .password("")

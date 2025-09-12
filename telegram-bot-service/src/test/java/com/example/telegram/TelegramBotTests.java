@@ -41,6 +41,7 @@ import org.junit.jupiter.api.*;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.mockserver.client.MockServerClient;
+import org.mockserver.mock.Expectation;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -272,7 +273,6 @@ public class TelegramBotTests {
         assertEquals(expectedMsgText, actual.getText());
 
     }
-    /*
     @Test
     @Order(8)
     public void testTestCommandWithExpiredTransientToken() throws JsonProcessingException {
@@ -287,12 +287,6 @@ public class TelegramBotTests {
         String requestBody = objectMapper.writeValueAsString(update);
 
         ApiResponse<TelegramChatDTO> telegramChatResponse = responses.get(TELEGRAM_CHAT.getKeyValue());
-
-        TelegramChatDTO telegramChatDTO = telegramChatResponse.getData();
-        telegramChatDTO.setUiElement(UiElements.COMMAND.getUiElement());
-        telegramChatDTO.setUiElementValue(Commands.START.getCommand());
-
-        telegramChatResponse.setData(telegramChatDTO);
 
         //When
         telegramUserAuthFilterMockRequests();
@@ -419,7 +413,6 @@ public class TelegramBotTests {
         assertEquals(expectedMsg, actualMessage);
 
     }
-    */
     @Test
     @Order(3)
     public void testAuthCommand() throws JsonProcessingException {
