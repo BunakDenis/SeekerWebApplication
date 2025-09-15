@@ -12,18 +12,17 @@ import lombok.*;
 @Table(name = "telegram_chats")
 public class TelegramChat {
 
+
     @Id
     private Long id;
-
+    @Column(name = "telegram_chat_id")
+    private Long telegramChatId;
     @Column(name = "ui_element")
     private String uiElement;
-
     @Column(name = "ui_element_value")
     private String uiElementValue;
-
     @Column(name = "chat_state")
     private String chatState;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "telegram_user_id", nullable = false)
     @JsonIgnore
@@ -33,10 +32,12 @@ public class TelegramChat {
     public String toString() {
         return "TelegramChat{" +
                 "id=" + id +
+                "telegramChatId=" + telegramChatId +
                 ", uiElement='" + uiElement + '\'' +
                 ", uiElementValue='" + uiElementValue + '\'' +
                 ", chatState='" + chatState + '\'' +
                 ", telegramUserId=" + telegramUser.getId() +
                 '}';
     }
+
 }

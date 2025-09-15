@@ -24,7 +24,7 @@ BEGIN
     INSERT INTO telegram_users (id, user_id, username, is_active) VALUES (465963651, user_id, 'dbunakns', 'TRUE');
 
     -- Вставляем данные о чате Telegram
-    INSERT INTO telegram_chats (id, telegram_user_id, ui_element, ui_element_value, chat_state)
+    INSERT INTO telegram_chats (telegram_chat_id, telegram_user_id, ui_element, ui_element_value, chat_state)
     VALUES (465963651, 465963651, '', '', '');
 
 END $$;

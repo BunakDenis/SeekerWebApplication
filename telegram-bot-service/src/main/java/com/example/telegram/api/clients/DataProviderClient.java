@@ -11,6 +11,7 @@ import com.example.data.models.entity.dto.response.ApiResponse;
 import com.example.data.models.exception.ApiException;
 import com.example.data.models.entity.TelegramChat;
 import com.example.telegram.bot.service.ModelMapperService;
+import io.swagger.annotations.Api;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +30,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 @Slf4j
 public class DataProviderClient {
+
 
     @Value("${data.provide.api.url}")
     private String dataProviderURL;
@@ -52,6 +54,7 @@ public class DataProviderClient {
                 .baseUrl(baseURL)
                 .defaultHeader(apiKeyHeaderName, apiKey)
                 .filter(ExchangeFilterFunction.ofRequestProcessor(clientRequest -> {
+                    log.debug("Request method: {}", clientRequest.method());
                     log.debug("Request URL: {}", clientRequest.url());
                     return Mono.just(clientRequest);
                 }))
@@ -367,6 +370,23 @@ public class DataProviderClient {
                 .bodyToMono(new ParameterizedTypeReference<>() {
                 });
     }
+    public Mono<ApiResponse<TelegramChatDTO>> updateTelegramChat(TelegramChatDTO dto) {
+
+        StringBuffer endpoint = new StringBuffer(getApiChatEndpoint("update"));
+        ApiRequest<TelegramChatDTO> request = new ApiRequest<>(dto);
+
+        log.debug("Отправляю запрос к Data provide service для обновления информации о чате {}", dto);
+        log.debug("Отправка на endpoint {}", endpoint);
+
+        return webClient.post()
+                .uri(endpoint.toString())
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<>() {
+                });
+    }
     public Mono<ApiResponse<TelegramChatDTO>> getTelegramChat(Long id) {
 
         StringBuilder endpoint = new StringBuilder(getApiChatEndpoint(""));
@@ -399,6 +419,28 @@ public class DataProviderClient {
 
         return webClient.get()
                 .uri(endpoint.toString()).accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<>() {
+                });
+    }
+    public Mono<ApiResponse<TelegramChatDTO>> getTelegramChatByTelegramUserId(Long id) {
+
+        StringBuilder endpoint = new StringBuilder(getApiChatEndpoint("telegram_user_id/"));
+        endpoint.append(id);
+
+        log.debug("Отправляю запрос к Data provide service для получения чата с телеграм юзером {}", id);
+        log.debug("Отправка на endpoint {}", endpoint);
+
+        return webClient.get()
+                .uri(endpoint.toString()).accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<>() {
+                });
+    }
+    public Mono<ApiResponse<Boolean>> deleteTelegramChat(Long id) {
+        return webClient.post()
+                .uri(getApiChatEndpoint("delete/" + id))
+                .contentType(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<>() {
                 });

@@ -5,11 +5,11 @@ import lombok.Data;
 @Data
 public class EntityNotFoundException extends IllegalArgumentException{
 
-    private Object object;
+    private String entityClassName;
 
     public EntityNotFoundException(String msg, Object object) {
         super(msg);
-        this.object = object;
+        this.entityClassName = object.getClass().getName();
     }
 
     /*

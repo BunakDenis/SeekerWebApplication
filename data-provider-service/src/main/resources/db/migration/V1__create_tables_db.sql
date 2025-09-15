@@ -42,7 +42,8 @@ CREATE TABLE IF NOT EXISTS telegram_users (
 
 -- Информация о чате Telegram
 CREATE TABLE IF NOT EXISTS telegram_chats (
-    id BIGINT PRIMARY KEY, -- Telegram chat id
+    id BIGSERIAL PRIMARY KEY,
+    telegram_chat_id BIGINT,
     telegram_user_id BIGINT REFERENCES telegram_users(id) NOT NULL,
     ui_element VARCHAR(255),
     ui_element_value VARCHAR(255),

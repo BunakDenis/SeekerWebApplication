@@ -24,36 +24,8 @@ public class TelegramChatDataController {
     private final ModelMapperService mapperService;
 
 
-    @GetMapping("/chat/{id}")
-    public ResponseEntity<ApiResponse<TelegramChatDTO>> getById(
-            @PathVariable("id") Long chatId
-    ) {
-
-        log.debug("Запрос на получения чатов по id {}", chatId);
-
-        ApiResponse<TelegramChatDTO> response = chatsService.getTelegramChatById(chatId);
-
-        log.debug("Ответ {}", response);
-
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-
-    @GetMapping("/chat/telegram_user/{id}")
-    public ResponseEntity<ApiResponse<TelegramChatDTO>> getWithTelegramUser(
-            @PathVariable("id") Long chatId
-    ) {
-
-        log.debug("Запрос на получения чатов с телеграм юзером по id {}", chatId);
-
-        ApiResponse<TelegramChatDTO> response = chatsService.getTelegramChatByIdWithTelegramUser(chatId);
-
-        log.debug("Ответ {}", response);
-
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-
     @PostMapping(path = {"/chat/add/", "/chat/add"})
-    public ResponseEntity<ApiResponse<TelegramChatDTO>> addChat(
+    public ResponseEntity<ApiResponse<TelegramChatDTO>> save(
             @RequestBody ApiRequest<TelegramChatDTO> request
     ) {
 
@@ -73,5 +45,70 @@ public class TelegramChatDataController {
         log.debug("Ответ {}", response);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+    @PostMapping(path = {"/chat/update/", "/chat/updates"})
+    public ResponseEntity<ApiResponse<TelegramChatDTO>> update(
+            @RequestBody ApiRequest<TelegramChatDTO> request
+    ) {
+
+        log.debug("Запрос на обновление чата {}", request);
+
+        TelegramChatDTO data = request.getData();
+
+        TelegramChat chat = mapperService.toEntity(data, TelegramChat.class);
+
+        ApiResponse<TelegramChatDTO> response = chatsService.create(chat);
+
+        log.debug("Ответ {}", response);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+    @GetMapping("/chat/{id}")
+    public ResponseEntity<ApiResponse<TelegramChatDTO>> getById(
+            @PathVariable("id") Long id
+    ) {
+
+        log.debug("Запрос на получения чатов по id {}", id);
+
+        ApiResponse<TelegramChatDTO> response = chatsService.getTelegramChatById(id);
+
+        log.debug("Ответ {}", response);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+    @GetMapping("/chat/telegram_user/{id}")
+    public ResponseEntity<ApiResponse<TelegramChatDTO>> getWithTelegramUser(
+            @PathVariable("id") Long id
+    ) {
+
+        log.debug("Запрос на получения чатов с телеграм юзером по id {}", id);
+
+        ApiResponse<TelegramChatDTO> response = chatsService.getTelegramChatByIdWithTelegramUser(id);
+
+        log.debug("Ответ {}", response);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+    @GetMapping("/chat/telegram_user_id/{telegram_user_id}")
+    public ResponseEntity<ApiResponse<TelegramChatDTO>> getLastByTelegramUserId(
+            @PathVariable("telegram_user_id") Long id
+    ) {
+
+        log.debug("Запрос на получения чатов по telegram_user_id {}", id);
+
+        ApiResponse<TelegramChatDTO> response = chatsService.getTelegramChatByTelegramUserId(id);
+
+        log.debug("Ответ {}", response);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+    @PostMapping("/chat/delete/")
+    public ResponseEntity<ApiResponse<Boolean>> delete(
+            @PathVariable("id") Long id
+    ) {
+
+        ApiResponse<Boolean> response = chatsService.delete(id);
+
+        return ResponseEntity.status(response.getStatus()).body(response);
     }
 }

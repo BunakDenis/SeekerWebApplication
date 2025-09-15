@@ -63,28 +63,32 @@ public class UserService implements ReactiveUserDetailsService {
                 .flatMap(resp -> Mono.just(mapperService.toEntity(resp.getData(), User.class)));
 
     }
+
     public Mono<ApiResponse<UserDTO>> getUserById(Long id) {
         return dataProviderClient.getUserById(id);
     }
-    public Mono<ApiResponse<UserDTO>> getUserByUsername(String username) {
-        return dataProviderClient.getUserByUsername(username);
+
+    public Mono<User> getUserByUsername(String username) {
+        return dataProviderClient.getUserByUsername(username)
+                .flatMap(resp -> Mono.just(mapperService.toEntity(resp.getData(), User.class)));
     }
+
     public Mono<User> getUserByEmail(String email) {
         return dataProviderClient.getUserByEmail(email)
-                .flatMap(resp -> {
-                    if (resp.getStatus().equals(HttpStatus.OK)) {
-                        return Mono.just(mapperService.toEntity(resp.getData(), User.class));
-                    }
-                    return Mono.just(User.builder().build());
-                });
+                .flatMap(resp -> Objects.nonNull(resp.getData()) ?
+                        Mono.just(mapperService.toEntity(resp.getData(), User.class)) :
+                        Mono.just(User.builder().build())
+                );
     }
+
     public Mono<User> getDefaultUser() {
         return dataProviderClient.getUserByUsername(DefaultEntityValuesConsts.USER_USERNAME_DEFAULT)
                 .flatMap(resp -> Mono.just(
-                        mapperService.toEntity(resp.getData(), User.class)
+                                mapperService.toEntity(resp.getData(), User.class)
                         )
                 );
     }
+
     public Mono<User> getUserByTelegramUserId(Long id) {
         return dataProviderClient.getUserByTelegramUserId(id)
                 .flatMap(resp -> Objects.nonNull(resp.getData()) ?
@@ -97,9 +101,14 @@ public class UserService implements ReactiveUserDetailsService {
     }
     public Mono<CheckUserResponse> checkUserInMysticSchoolDB(String email) {
         return dataProviderClient.checkUserAuthInMysticSchoolDbByUserEmail(email)
-                .flatMap(resp -> Mono.just(resp.getData()))
+                .flatMap(resp -> {
+
+                    log.debug("Response: {}", resp);
+
+                    return Mono.just(resp.getData());
+                })
                 .doOnError(err -> log.error("Ошибка проверки юзера по email=" + email +
-                        "\nТекст ошибки - {}", err.getMessage()))
+                        "\nТекст ошибки - {}", err.getMessage(), err))
                 .onErrorResume(err -> Mono.empty());
     }
     public Mono<Boolean> delete(Long id) {
@@ -158,28 +167,17 @@ public class UserService implements ReactiveUserDetailsService {
     @Override
     public Mono<org.springframework.security.core.userdetails.UserDetails> findByUsername(String username) {
         return getUserByUsername(username)
-                .flatMap(resp -> {
+                .flatMap(user -> {
 
-                    if (Objects.nonNull(resp)) {
+                    log.debug("Класс UserService, метод findByUsername, user = {}", user);
 
-                        User user = mapperService.toEntity(resp.getData(), User.class);
-
-                        log.debug("Класс UserService, метод findByUsername, user = {}", user);
-
-                        return Mono.just(
-                                org.springframework.security.core.userdetails.User.builder()
-                                        .username(user.getUsername())
-                                        .password("")
-                                        .roles(user.getRole())
-                                        .build()
-                        );
-                    }
-
-                    return Mono.just(org.springframework.security.core.userdetails.User.builder()
-                            .username(DefaultEntityValuesConsts.USER_USERNAME_DEFAULT)
-                            .password("")
-                            .roles(UserRoles.TOURIST.getRole())
-                            .build());
+                    return Mono.just(
+                            org.springframework.security.core.userdetails.User.builder()
+                                    .username(user.getUsername())
+                                    .password("")
+                                    .roles(user.getRole())
+                                    .build()
+                    );
                 });
     }
     public org.springframework.security.core.userdetails.UserDetails getDefaultUserDetails() {

@@ -40,6 +40,15 @@ public class TelegramChatService {
                     }
                 });
     }
+    public Mono<TelegramChat> update(TelegramChat chat) {
+
+        TelegramChatDTO dto = mapperService.toDTO(chat, TelegramChatDTO.class);
+
+        return dataProviderClient.updateTelegramChat(dto)
+                .flatMap(resp -> Objects.nonNull(resp.getData()) ? Mono.just(mapperService.toEntity(resp.getData(), TelegramChat.class)) :
+                    Mono.empty()
+                );
+    }
     public Mono<TelegramChat> getTelegramChatById(Long id) {
 
         return dataProviderClient.getTelegramChat(id)
@@ -52,7 +61,6 @@ public class TelegramChatService {
                 });
 
     }
-
     public Mono<TelegramChat> getTelegramChatByIdWithTelegramUser(Long id) {
 
         return dataProviderClient.getTelegramChatWithTelegramUser(id)
@@ -68,7 +76,20 @@ public class TelegramChatService {
                 });
 
     }
-
+    public Mono<TelegramChat> getTelegramChatByTelegramUserId(Long id) {
+        return dataProviderClient.getTelegramChatByTelegramUserId(id)
+                .flatMap(resp -> Objects.nonNull(resp.getData()) ?
+                        Mono.just(
+                                mapperService.toEntity(resp.getData(), TelegramChat.class)
+                        ) :
+                        Mono.empty());
+    }
+    public Mono<Boolean> delete(Long id) {
+        return dataProviderClient.deleteTelegramChat(id)
+                .flatMap(resp -> Objects.nonNull(resp.getData()) ?
+                        Mono.just(resp.getData()) :
+                        Mono.empty());
+    }
     public TelegramChat toEntity(ApiResponse<TelegramChatDTO> respWithDto) {
 
         TelegramChatDTO dto = respWithDto.getData();

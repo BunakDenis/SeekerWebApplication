@@ -1,39 +1,58 @@
 package com.example.telegram.exception;
 
 
+import com.example.data.models.consts.WarnMessageProvider;
 import com.example.data.models.entity.dto.response.ApiResponse;
-import com.example.data.models.exception.ApiException;
-import com.example.utils.text.ExceptionServiceUtils;
-import lombok.extern.log4j.Log4j2;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpStatus;
+import com.example.telegram.bot.message.TelegramBotMessageSender;
+import com.example.telegram.bot.utils.update.UpdateUtilsService;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.web.WebProperties;
+import org.springframework.boot.autoconfigure.web.reactive.error.AbstractErrorWebExceptionHandler;
+import org.springframework.boot.web.reactive.error.ErrorAttributes;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.reactive.function.client.WebClientException;
-import org.springframework.web.reactive.function.client.WebClientRequestException;
+import org.springframework.http.codec.ServerCodecConfigurer;
+import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.server.*;
+import org.telegram.telegrambots.meta.api.objects.Update;
+import reactor.core.publisher.Mono;
 
-@Order(Ordered.HIGHEST_PRECEDENCE)
-@ControllerAdvice
-@Log4j2
-public class GlobalExceptionHandler {
+//@Component
+@Slf4j
+public class GlobalExceptionHandler extends AbstractErrorWebExceptionHandler {
 
 
-    @ExceptionHandler(ApiException.class)
-    protected ApiResponse apiExceptionHandler(Exception e) {
-        return ApiResponse.builder()
-                .message(e.getMessage())
-                .debugMsg(ExceptionServiceUtils.stackTraceToString(e))
-                .build();
+    private TelegramBotMessageSender sender;
+
+    public GlobalExceptionHandler(ErrorAttributes errorAttributes,
+                                  WebProperties.Resources resources,
+                                  ApplicationContext applicationContext,
+                                  ServerCodecConfigurer codecConfigurer,
+                                  TelegramBotMessageSender sender) {
+        super(errorAttributes, resources, applicationContext);
+        super.setMessageWriters(codecConfigurer.getWriters());
+        super.setMessageReaders(codecConfigurer.getReaders());
+        this.sender = sender;
     }
 
-    @ExceptionHandler(Exception.class)
-    protected ApiResponse notSupportedExceptionHandler(Exception e) {
-
-        log.error("Неизвестная ошибка {}", e);
-
-        return ApiResponse.builder().message(e.getMessage()).build();
+    @Override
+    protected RouterFunction<ServerResponse> getRoutingFunction(ErrorAttributes errorAttributes) {
+        return RouterFunctions.route(RequestPredicates.all(), this::renderErrorResponse);
     }
 
+    private Mono<ServerResponse> renderErrorResponse(ServerRequest request) {
+
+        log.error("Global error handler поймал исключение для {}", request.path());
+
+        return request.bodyToMono(Update.class)
+                .flatMap(upd -> {
+
+                    log.debug(upd.toString());
+
+                    return Mono.just(upd);
+                })
+                .then(ServerResponse.ok().bodyValue("Извините, произошла ошибка. Повторите запрос позже."));
+    }
 }

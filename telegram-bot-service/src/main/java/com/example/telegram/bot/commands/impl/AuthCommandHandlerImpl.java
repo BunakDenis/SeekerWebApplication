@@ -12,10 +12,7 @@ import com.example.data.models.entity.TelegramChat;
 import com.example.telegram.bot.keyboard.ReplyKeyboardMarkupProvider;
 import com.example.telegram.bot.message.MessageProvider;
 import com.example.telegram.bot.commands.Commands;
-import com.example.telegram.bot.service.AuthService;
-import com.example.telegram.bot.service.TelegramChatService;
-import com.example.telegram.bot.service.UserService;
-import com.example.telegram.bot.service.VerificationCodeService;
+import com.example.telegram.bot.service.*;
 import com.example.telegram.bot.utils.update.UpdateUtilsService;
 import com.example.utils.generator.GenerationService;
 import com.example.utils.sender.EmailService;
@@ -45,6 +42,7 @@ public class AuthCommandHandlerImpl implements CommandHandler {
     private String botName;
     private final AuthService authService;
     private final UserService userService;
+    private final TelegramUserService telegramUserService;
     private final TelegramChatService chatService;
     private final VerificationCodeService verificationCodeService;
     private final EmailService emailService;
@@ -114,6 +112,7 @@ public class AuthCommandHandlerImpl implements CommandHandler {
 
     }
     private Mono<SendMessage> emailCheckingStateHandler(Update update, TelegramChat chat) {
+
         final long chatId = UpdateUtilsService.getChatId(update);
         final Long tgUserId = UpdateUtilsService.getTelegramUserId(update);
         final String email = UpdateUtilsService.getMessageText(update);
@@ -127,20 +126,20 @@ public class AuthCommandHandlerImpl implements CommandHandler {
             log.debug("Метод emailCheckingStateHandler");
 
             return authService.authorize(email)
-                    .flatMap(isFound -> isFound ?
-                                Mono.just(
-                                        new SendMessage(
-                                                String.valueOf(chatId),
-                                                "Поздравляю Вы зарегистрированы на сайте Школы \"Восходящий поток\""
-                                        )
-                                ) :
-                                Mono.just(
-                                        new SendMessage(
-                                                String.valueOf(chatId),
-                                                "Поздравляю Вы зарегистрированы на сайте Школы \"Восходящий поток\""
-                                        )
-                                )
-                    );
+                    .flatMap(isFound -> {
+
+                        if (isFound) {
+                            return userService.getUserByEmail(email)
+                                    .flatMap(user -> userService.findByUsername(user.getUsername()))
+                                    .switchIfEmpty(
+                                            userService.getDefaultUser()
+                                                    .flatMap(user -> Mono.just(userService.getDefaultUserDetails()))
+                                    )
+                                    .flatMap(userDetails -> Mono.just(new SendMessage("11","11"))
+                                    );
+                        }
+                        return Mono.just(new SendMessage("11","11"));
+                    });
 /*
             // 2) Генерация и подготовка сообщений
             final String code = GenerationService.generateEmailVerificationCode();

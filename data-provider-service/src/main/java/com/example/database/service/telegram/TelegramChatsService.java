@@ -1,5 +1,6 @@
 package com.example.database.service.telegram;
 
+import com.example.data.models.consts.WarnMessageProvider;
 import com.example.data.models.entity.dto.telegram.TelegramChatDTO;
 import com.example.data.models.entity.dto.response.ApiResponse;
 import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
@@ -10,6 +11,7 @@ import com.example.database.service.ModelMapperService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +20,7 @@ import static com.example.data.models.utils.ApiResponseUtilsService.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +37,16 @@ public class TelegramChatsService {
         TelegramChatDTO dto = mapperService.toDTO(savedChat, TelegramChatDTO.class);
 
         return success(HttpStatus.CREATED, dto);
+    }
+    public ApiResponse<TelegramChatDTO> update(TelegramUserDTO dto) {
+        TelegramChat telegramChat = mapperService.toEntity(dto, TelegramChat.class);
+
+        ApiResponse<TelegramChatDTO> response = create(telegramChat);
+
+        response.setStatus(HttpStatus.OK);
+
+        return response;
+
     }
     public ApiResponse<TelegramChatDTO> getTelegramChatById(Long id) {
 
@@ -65,6 +78,13 @@ public class TelegramChatsService {
 
         return response;
     }
+    public ApiResponse<TelegramChatDTO> getTelegramChatByTelegramUserId(Long id) {
+
+        TelegramChat chat = chatRepo.findLastByTelegramUserIdOrderById(id).get();
+
+        return success(mapperService.toDTO(chat, TelegramChatDTO.class));
+
+    }
     public ApiResponse<TelegramChatDTO> getAllTelegramChatById(Long id) {
 
         List<TelegramChatDTO> dtoList = new ArrayList<>();
@@ -76,6 +96,12 @@ public class TelegramChatsService {
         response.addIncludeListObjects("telegram_chat", chats);
 
         return response;
+    }
+    public ApiResponse<Boolean> delete(Long id) {
+        chatRepo.deleteById(id);
+
+        return success(true);
+
     }
 
 }
