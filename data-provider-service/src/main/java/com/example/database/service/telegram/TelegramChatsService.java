@@ -1,17 +1,17 @@
 package com.example.database.service.telegram;
 
-import com.example.data.models.consts.WarnMessageProvider;
+import com.example.data.models.consts.ResponseMessageProvider;
 import com.example.data.models.entity.dto.telegram.TelegramChatDTO;
 import com.example.data.models.entity.dto.response.ApiResponse;
 import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
+import com.example.data.models.enums.ResponseIncludeDataKeys;
+import com.example.data.models.utils.ApiResponseUtilsService;
 import com.example.database.entity.TelegramChat;
 import com.example.database.entity.TelegramUser;
 import com.example.database.repo.telegram.TelegramChatRepo;
 import com.example.database.service.ModelMapperService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -48,39 +48,60 @@ public class TelegramChatsService {
         return response;
 
     }
-    public ApiResponse<TelegramChatDTO> getTelegramChatById(Long id) {
+    public ApiResponse getTelegramChatById(Long id) {
 
-        List<TelegramChat> all = chatRepo.getAllById(id);
+        Optional<TelegramChat> findChat = chatRepo.findFirstByIdOrderByIdDesc(id);
 
-        TelegramChat chat = all.get(all.size() - 1);
+        if (findChat.isPresent()) {
 
-        TelegramChatDTO dto = mapperService.toDTO(chat, TelegramChatDTO.class);
+            TelegramChat chat = findChat.get();
+            TelegramChatDTO telegramChatDTO = mapperService.toDTO(chat, TelegramChatDTO.class);
+            TelegramUser telegramUser = chat.getTelegramUser();
+            TelegramUserDTO telegramUserDTO = mapperService.toDTO(telegramUser, TelegramUserDTO.class);
 
-        return success(dto);
+            ApiResponse<TelegramChatDTO> response = success(telegramChatDTO);
+
+            response.addIncludeObject(ResponseIncludeDataKeys.TELEGRAM_USER.getKeyValue(), telegramUserDTO);
+
+            return response;
+        }
+
+        return fail(ResponseMessageProvider.getEntityNotFoundMessage(new TelegramChat()));
     }
-    @Transactional
-    public ApiResponse<TelegramChatDTO> getTelegramChatByIdWithTelegramUser(Long id) {
+    public ApiResponse getTelegramChatByTelegramUserIdWithTelegramUser(Long id) {
 
-        List<TelegramChat> all = chatRepo.findByTelegramUserIdWithTelegramUser(id);
+        log.debug("Метод getTelegramChatByIdWithTelegramUser {}", id);
 
-        TelegramChat chat = all.get(all.size() - 1);
-        log.debug(chat.getTelegramUser().toString());
-        TelegramUser telegramUser = chat.getTelegramUser();
-        TelegramUserDTO telegramUserDTO = mapperService.toDTO(telegramUser, TelegramUserDTO.class);
+        Optional<TelegramChat> findChat = chatRepo.findFirstByTelegramUserIdOrderByIdDesc(id);
 
-        log.debug("Метод getTelegramChatById, telegramUser = {}", telegramUser);
+        log.debug("findChat.isPresent() = {}", findChat.isPresent());
 
-        TelegramChatDTO dto = mapperService.toDTO(chat, TelegramChatDTO.class);
+        if (findChat.isPresent()) {
 
-        ApiResponse<TelegramChatDTO> response = success(dto);
+            TelegramChat chat = findChat.get();
 
-        response.addIncludeObject("telegram_user", telegramUserDTO);
+            log.debug(chat.getTelegramUser().toString());
 
-        return response;
+            TelegramUser telegramUser = chat.getTelegramUser();
+            TelegramUserDTO telegramUserDTO = mapperService.toDTO(telegramUser, TelegramUserDTO.class);
+
+            log.debug("Метод getTelegramChatByTelegramUserId, telegramUser = {}", telegramUser);
+
+            TelegramChatDTO dto = mapperService.toDTO(chat, TelegramChatDTO.class);
+
+            ApiResponse<TelegramChatDTO> response = success(dto);
+
+            response.addIncludeObject("telegram_user", telegramUserDTO);
+
+            return response;
+        }
+
+        return ApiResponseUtilsService.fail("Telegram chat of telegram user with id = " + id + ", not found");
+
     }
     public ApiResponse<TelegramChatDTO> getTelegramChatByTelegramUserId(Long id) {
 
-        TelegramChat chat = chatRepo.findLastByTelegramUserIdOrderById(id).get();
+        TelegramChat chat = chatRepo.findFirstByTelegramUserIdOrderByIdDesc(id).get();
 
         return success(mapperService.toDTO(chat, TelegramChatDTO.class));
 

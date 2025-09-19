@@ -31,7 +31,7 @@ public class UserDataController {
     private final ModelMapperService mapperService;
 
     @PostMapping("/user/add/")
-    public ResponseEntity<ApiResponse<UserDTO>> createUser(
+    public ResponseEntity<ApiResponse<UserDTO>> save(
             @RequestBody ApiResponse<UserDTO> request
     ) {
         UserDTO dto = request.getData();
@@ -44,7 +44,7 @@ public class UserDataController {
         return ResponseEntity.status(result.getStatus()).body(result);
     }
     @PostMapping("/user/update/")
-    public ResponseEntity<ApiResponse<UserDTO>> updateUser(
+    public ResponseEntity<ApiResponse<UserDTO>> update(
             @RequestBody ApiRequest<UserDTO> request
     ) {
         UserDTO dto = request.getData();
@@ -65,7 +65,7 @@ public class UserDataController {
 
         ApiResponse<UserDTO> response = userService.getUserById(id);
 
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.status(response.getStatus()).body(response);
     }
 
     @GetMapping("/user/username/{username}")

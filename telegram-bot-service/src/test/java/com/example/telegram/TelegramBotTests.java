@@ -1,6 +1,6 @@
 package com.example.telegram;
 
-import com.example.data.models.consts.RequestMessageProvider;
+import com.example.data.models.consts.ResponseMessageProvider;
 import com.example.data.models.consts.WarnMessageProvider;
 import com.example.data.models.entity.PersistentSession;
 import com.example.data.models.entity.TransientSession;
@@ -14,7 +14,6 @@ import com.example.data.models.entity.dto.telegram.TelegramChatDTO;
 import com.example.data.models.entity.dto.telegram.TelegramSessionDTO;
 import com.example.data.models.entity.dto.telegram.TransientSessionDTO;
 import com.example.data.models.enums.JWTDataSubjectKeys;
-import com.example.data.models.enums.UserRoles;
 import com.example.data.models.service.JWTService;
 import com.example.data.models.utils.ApiResponseUtilsService;
 import com.example.telegram.bot.chat.states.DialogStates;
@@ -23,10 +22,8 @@ import com.example.telegram.bot.commands.Commands;
 import com.example.telegram.bot.message.MessageProvider;
 import com.example.telegram.bot.message.TelegramBotMessageSender;
 import com.example.telegram.bot.service.ModelMapperService;
-import com.example.telegram.bot.service.TelegramSessionService;
 import com.example.telegram.bot.utils.update.UpdateUtilsService;
 import com.example.utils.datetime.DateTimeService;
-import com.example.utils.file.loader.EnvLoader;
 import com.example.utils.generator.GenerationService;
 import com.example.utils.sender.EmailService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -34,16 +31,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import io.github.cdimascio.dotenv.Dotenv;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.mockserver.client.MockServerClient;
-import org.mockserver.mock.Expectation;
-import org.mockserver.model.HttpRequest;
-import org.mockserver.verify.VerificationTimes;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -53,8 +46,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -73,18 +64,18 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 
-import static com.example.data.models.consts.RequestMessageProvider.REQUEST_BODY_DO_NOT_CONTAINS_TELEGRAM_UPDATE;
-import static com.example.data.models.consts.RequestMessageProvider.REQUEST_BODY_IS_EMPTY;
+import static com.example.data.models.consts.ResponseMessageProvider.*;
 import static com.example.data.models.enums.ResponseIncludeDataKeys.*;
 import static com.example.telegram.constanst.TelegramBotConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        properties = "spring.main.web-application-type=reactive")
+@SpringBootTest(
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        properties = "spring.main.web-application-type=reactive"
+)
 @AutoConfigureWebTestClient
 @EnableReactiveMethodSecurity
 @Testcontainers
@@ -105,7 +96,6 @@ public class TelegramBotTests {
     private JWTService jwtService;
     @Autowired
     private PasswordEncoder passwordEncoder;
-    private static Dotenv dotenv;
     private static ObjectMapper objectMapper;
     private static ModelMapperService mapperService;
     private Map<String, ApiResponse> responses;
@@ -119,7 +109,6 @@ public class TelegramBotTests {
     static MockServerClient mockServerClient;
 
     static {
-        dotenv = EnvLoader.DOTENV;
         mapperService = new ModelMapperService(new ModelMapper());
     }
 
@@ -149,13 +138,13 @@ public class TelegramBotTests {
 
         ApiResponse<UserDTO> userDTOApiResponse = ApiResponse.<UserDTO>builder()
                 .status(HttpStatus.OK)
-                .message(RequestMessageProvider.SUCCESSES_MSG)
+                .message(ResponseMessageProvider.SUCCESSES_MSG)
                 .data(mapperService.toDTO(USER_FOR_TESTS, UserDTO.class))
                 .build();
 
         ApiResponse<TelegramChatDTO> telegramChatResponse = ApiResponse.<TelegramChatDTO>builder()
                 .status(HttpStatus.OK)
-                .message(RequestMessageProvider.SUCCESSES_MSG)
+                .message(ResponseMessageProvider.SUCCESSES_MSG)
                 .data(mapperService.toDTO(telegramChatForTests, TelegramChatDTO.class))
                 .includeObject(TELEGRAM_USER.getKeyValue(), TELEGRAM_USER_FOR_TESTS)
                 .build();
@@ -166,7 +155,7 @@ public class TelegramBotTests {
 
         ApiResponse<VerificationCodeDTO> verificationCodeResponse = ApiResponse.<VerificationCodeDTO>builder()
         .status(HttpStatus.OK)
-                .message(RequestMessageProvider.SUCCESSES_MSG)
+                .message(ResponseMessageProvider.SUCCESSES_MSG)
                 .data(mapperService.toDTO(verificationCodeForTests, VerificationCodeDTO.class))
                 .build();
 
@@ -181,9 +170,6 @@ public class TelegramBotTests {
     @AfterEach
     public void afterEach() {
         mockServerClient.reset();
-
-        log.info("EXPECTATIONS: {}", Arrays.toString(mockServerClient.retrieveActiveExpectations(null)));
-        log.info("RECORDED REQUESTS: {}", Arrays.toString(mockServerClient.retrieveRecordedRequests(null)));
     }
     @Test
     @Order(1)
@@ -988,7 +974,6 @@ public class TelegramBotTests {
 
         ArgumentCaptor<Long> chatIdCaptor = ArgumentCaptor.forClass(Long.class);
         ArgumentCaptor<String> messageTextCaptor = ArgumentCaptor.forClass(String.class);
-
 
         Mockito.verify(telegramBotMessageSender)
                 .sendMessage(chatIdCaptor.capture(), messageTextCaptor.capture());

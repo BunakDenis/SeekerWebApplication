@@ -3,9 +3,8 @@ package com.example.data.models.enums;
 public enum UserRoles {
 
     ADMIN ("admin"),
-
+    ADVANCED("advanced"),
     USER ("user"),
-
     TOURIST ("tourist");
 
     private String role;

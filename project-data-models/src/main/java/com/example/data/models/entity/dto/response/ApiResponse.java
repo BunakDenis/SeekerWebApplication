@@ -1,6 +1,6 @@
 package com.example.data.models.entity.dto.response;
 
-import com.example.data.models.consts.RequestMessageProvider;
+import com.example.data.models.consts.ResponseMessageProvider;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
@@ -96,7 +96,7 @@ public class ApiResponse<T> {
                 instance.setStatus(HttpStatus.OK);
             }
             if (instance.getMessage() == null) {
-                instance.setMessage(RequestMessageProvider.SUCCESSES_MSG);
+                instance.setMessage(ResponseMessageProvider.SUCCESSES_MSG);
             }
             return instance;
         }

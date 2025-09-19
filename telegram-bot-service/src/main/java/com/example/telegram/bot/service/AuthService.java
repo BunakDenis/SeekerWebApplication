@@ -3,6 +3,7 @@ package com.example.telegram.bot.service;
 import com.example.data.models.consts.WarnMessageProvider;
 import com.example.data.models.entity.TelegramUser;
 import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
+import com.example.data.models.utils.UserRoleConverterUtilService;
 import com.example.telegram.bot.message.TelegramBotMessageSender;
 import com.example.telegram.bot.utils.update.UpdateUtilsService;
 import lombok.RequiredArgsConstructor;
@@ -20,12 +21,13 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import reactor.core.publisher.Mono;
+import reactor.util.context.Context;
 
 import java.util.Objects;
 
@@ -47,11 +49,10 @@ public class AuthService {
      * Помещает Authentication с нашим User в контекст реактивного потока.
      * Возвращает Mono<Authentication> который можно вписать в chain.filter(...).contextWrite(...)
      */
-    public Mono<Authentication> authenticate(Update update) {
+    public Mono<Void> authenticate(Update update) {
 
         log.debug("Начало метода authenticate");
 
-        User telegramUser = UpdateUtilsService.getTelegramUser(update);
         Long telegramUserId = UpdateUtilsService.getTelegramUserId(update);
         Long chatId = UpdateUtilsService.getChatId(update);
 
@@ -70,9 +71,7 @@ public class AuthService {
                                             .isActive(true)
                                             .build();
 
-                                    TelegramUserDTO dto = mapperService.toDTO(tgUser, TelegramUserDTO.class);
-
-                                    return telegramUserService.save(dto);
+                                    return telegramUserService.save(tgUser);
                                 })
                                 .flatMap(savedTgUser -> Mono.just(userService.getDefaultUserDetails()))
                 )
@@ -95,33 +94,39 @@ public class AuthService {
 
                     UserDetails userDetails = tuple.getT2();
 
-                    Authentication auth = new UsernamePasswordAuthenticationToken(
-                            userDetails,
-                            null,
-                            userDetails.getAuthorities()
-                    );
+                    Authentication auth = getAuthenticationByUserDetails(userDetails);
 
                     log.debug("Authentication = {}", auth);
+
                     return Mono.just(auth);
                 })
-                .filter(Objects::nonNull)
-                .flatMap(auth -> {
+                .flatMap(authentication -> {
+                    SecurityContext newContext = new SecurityContextImpl(authentication);
 
-                    SecurityContext emptyContext = SecurityContextHolder.createEmptyContext();
-                    emptyContext.setAuthentication(auth);
-
-                    log.debug("Конец метода authenticate");
-
-                    return Mono.just(auth);
-                });
+                    return Mono.just(
+                            ReactiveSecurityContextHolder.withSecurityContext(Mono.just(newContext))
+                    );
+                })
+                .then()
+                .doOnSuccess(v -> log.debug("Контекст безопасности успешно установлен"))
+                .doFinally(signalType -> log.debug("Конец метода authenticate: {}", signalType));
     }
 
     /**
      * Авторизация юзера в телеграм боте через команду "/authorize"
      */
-    public Mono<Boolean> authorize(String email) {
-        return userService.checkUserInMysticSchoolDB(email)
-                .flatMap(resp -> Mono.just(resp.isFound()));
+    public Mono<Boolean> isRegistered(String email, Update update) {
+        return userService.getUserByEmail(email)
+                .flatMap(user -> {
+
+                    if (Objects.nonNull(user)) {
+                        return Mono.just(true);
+                    } else {
+                        return userService.checkUserInMysticSchoolDB(email)
+                                .flatMap(resp -> Mono.just(resp.isActive()));
+                    }
+
+                });
     }
 
     /**
@@ -134,5 +139,13 @@ public class AuthService {
         return ReactiveSecurityContextHolder.getContext()
                 .map(SecurityContext::getAuthentication)
                 .map(auth -> auth != null && auth.isAuthenticated());
+    }
+
+    private Authentication getAuthenticationByUserDetails(UserDetails userDetails) {
+        return new UsernamePasswordAuthenticationToken(
+                userDetails,
+                null,
+                userDetails.getAuthorities()
+        );
     }
 }

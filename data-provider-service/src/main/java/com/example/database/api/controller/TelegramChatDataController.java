@@ -83,7 +83,7 @@ public class TelegramChatDataController {
 
         log.debug("Запрос на получения чатов с телеграм юзером по id {}", id);
 
-        ApiResponse<TelegramChatDTO> response = chatsService.getTelegramChatByIdWithTelegramUser(id);
+        ApiResponse<TelegramChatDTO> response = chatsService.getTelegramChatByTelegramUserIdWithTelegramUser(id);
 
         log.debug("Ответ {}", response);
 
@@ -96,7 +96,7 @@ public class TelegramChatDataController {
 
         log.debug("Запрос на получения чатов по telegram_user_id {}", id);
 
-        ApiResponse<TelegramChatDTO> response = chatsService.getTelegramChatByTelegramUserId(id);
+        ApiResponse<TelegramChatDTO> response = chatsService.getTelegramChatByTelegramUserIdWithTelegramUser(id);
 
         log.debug("Ответ {}", response);
 

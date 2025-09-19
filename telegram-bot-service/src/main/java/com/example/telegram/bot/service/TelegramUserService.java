@@ -23,7 +23,10 @@ public class TelegramUserService {
     private final TelegramSessionService telegramSessionService;
     private final ModelMapperService mapperService;
 
-    public Mono<TelegramUser> save(TelegramUserDTO dto) {
+    public Mono<TelegramUser> save(TelegramUser telegramUser) {
+
+        TelegramUserDTO dto = mapperService.toDTO(telegramUser, TelegramUserDTO.class);
+
         return dataProviderClient.createTelegramUser(dto)
                 .flatMap(resp -> Objects.nonNull(resp.getData()) ?
                         Mono.just(mapperService.toEntity(resp.getData(), TelegramUser.class)) :

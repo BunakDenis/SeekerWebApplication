@@ -1,4 +1,4 @@
-package com.example.telegram.filter;
+package com.example.data.models.service;
 
 import com.example.data.models.entity.dto.response.ApiResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -27,7 +28,8 @@ public class ApplicationFiltersService {
 
     private final ObjectMapper objectMapper;
 
-    protected Long extractTelegramUserId(String body) {
+
+    public Long extractTelegramUserId(String body) {
         try {
             JsonNode json = objectMapper.readTree(body);
             if (json.has("message") && json.get("message").has("from")) {
@@ -40,8 +42,7 @@ public class ApplicationFiltersService {
         }
         return null;
     }
-
-    protected Long extractChatId(String body) {
+    public Long extractChatId(String body) {
         try {
             JsonNode json = objectMapper.readTree(body);
             if (json.has("message") && json.get("message").has("chat")) {
@@ -54,8 +55,7 @@ public class ApplicationFiltersService {
         }
         return null;
     }
-
-    protected ServerHttpRequest decorateRequest(ServerWebExchange exchange, String body, String sessionId) {
+    public ServerHttpRequest decorateRequestWithSessionId(ServerWebExchange exchange, String body, String sessionId) {
         byte[] bytes = body.getBytes(StandardCharsets.UTF_8);
 
         return new ServerHttpRequestDecorator(exchange.getRequest()) {
@@ -79,8 +79,31 @@ public class ApplicationFiltersService {
             }
         };
     }
+    public ServerHttpRequest decorateRequestWithApiKey(ServerWebExchange exchange, String body, String apiKey) {
+        byte[] bytes = body.getBytes(StandardCharsets.UTF_8);
 
-    protected Mono<Void> writeJsonErrorResponse(ServerHttpResponse response,
+        return new ServerHttpRequestDecorator(exchange.getRequest()) {
+            @Override
+            public Flux<DataBuffer> getBody() {
+                return Flux.defer(() -> {
+                    DataBuffer buffer = exchange.getResponse().bufferFactory().wrap(bytes);
+                    return Mono.just(buffer);
+                });
+            }
+
+            @Override
+            public HttpHeaders getHeaders() {
+                HttpHeaders headers = new HttpHeaders();
+                headers.putAll(super.getHeaders());
+                if (apiKey != null) {
+                    headers.add("X-Session-Id", apiKey);
+                }
+                headers.setContentLength(bytes.length);
+                return headers;
+            }
+        };
+    }
+    public Mono<Void> writeJsonErrorResponse(ServerHttpResponse response,
                                               HttpStatus status,
                                               ApiResponse body) {
         response.setStatusCode(status);
@@ -94,5 +117,4 @@ public class ApplicationFiltersService {
             return response.setComplete();
         }
     }
-
 }

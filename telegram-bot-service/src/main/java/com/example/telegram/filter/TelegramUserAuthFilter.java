@@ -1,9 +1,11 @@
 package com.example.telegram.filter;
 
 
-import com.example.data.models.consts.RequestMessageProvider;
+import com.example.data.models.consts.ResponseMessageProvider;
 import com.example.data.models.consts.WarnMessageProvider;
+import com.example.data.models.service.ApplicationFiltersService;
 import com.example.data.models.utils.ApiResponseUtilsService;
+import com.example.telegram.bot.commands.Commands;
 import com.example.telegram.bot.message.TelegramBotMessageSender;
 import com.example.telegram.bot.service.*;
 import com.example.telegram.bot.utils.update.UpdateUtilsService;
@@ -17,10 +19,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.security.core.context.ReactiveSecurityContextHolder;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
@@ -99,7 +99,7 @@ public class TelegramUserAuthFilter implements WebFilter {
                             return appFilterService.writeJsonErrorResponse(exchange.getResponse(),
                                     HttpStatus.BAD_REQUEST,
                                     ApiResponseUtilsService.fail(
-                                            RequestMessageProvider.REQUEST_BODY_DO_NOT_CONTAINS_TELEGRAM_UPDATE
+                                            ResponseMessageProvider.REQUEST_BODY_DO_NOT_CONTAINS_TELEGRAM_UPDATE
                                     )
                             );
 
@@ -110,43 +110,44 @@ public class TelegramUserAuthFilter implements WebFilter {
 
                         Long telegramUserId = UpdateUtilsService.getTelegramUserId(update);
 
+                        log.debug("Проверка запроса от Telegram API");
+                        // Пропускаем запросы с командами /auth и /register
+                        if (
+                                body.contains(Commands.AUTHORIZE.getCommand()) ||
+                                        body.contains(Commands.REGISTER.getCommand())
+                        ) {
+
+                            log.debug("Обработка в фильтре запроса \"/authorize\" или \"/register\"");
+
+                            return chain.filter(exchange.mutate()
+                                    .request(appFilterService.decorateRequestWithSessionId(exchange, body, ""))
+                                    .build());
+                        }
+
                         return telegramChatService.getTelegramChatByTelegramUserId(telegramUserId)
                                 .flatMap(chat -> {
 
                                     log.debug("Проверка запроса от Telegram API");
                                     // Пропускаем запросы с командами /auth и /register
-                                    if (
-                                            body.contains("/authorize") ||
-                                                    body.contains("/register") ||
-                                                    chat.getUiElementValue().contains("/authorize") ||
-                                                    chat.getUiElementValue().contains("/register")
+                                    if (chat.getUiElementValue().contains("/authorize") ||
+                                            chat.getUiElementValue().contains("/register")
                                     ) {
 
                                         log.debug("Обработка в фильтре запроса \"/authorize\" или \"/register\"");
 
                                         return chain.filter(exchange.mutate()
-                                                .request(appFilterService.decorateRequest(exchange, body, ""))
+                                                .request(appFilterService.decorateRequestWithSessionId(exchange, body, ""))
                                                 .build());
                                     }
 
                                     return authService.authenticate(update)
-                                            .flatMap(auth -> {
-
-                                                SecurityContext emptyContext = SecurityContextHolder.createEmptyContext();
-
-                                                emptyContext.setAuthentication(auth);
-
-                                                log.debug("TelegramUserAuthFilter end.");
-
-                                                return chain.filter(exchange.mutate()
-                                                                .request(
-                                                                        appFilterService.decorateRequest(exchange, body, "")
-                                                                )
-                                                                .build()
-                                                        )
-                                                        .contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth));
-
-                                            })
+                                            .then(chain.filter(exchange.mutate()
+                                                            .request(
+                                                                    appFilterService.decorateRequestWithSessionId(exchange, body, "")
+                                                            )
+                                                            .build()
+                                                    )
+                                            )
                                             // Ловим любые ошибки в цепочке
                                             .doOnError(ex -> log.error("Ошибка в TelegramUserAuthFilter - {}", ex.getMessage(), ex))
                                             .onErrorResume(ex -> {
@@ -180,7 +181,7 @@ public class TelegramUserAuthFilter implements WebFilter {
                                                 }
 
                                                 return chain.filter(exchange.mutate()
-                                                        .request(appFilterService.decorateRequest(exchange, modifiedBody, ""))
+                                                        .request(appFilterService.decorateRequestWithSessionId(exchange, modifiedBody, ""))
                                                         .build());
                                             });
                                 });
@@ -192,7 +193,7 @@ public class TelegramUserAuthFilter implements WebFilter {
                         log.debug("Проверка запроса к API \"{}\"", path);
 
                         return chain.filter(exchange.mutate()
-                                .request(appFilterService.decorateRequest(exchange, body, ""))
+                                .request(appFilterService.decorateRequestWithSessionId(exchange, body, ""))
                                 .build());
                     }
 
@@ -200,27 +201,33 @@ public class TelegramUserAuthFilter implements WebFilter {
                     return appFilterService.writeJsonErrorResponse(exchange.getResponse(),
                             HttpStatus.NOT_FOUND,
                             ApiResponseUtilsService.fail(
-                                    RequestMessageProvider.getEndpointNotFoundMsg(path)
+                                    ResponseMessageProvider.getEndpointNotFoundMsg(path)
                             )
                     );
                 })
                 .switchIfEmpty(
-                        appFilterService.writeJsonErrorResponse(exchange.getResponse(),
+                        appFilterService.writeJsonErrorResponse(
+                                exchange.getResponse(),
                                 HttpStatus.BAD_REQUEST,
-                                ApiResponseUtilsService.fail(RequestMessageProvider.REQUEST_BODY_DO_NOT_CONTAINS_TELEGRAM_UPDATE))
+                                ApiResponseUtilsService.fail(
+                                        ResponseMessageProvider.REQUEST_BODY_DO_NOT_CONTAINS_TELEGRAM_UPDATE
+                                )
+                        )
                 )
+                .doOnError(err -> log.error("Ошибка в фильтре аутентификации - {}", err.getMessage(), err))
                 .onErrorResume(err -> {
 
-                    log.error("Ошибка фильтра аутентификации - {}", err.getMessage(), err);
-
+                    if (err instanceof WebClientRequestException) log.debug("WebClientRequestException");
                     sender.sendMessage(
                             UpdateUtilsService.getChatId(update),
                             WarnMessageProvider.getSorryMsg("бот временно недоступен, попробуйте написать позже!")
                     );
 
-                    return appFilterService.writeJsonErrorResponse(exchange.getResponse(),
+                    return appFilterService.writeJsonErrorResponse(
+                            exchange.getResponse(),
                             HttpStatus.OK,
-                            ApiResponseUtilsService.success("Извините, произошла ошибка. Повторите запрос позже."));
+                            ApiResponseUtilsService.success("Извините, произошла ошибка. Повторите запрос позже.")
+                    );
                 });
 
     }

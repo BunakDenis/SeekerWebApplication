@@ -1,18 +1,18 @@
 package com.example.database.filter;
 
 
-import com.example.data.models.entity.User;
-import com.example.data.models.entity.dto.UserDTO;
+import com.example.data.models.consts.ResponseMessageProvider;
 import com.example.data.models.entity.dto.response.ApiResponse;
-import com.example.data.models.service.ApiKeyCookieServiceImpl;
+import com.example.data.models.service.ApplicationFiltersService;
 import com.example.data.models.service.JWTService;
+import com.example.data.models.utils.ApiResponseUtilsService;
 import com.example.database.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpCookie;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -26,7 +26,6 @@ import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 
@@ -37,6 +36,7 @@ public class DataProviderServiceAuthFilter implements WebFilter {
 
     @Value("${api.key.header.name}")
     private String apiKeyHeaderName;
+    private final ApplicationFiltersService appFiltersService;
     private final UserService userService;
     private final JWTService jwtService;
     private final ModelMapper mapper;
@@ -52,7 +52,7 @@ public class DataProviderServiceAuthFilter implements WebFilter {
 
         List<String> apiKeyValue = headers.get(apiKeyHeaderName);
 
-        String apiKey = apiKeyValue.isEmpty() ? "" : apiKeyValue.get(0);
+        String apiKey = Objects.isNull(apiKeyValue) ? "" : apiKeyValue.get(0);
 
         if (StringUtils.hasText(apiKey)) {
 
@@ -78,8 +78,17 @@ public class DataProviderServiceAuthFilter implements WebFilter {
                     .contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth));
         }
 
+        ApiResponse<Object> response = ApiResponseUtilsService.fail(
+                ResponseMessageProvider.REQUEST_DO_NOT_CONTAIN_API_KEY
+        );
+
         log.debug("No api-key header found -> proceed without authentication");
-        return chain.filter(exchange);
+
+        return appFiltersService.writeJsonErrorResponse(
+                exchange.getResponse(),
+                HttpStatus.UNAUTHORIZED,
+                response
+        );
 
     }
 

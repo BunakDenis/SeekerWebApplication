@@ -1,6 +1,7 @@
 package com.example.database.exception;
 
 
+import com.example.data.models.consts.ResponseMessageProvider;
 import com.example.data.models.entity.User;
 import com.example.data.models.entity.dto.response.ApiResponse;
 import com.example.data.models.exception.ApiException;
@@ -13,25 +14,27 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.reactive.result.method.annotation.ResponseEntityExceptionHandler;
+
 
 import java.util.NoSuchElementException;
 
-import static com.example.data.models.consts.RequestMessageProvider.*;
+import static com.example.data.models.consts.ResponseMessageProvider.*;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
 @Slf4j
-public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
+public class RestControllerExceptionHandler {
 
     @ExceptionHandler(EntityNotFoundException.class)
     protected ResponseEntity<ApiResponse> entityNotFoundExceptionHandle(EntityNotFoundException e) {
 
-        ApiResponse resp = ApiResponse.builder()
-                .status(HttpStatus.NOT_FOUND)
-                .message(getEntityNotFoundMessage(e.getEntityClassName()))
-                .debugMsg(getExceptionStackTrace(e))
-                .build();
+        log.debug("entityNotFoundExceptionHandle");
+
+        log.debug("EntityNotFoundException message = {}", e.getMessage());
+
+        ApiResponse resp = getResponse(HttpStatus.NOT_FOUND, e);
+
+        log.debug(resp.toString());
 
         return ResponseEntity.status(resp.getStatus()).body(resp);
 
@@ -39,11 +42,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(UserNotFoundException.class)
     protected ResponseEntity<ApiResponse> userNotFoundExceptionHandle(UserNotFoundException e) {
 
-        ApiResponse resp = ApiResponse.builder()
-                .status(HttpStatus.NOT_FOUND)
-                .message(getEntityNotFoundMessage(new User()))
-                .debugMsg(getExceptionStackTrace(e))
-                .build();
+        ApiResponse resp = getResponse(HttpStatus.NOT_FOUND, e);
 
         log.debug("UserNotFoundException {}", resp);
 

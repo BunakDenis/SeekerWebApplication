@@ -26,16 +26,12 @@ public class WebhookController {
 
     @Autowired
     private TelegramBot telegramBot;
-
     @Autowired
     private UserService userService;
-
     @Autowired
     private AuthService authService;
-
     @Autowired
     private ModelMapperService mapperService;
-
     @Value("${telegram.bot.name}")
     private String telegramBotName;
 
@@ -46,19 +42,21 @@ public class WebhookController {
 
     @PostMapping("/")
     public Mono<ResponseEntity<?>> handleWebhook(
-            @RequestHeader(name = "X-Session-Id") String sessionId,
             @RequestBody Update update
     ) {
 
         log.debug("Метод handleWebhook");
 
-        log.debug(update.toString());
+        log.debug("Входящий update = {}", update);
 
         if (update.getUpdateId() == 0) return Mono.just(ResponseEntity.ok().body("ok"));
 
         return ReactiveSecurityContextHolder.getContext()
                 .map(SecurityContext::getAuthentication)
-                .doOnNext(auth -> telegramBot.getReactiveHandler().setAuthentication(auth))
+                .doOnNext(auth -> {
+                    log.debug("Authorization = {}", auth);
+                    telegramBot.getReactiveHandler().setAuthentication(auth);
+                })
                 .then(telegramBot.getReactiveHandler().handleUpdate(update))
                 .map(sent -> ResponseEntity.ok().body("ok"));
     }

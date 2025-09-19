@@ -1,6 +1,6 @@
 package com.example.database.service.telegram;
 
-import com.example.data.models.consts.RequestMessageProvider;
+import com.example.data.models.consts.ResponseMessageProvider;
 import com.example.data.models.entity.dto.VerificationCodeDTO;
 import com.example.data.models.entity.dto.response.ApiResponse;
 import com.example.data.models.exception.EntityNotFoundException;
@@ -57,7 +57,7 @@ public class VerificationCodeService {
         if (code.isPresent()) return success(
                     modelMapperService.toDTO(code, VerificationCodeDTO.class));
 
-        throw new EntityNotFoundException(RequestMessageProvider.getEntityNotFoundMessage(User.class), new User());
+        throw new EntityNotFoundException(ResponseMessageProvider.getEntityNotFoundMessage(User.class), new User());
     }
     public ApiResponse<VerificationCodeDTO> getCodeByUserId(Long userId) {
 
@@ -66,7 +66,7 @@ public class VerificationCodeService {
         if (code.isPresent()) return success(
                     modelMapperService.toDTO(code, VerificationCodeDTO.class));
 
-        throw new EntityNotFoundException(RequestMessageProvider.getEntityNotFoundMessage(User.class), new User());
+        throw new EntityNotFoundException(ResponseMessageProvider.getEntityNotFoundMessage(User.class), new User());
 
     }
     public ApiResponse<VerificationCodeDTO> getCodeByTelegramUserId(Long telegramUserId) {
@@ -77,7 +77,7 @@ public class VerificationCodeService {
                     modelMapperService.toDTO(code, VerificationCodeDTO.class)
         );
 
-        throw new EntityNotFoundException(RequestMessageProvider.getEntityNotFoundMessage(User.class), new User());
+        throw new EntityNotFoundException(ResponseMessageProvider.getEntityNotFoundMessage(User.class), new User());
     }
     public ApiResponse<Boolean> delete(Long id) {
 

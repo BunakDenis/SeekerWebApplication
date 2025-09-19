@@ -39,7 +39,7 @@ public class UserService implements ReactiveUserDetailsService {
     private final ObjectMapper objectMapper;
 
 
-    public Mono<User> create(User user) {
+    public Mono<User> save(User user) {
 
         if (Objects.isNull(user)) return Mono.empty();
 

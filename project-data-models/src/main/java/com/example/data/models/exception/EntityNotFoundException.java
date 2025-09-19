@@ -9,12 +9,7 @@ public class EntityNotFoundException extends IllegalArgumentException{
 
     public EntityNotFoundException(String msg, Object object) {
         super(msg);
-        this.entityClassName = object.getClass().getName();
+        this.entityClassName = object.getClass().getSimpleName();
     }
-
-    /*
-       TODO
-            1. Вместо поля object добавить поле EntityClassName
-     */
 
 }
