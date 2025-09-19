@@ -1,17 +1,20 @@
 package com.example.tools.text.cheker;
 
 import lombok.extern.log4j.Log4j2;
-import org.languagetool.JLanguageTool;
-import org.languagetool.language.Russian;
-import org.languagetool.rules.RuleMatch;
+import lombok.extern.slf4j.Slf4j;
+//import org.languagetool.JLanguageTool;
+//import org.languagetool.language.Russian;
+//import org.languagetool.rules.RuleMatch;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.List;
 
 @Component
-@Log4j2
-public class LanguageToolSpellChecker implements SpellChecker {
+@Slf4j
+public class LanguageToolSpellChecker {
+
+    /*
     private final JLanguageTool langTool;
 
     public LanguageToolSpellChecker() {
@@ -59,4 +62,5 @@ public class LanguageToolSpellChecker implements SpellChecker {
             return inputText;
         }
     }
+    */
 }

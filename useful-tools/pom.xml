@@ -96,12 +96,15 @@
             <version>0.3.45</version>
         </dependency>
         <!-- Sphinx4: используем pre-release из Sonatype snapshots -->
+        <!--
         <dependency>
             <groupId>edu.cmu.sphinx</groupId>
             <artifactId>sphinx4-core</artifactId>
             <version>5prealpha-SNAPSHOT</version>
         </dependency>
+        -->
         <!-- https://mvnrepository.com/artifact/org.languagetool/languagetool-core -->
+        <!--
         <dependency>
             <groupId>org.languagetool</groupId>
             <artifactId>languagetool-core</artifactId>
@@ -147,6 +150,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        -->
         <!-- https://mvnrepository.com/artifact/org.renjin.cran/hunspell -->
         <dependency>
             <groupId>org.renjin.cran</groupId>

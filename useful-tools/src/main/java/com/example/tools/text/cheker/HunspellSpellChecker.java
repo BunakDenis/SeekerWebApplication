@@ -1,9 +1,10 @@
 package com.example.tools.text.cheker;
 
-import dumonts.hunspell.Hunspell;
+
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 
@@ -14,12 +15,12 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
-@Component
+//@Component
 @Data
-@Log4j2
-@RequiredArgsConstructor
-public class HunspellSpellChecker implements SpellChecker {
-
+@Slf4j
+//@RequiredArgsConstructor
+public class HunspellSpellChecker {
+/*
     private final Hunspell hunspell;
 
     public HunspellSpellChecker() {
@@ -72,5 +73,5 @@ public class HunspellSpellChecker implements SpellChecker {
 
         return tempFile;
     }
-
+*/
 }
