@@ -49,6 +49,17 @@ jobs:
           echo "SPRING_PROFILES_ACTIVE=${{ vars.SPRING_PROFILES_ACTIVE }}" >> $GITHUB_ENV
           echo "DOCKER_REGISTRY_PASSWORD=${{ secrets.DOCKER_REGISTRY_PASSWORD }}" >> $GITHUB_ENV
           echo "DOCKER_REGISTRY_USERNAME=${{ secrets.DOCKER_REGISTRY_USERNAME }}" >> $GITHUB_ENV
+          echo "DB_NAME=${{ secrets.DB_NAME }}" >> $GITHUB_ENV
+          echo "DB_USER_NAME=${{ secrets.DB_USER_NAME }}" >> $GITHUB_ENV
+          echo "DB_USER_PASSWORD=${{ secrets.DB_USER_PASSWORD }}" >> $GITHUB_ENV
+          echo "PROXY_TOR_HOST=${{ secrets.PROXY_TOR_HOST }}" >> $GITHUB_ENV
+          echo "PROXY_TOR_PORT=${{ secrets.PROXY_TOR_PORT }}" >> $GITHUB_ENV
+          echo "PROXY_TOR_ENABLED=${{ secrets.PROXY_TOR_ENABLED }}" >> $GITHUB_ENV
+          echo "MYSTIC_SCHOOL_API_URL=${{ secrets.MYSTIC_SCHOOL_API_URL }}" >> $GITHUB_ENV
+          echo "MYSTIC_SCHOOL_API_VERSION=${{ secrets.MYSTIC_SCHOOL_API_VERSION }}" >> $GITHUB_ENV
+          echo "MYSTIC_SCHOOL_API_KEY=${{ secrets.MYSTIC_SCHOOL_API_KEY }}" >> $GITHUB_ENV
+          echo "MYSTIC_SCHOOL_CHECK_USER_ENDPOINT=${{ secrets.MYSTIC_SCHOOL_CHECK_USER_ENDPOINT }}" >> $GITHUB_ENV
+          echo "MYSTIC_SCHOOL_ARTICLE_ENDPOINT=${{ secrets.MYSTIC_SCHOOL_ARTICLE_ENDPOINT }}" >> $GITHUB_ENV
           echo "INTERNAL_NETWORK_API_KEY=${{ secrets.INTERNAL_NETWORK_API_KEY }}" >> $GITHUB_ENV
           echo "API_KEY_HEADER_NAME=${{ secrets.API_KEY_HEADER_NAME }}" >> $GITHUB_ENV
           echo "TELEGRAM_BOT_SERVICE_API_KEY=${{ secrets.TELEGRAM_BOT_SERVICE_API_KEY }}" >> $GITHUB_ENV

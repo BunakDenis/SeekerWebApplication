@@ -28,7 +28,12 @@ public class RestControllerExceptionHandler {
 
     @ExceptionHandler(NoResourceFoundException.class)
     protected ResponseEntity<ApiResponse> endPointNotFoundExceptionHandler(NoResourceFoundException e) {
-        ApiResponse response = getResponse(HttpStatus.NOT_FOUND, e);
+
+        ApiResponse response = ApiResponse.builder()
+                .status(HttpStatus.NOT_FOUND)
+                .message(e.getReason())
+                .debugMsg(getExceptionStackTrace(e))
+                .build();
 
         return ResponseEntity.status(response.getStatus()).body(response);
     }

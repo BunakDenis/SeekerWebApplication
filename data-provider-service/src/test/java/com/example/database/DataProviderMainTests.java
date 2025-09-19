@@ -31,11 +31,10 @@ public class DataProviderMainTests extends DataProviderTestsBaseClass {
                 .expectBody()
                 .json(objectMapper.writeValueAsString(expectedResponse));
     }
-
     @Test
     void testResponseToUnknownEndPoint() {
 
-        String expectedExceptionMsg = "404 NOT_FOUND \"No static resource api/v100/user/id/500.\"";
+        String expectedExceptionMsg = "No static resource api/v100/user/id/500.";
 
         ApiResponse response = client.get()
                 .uri("/api/v100/user/id/500")
