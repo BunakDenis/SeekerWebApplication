@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.reactive.resource.NoResourceFoundException;
 
 
 import java.util.NoSuchElementException;
@@ -25,6 +26,12 @@ import static com.example.data.models.consts.ResponseMessageProvider.*;
 @Slf4j
 public class RestControllerExceptionHandler {
 
+    @ExceptionHandler(NoResourceFoundException.class)
+    protected ResponseEntity<ApiResponse> endPointNotFoundExceptionHandler(NoResourceFoundException e) {
+        ApiResponse response = getResponse(HttpStatus.NOT_FOUND, e);
+
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
     @ExceptionHandler(EntityNotFoundException.class)
     protected ResponseEntity<ApiResponse> entityNotFoundExceptionHandle(EntityNotFoundException e) {
 
