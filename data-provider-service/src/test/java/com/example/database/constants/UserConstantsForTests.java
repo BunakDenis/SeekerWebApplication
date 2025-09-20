@@ -8,11 +8,9 @@ import com.example.data.models.enums.UserRoles;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.Month;
-import java.time.ZoneId;
 import java.util.List;
-import java.util.Objects;
 
 public class UserConstantsForTests {
 
@@ -25,11 +23,11 @@ public class UserConstantsForTests {
     public static final com.example.database.entity.UserDetails USER_DETAILS_FOR_TESTS = com.example.database.entity.UserDetails.builder()
             .firstName("Василий")
             .lastname("Тёркин")
-            .birthday(LocalDateTime.of(1980, Month.SEPTEMBER, 20, 1, 0))
+            .birthday(LocalDate.of(1980, Month.SEPTEMBER, 20))
             .phoneNumber("+380555555555")
             .gender("MALE")
             .location("Украина, г. Киев")
-            .dateStartStudyingSchool(LocalDateTime.of(2020, Month.FEBRUARY, 11, 0, 0))
+            .dateStartStudyingSchool(LocalDate.of(2020, Month.FEBRUARY, 11))
             .curator("Руслан Жуковец")
             .build();
 

@@ -13,12 +13,12 @@ CREATE TABLE IF NOT EXISTS user_details (
     user_id BIGINT REFERENCES users(id) NOT NULL,
     first_name VARCHAR(255),
     last_name VARCHAR(255),
-    birthday TIMESTAMP WITH TIME ZONE,
+    birthday DATE,
     phone_number VARCHAR(50),
     gender VARCHAR(50),
     avatar_link VARCHAR(255),
     location VARCHAR(255),
-    date_start_studying_school TIMESTAMP WITH TIME ZONE,
+    date_start_studying_school DATE,
     curator VARCHAR(255)
 );
 

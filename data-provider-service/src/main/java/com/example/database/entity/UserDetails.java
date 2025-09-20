@@ -3,7 +3,7 @@ package com.example.database.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Data
@@ -24,7 +24,7 @@ public class UserDetails {
     private String lastname;
 
     @Column
-    private LocalDateTime birthday;
+    private LocalDate birthday;
 
     @Column(name = "phone_number")
     private String phoneNumber;
@@ -39,7 +39,7 @@ public class UserDetails {
     private String location;
 
     @Column(name = "date_start_studying_school")
-    private LocalDateTime dateStartStudyingSchool;
+    private LocalDate dateStartStudyingSchool;
 
     @Column
     private String curator;

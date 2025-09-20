@@ -24,11 +24,11 @@ INSERT INTO user_details (user_id, first_name, last_name, birthday, phone_number
 SELECT u.id,
        'Денис',
        'Бунак',
-       '1990-10-14 00:00:00+02',
+       '1990-10-14',
        '+380664988869',
        'MALE',
        'Украина, г. Чернигов',
-       '2020-02-11 00:00:00+02',
+       '2020-02-11',
        'Алексей Киселёв'
 FROM users u
 WHERE u.email = 'xisi926@ukr.net'
@@ -58,11 +58,11 @@ INSERT INTO user_details (user_id, first_name, last_name, birthday, phone_number
 SELECT u.id,
        'Василий',
        'Тёркин',
-       '1980-09-20 00:00:00+02',
+       '1980-09-20',
        '+380555555555',
        'MALE',
        'Украина, г. Киев',
-       '2020-02-11 00:00:00+02',
+       '2020-02-11',
        'Руслан Жуковец'
 FROM users u
 WHERE u.email = 'tourist@gmail.com'

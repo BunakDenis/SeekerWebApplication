@@ -2,7 +2,7 @@ package com.example.data.models.entity.dto;
 
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
@@ -17,7 +17,7 @@ public class UserDetailsDTO {
 
     private String lastname;
 
-    private LocalDateTime birthday;
+    private LocalDate birthday;
 
     private String phoneNumber;
 
@@ -27,7 +27,7 @@ public class UserDetailsDTO {
 
     private String location;
 
-    private LocalDateTime dateStartStudyingSchool;
+    private LocalDate dateStartStudyingSchool;
 
     private String curator;
 
