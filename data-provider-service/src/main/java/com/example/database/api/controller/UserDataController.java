@@ -1,10 +1,12 @@
 package com.example.database.api.controller;
 
 
+import com.example.data.models.consts.ExceptionMessageProvider;
 import com.example.data.models.entity.dto.UserDTO;
 import com.example.data.models.entity.dto.request.ApiRequest;
 import com.example.data.models.entity.dto.response.ApiResponse;
 import com.example.data.models.entity.dto.response.CheckUserResponse;
+import com.example.data.models.exception.EntityNullException;
 import com.example.database.api.client.MysticSchoolClient;
 import com.example.database.entity.User;
 import com.example.database.service.ModelMapperService;
@@ -37,6 +39,11 @@ public class UserDataController {
         log.debug("Запрос на сохранения User {}", request);
 
         UserDTO dto = request.getData();
+
+        if (Objects.isNull(dto)) throw new EntityNullException(
+                ExceptionMessageProvider.getEntityNullExceptionText(new User())
+        );
+
         User user = mapperService.toEntity(dto, User.class);
 
         ApiResponse<UserDTO> result = ApiResponse.<UserDTO>builder().build();
@@ -137,7 +144,7 @@ public class UserDataController {
             @PathVariable("id") Long id
     ) {
 
-        log.debug("Запрос на получение User по telegramUserId {}", id);
+        log.debug("Запрос на получение User full по telegramUserId {}", id);
 
         ApiResponse<UserDTO> response = userService.getUserByTelegramUserIdFull(id);
 

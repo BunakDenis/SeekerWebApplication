@@ -1,10 +1,10 @@
 -- Пользователи системы
 CREATE TABLE IF NOT EXISTS users (
     id BIGSERIAL PRIMARY KEY,
-    username VARCHAR(255) UNIQUE,
-    password VARCHAR(255),
+    username VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
-    role VARCHAR(255) NOT NULL,
+    role VARCHAR(255) DEFAULT 'GUEST',
     is_active BOOLEAN NOT NULL DEFAULT TRUE
 );
 
@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS top_level_menus (
 -- Элементы подменю
 CREATE TABLE IF NOT EXISTS sub_level_menus (
     id BIGSERIAL PRIMARY KEY,
-    top_level_menu_id BIGINT REFERENCES top_level_menus(id) NOT NULL,
+    top_level_menu_id BIGINT,
     command_key VARCHAR(255) UNIQUE NOT NULL,
     command_name VARCHAR(255) NOT NULL
 );
@@ -93,7 +93,7 @@ CREATE TABLE IF NOT EXISTS sub_level_menus (
 -- Элементы меню нижнего уровня
 CREATE TABLE IF NOT EXISTS leaf_level_menus (
     id BIGSERIAL PRIMARY KEY,
-    sub_level_menu_id BIGINT REFERENCES sub_level_menus(id) NOT NULL,
+    sub_level_menu_id BIGINT,
     command_key VARCHAR(255) UNIQUE NOT NULL,
     command_name VARCHAR(255) NOT NULL
 );

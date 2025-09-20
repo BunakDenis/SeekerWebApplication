@@ -25,6 +25,8 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
 
+import java.io.File;
+
 import static org.mockito.ArgumentMatchers.any;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
@@ -51,14 +53,18 @@ public abstract class DataProviderTestsBaseClass {
     protected JWTService jwtService;
 
     static {
+
+        log.debug("DataProviderTestsBaseClass static initial block");
+
         postgres = new PostgreSQLContainer<>(DockerImageName.parse("postgres:16-alpine"));
 
         postgres.start();
 
         Flyway flyway = Flyway.configure()
                 .dataSource(postgres.getJdbcUrl(), postgres.getUsername(), postgres.getPassword())
-                .locations("classpath:db/migration")
+                .locations("classpath:db/migration-test")
                 .load();
+
         flyway.migrate();
     }
 

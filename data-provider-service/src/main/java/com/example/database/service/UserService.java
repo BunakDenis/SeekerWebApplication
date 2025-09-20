@@ -1,14 +1,13 @@
 package com.example.database.service;
 
-import com.example.data.models.consts.DefaultEntityValuesConsts;
+import com.example.data.models.consts.ExceptionMessageProvider;
 import com.example.data.models.entity.dto.UserDTO;
 import com.example.data.models.entity.dto.UserDetailsDTO;
 import com.example.data.models.entity.dto.response.ApiResponse;
 import com.example.data.models.enums.ResponseIncludeDataKeys;
 import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
 import com.example.data.models.enums.UserRoles;
-import com.example.data.models.exception.EntityNotFoundException;
-import com.example.data.models.exception.EntityNotSavedException;
+import com.example.data.models.exception.*;
 import com.example.data.models.utils.ApiResponseUtilsService;
 import com.example.database.entity.TelegramUser;
 import com.example.database.entity.User;
@@ -17,12 +16,10 @@ import com.example.database.repo.telegram.UserRepo;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +27,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static com.example.data.models.utils.ApiResponseUtilsService.*;
+import static com.example.data.models.utils.EntityUtilsService.*;
 
 @Service
 @RequiredArgsConstructor
@@ -42,12 +40,15 @@ public class UserService implements UserDetailsService {
 
 
     public ApiResponse<UserDTO> create(User user) {
+
         User save;
+
+        checkUser(user);
 
         try {
             save = repo.save(user);
         } catch (Exception e) {
-            log.error("Ошибка сохранения юзера {}", user);
+            log.error("Ошибка сохранения юзера User - {}", e.getMessage(), e.getClass());
             throw new EntityNotSavedException("Ошибка сохранения юзера " + user);
         }
 
@@ -75,7 +76,7 @@ public class UserService implements UserDetailsService {
     }
     public ApiResponse<UserDTO> getUserByEmail(String email) {
 
-        Optional<User> userOptional = repo.findByUsername(email);
+        Optional<User> userOptional = repo.findByEmail(email);
 
         if (userOptional.isPresent())
             return success(mapper.toDTO(userOptional.get(), UserDTO.class));
@@ -84,7 +85,7 @@ public class UserService implements UserDetailsService {
     }
     public ApiResponse<UserDTO> getUserByTelegramUserId(Long id) throws UserNotFoundException {
 
-        User user = repo.getUserByTelegramUserId(id);
+        User user = repo.findUserByTelegramUsers_Id(id);
 
         if (Objects.nonNull(user))
             return success(mapper.toDTO(user, UserDTO.class));
@@ -92,72 +93,78 @@ public class UserService implements UserDetailsService {
         throw new  UserNotFoundException("User with telegram user id " + id + " is not found");
 
     }
-    @Transactional
     public ApiResponse<UserDTO> getUserByTelegramUserIdWithUserDetails(Long id) throws UserNotFoundException {
 
-        User user = repo.getUserByTelegramUserId(id);
+        Optional<User> optionalUser = repo.findByTelegramUsers_IdWithUserDetails(id);
 
-        if (Objects.nonNull(user)) {
+        if (!optionalUser.isPresent()) throw new UserNotFoundException(
+                "User with telegram user id " + id + " is not found"
+        );
 
-            ApiResponse<UserDTO> resp = success(mapper.toDTO(user, UserDTO.class));
+        User user = optionalUser.get();
 
-            UserDetailsDTO userDetailsDTO = mapper.toDTO(user.getUserDetails(), UserDetailsDTO.class);
+        ApiResponse<UserDTO> resp = success(mapper.toDTO(user, UserDTO.class));
 
-            resp.addIncludeObject(ResponseIncludeDataKeys.USER_DETAILS.getKeyValue(), userDetailsDTO);
+        UserDetailsDTO userDetailsDTO = mapper.toDTO(user.getUserDetails(), UserDetailsDTO.class);
 
-            return resp;
-        }
-        throw new  UserNotFoundException("User with telegram user id " + id + " is not found");
+        resp.addIncludeObject(ResponseIncludeDataKeys.USER_DETAILS.getKeyValue(), userDetailsDTO);
+
+        return resp;
+
     }
-    @Transactional
     public ApiResponse<UserDTO> getUserByTelegramUserIdWithTelegramUser(Long id) throws UserNotFoundException {
 
-        User user = repo.getUserByTelegramUserId(id);
+        Optional<User> userOptional = repo.findByTelegramUserIdWithTelegramUsers(id);
 
-        if (Objects.nonNull(user)) {
+        if (!userOptional.isPresent()) throw new EntityNotFoundException(
+                "User by telegram user id=" + id + ", is not found", new User()
+        );
 
-            ApiResponse<UserDTO> resp = success(mapper.toDTO(user, UserDTO.class));
+        log.debug("getUserByTelegramUserIdWithTelegramUser = {}", userOptional.get());
 
-            List<TelegramUser> telegramUsers = user.getTelegramUsers();
+        User user = userOptional.get();
 
-            Optional<TelegramUser> telegramUserOptional = telegramUsers.stream()
-                    .filter(u -> u.getId().equals(id))
-                    .findFirst();
+        if (Objects.isNull(user)) throw new UserNotFoundException(
+                "User with telegram user id " + id + " is not found"
+        );
 
-            TelegramUserDTO telegramUserDTO = new TelegramUserDTO();
 
-            if (telegramUserOptional.isPresent())
-                telegramUserDTO = mapper.toDTO(telegramUserOptional.get(), TelegramUserDTO.class);
+        ApiResponse<UserDTO> resp = success(mapper.toDTO(user, UserDTO.class));
 
-            resp.addIncludeObject(ResponseIncludeDataKeys.TELEGRAM_USER.getKeyValue(), telegramUserDTO);
+        List<TelegramUser> telegramUsers = user.getTelegramUsers();
 
-            return resp;
-        }
-        throw new  UserNotFoundException("User with telegram user id " + id + " is not found");
+        Optional<TelegramUser> telegramUserOptional = telegramUsers.stream()
+                .filter(u -> u.getId().equals(id))
+                .findFirst();
+
+        TelegramUserDTO telegramUserDTO = new TelegramUserDTO();
+
+        if (telegramUserOptional.isPresent())
+            telegramUserDTO = mapper.toDTO(telegramUserOptional.get(), TelegramUserDTO.class);
+
+        resp.addIncludeObject(ResponseIncludeDataKeys.TELEGRAM_USER.getKeyValue(), telegramUserDTO);
+
+        return resp;
     }
-    @Transactional
     public ApiResponse<UserDTO> getUserByTelegramUserIdFull(Long id) throws UserNotFoundException {
 
-        User user = repo.getUserByTelegramUserId(id);
+        Optional<User> optionalUser = repo.findFullByTelegramUser_id(id);
 
-        if (Objects.nonNull(user)) {
+        if (!optionalUser.isPresent())
+            throw new UserNotFoundException("User with telegram user id " + id + " is not found");
 
-            ApiResponse<UserDTO> resp = success(mapper.toDTO(user, UserDTO.class));
+        User user = optionalUser.get();
 
-            UserDetailsDTO userDetailsDTO = mapper.toDTO(user.getUserDetails(), UserDetailsDTO.class);
+        ApiResponse<UserDTO> resp = success(mapper.toDTO(user, UserDTO.class));
 
-            List<TelegramUser> telegramUsers = user.getTelegramUsers();
-            List<Object> telegramUserDTOList = new ArrayList<>();
+        UserDetailsDTO userDetailsDTO = mapper.toDTO(user.getUserDetails(), UserDetailsDTO.class);
 
-            if (!telegramUsers.isEmpty())
-                telegramUsers.forEach(tu -> telegramUserDTOList.add(mapper.toDTO(tu, TelegramUserDTO.class)));
+        TelegramUserDTO telegramUserDTO = mapper.toDTO(user.getTelegramUsers().get(0), TelegramUserDTO.class);
 
-            resp.addIncludeObject(ResponseIncludeDataKeys.USER_DETAILS.getKeyValue(), userDetailsDTO);
-            resp.addIncludeListObjects(ResponseIncludeDataKeys.TELEGRAM_USER.getKeyValue(), telegramUserDTOList);
+        resp.addIncludeObject(ResponseIncludeDataKeys.USER_DETAILS.getKeyValue(), userDetailsDTO);
+        resp.addIncludeObject(ResponseIncludeDataKeys.TELEGRAM_USER.getKeyValue(), telegramUserDTO);
 
-            return resp;
-        }
-        throw new  UserNotFoundException("User with telegram user id " + id + " is not found");
+        return resp;
     }
     public ApiResponse<Boolean> delete(Long id) {
         repo.deleteById(id);
@@ -182,6 +189,7 @@ public class UserService implements UserDetailsService {
                 .roles(user.getRole())
                 .build();
     }
+
     public UserDetails getDefaultUser() {
         return org.springframework.security.core.userdetails.User.builder()
                 .username("user")
@@ -189,4 +197,25 @@ public class UserService implements UserDetailsService {
                 .roles(UserRoles.TOURIST.getRole())
                 .build();
     }
+
+    private void checkUser(User user) {
+
+        if (isNull(user)) throw new EntityNullException(
+                ExceptionMessageProvider.getEntityNullExceptionText(new User())
+        );
+
+        if (isNull(user.getUsername())) throw new EntityNullFieldException("username");
+
+        if (isStringFieldEmpty(user.getUsername())) throw new EntityEmptyFieldException("username");
+
+        if (isNull(user.getPassword())) throw new EntityNullFieldException("password");
+
+        if (isStringFieldEmpty(user.getPassword())) throw new EntityEmptyFieldException("password");
+
+        if (isNull(user.getEmail())) throw new EntityNullFieldException("email");
+
+        if (isStringFieldEmpty(user.getEmail())) throw new EntityEmptyFieldException("email");
+
+    }
+
 }

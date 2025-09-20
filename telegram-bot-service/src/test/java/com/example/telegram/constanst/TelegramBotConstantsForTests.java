@@ -1,4 +1,4 @@
-package com.example.data.models.consts;
+package com.example.telegram.constanst;
 
 import com.example.data.models.entity.*;
 import com.example.data.models.entity.dto.request.CheckUserRequest;

@@ -66,7 +66,7 @@ import java.util.*;
 
 import static com.example.data.models.consts.ResponseMessageProvider.*;
 import static com.example.data.models.enums.ResponseIncludeDataKeys.*;
-import static com.example.data.models.consts.TelegramBotConstantsForTests.*;
+import static com.example.telegram.constanst.TelegramBotConstantsForTests.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
