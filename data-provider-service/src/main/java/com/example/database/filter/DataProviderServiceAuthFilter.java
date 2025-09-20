@@ -11,6 +11,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
+import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -30,6 +33,7 @@ import java.util.Objects;
 
 
 @Component
+@Order(Ordered.HIGHEST_PRECEDENCE)
 @RequiredArgsConstructor
 @Slf4j
 public class DataProviderServiceAuthFilter implements WebFilter {
@@ -74,8 +78,16 @@ public class DataProviderServiceAuthFilter implements WebFilter {
 
             log.debug("ApiKey header found -> authenticating as user: {}", userDetails.getUsername());
 
-            return chain.filter(exchange)
-                    .contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth));
+            return appFiltersService.getBodyFromRequest(exchange)
+                    .flatMap(body -> chain.filter(exchange.mutate().request(
+                                                            appFiltersService.decorateRequestWithApiKey(exchange, body.toString(), apiKey)
+                                                    )
+                                                    .build()
+                                    )
+                                    .contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth))
+
+                    );
+
         }
 
         ApiResponse<Object> response = ApiResponseUtilsService.fail(

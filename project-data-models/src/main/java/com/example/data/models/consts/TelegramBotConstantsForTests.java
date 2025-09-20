@@ -1,4 +1,4 @@
-package com.example.telegram.constanst;
+package com.example.data.models.consts;
 
 import com.example.data.models.entity.*;
 import com.example.data.models.entity.dto.request.CheckUserRequest;
@@ -8,8 +8,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
-public class TelegramBotConstants {
+public class TelegramBotConstantsForTests {
 
     public static final UserDetails USER_DETAILS_WITH_TOURIST_ROLE_FOR_TESTS = org.springframework.security.core.userdetails.User.builder()
             .username("user")
@@ -17,8 +18,9 @@ public class TelegramBotConstants {
             .roles(UserRoles.TOURIST.getRole())
             .build();
 
-    public static final User USER_FOR_TESTS = new User(
-            1L, "testUser", "test@exemple.com", UserRoles.ADMIN.getRole(), true, null, null
+    private static final User USER_FOR_TESTS = new User(
+            1L, "testUser", "truthseeker", "test@exemple.com", UserRoles.ADMIN.getRole(),
+            true, null, null
     );
 
     public static final CheckUserRequest CHECK_USER_REQUEST = CheckUserRequest.builder()
@@ -65,5 +67,15 @@ public class TelegramBotConstants {
             TELEGRAM_USER_FOR_TESTS);
 
     public static final Chat TELEGRAM_API_CHAT_FOR_TESTS = new Chat(555L, "private");
+
+    public static User getUserForTests() {
+
+        User result = USER_FOR_TESTS;
+
+        result.setTelegramUsers(List.of(TELEGRAM_USER_FOR_TESTS));
+
+        return result;
+
+    }
 
 }

@@ -66,7 +66,7 @@ import java.util.*;
 
 import static com.example.data.models.consts.ResponseMessageProvider.*;
 import static com.example.data.models.enums.ResponseIncludeDataKeys.*;
-import static com.example.telegram.constanst.TelegramBotConstants.*;
+import static com.example.data.models.consts.TelegramBotConstantsForTests.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
@@ -139,7 +139,7 @@ public class TelegramBotTests {
         ApiResponse<UserDTO> userDTOApiResponse = ApiResponse.<UserDTO>builder()
                 .status(HttpStatus.OK)
                 .message(ResponseMessageProvider.SUCCESSES_MSG)
-                .data(mapperService.toDTO(USER_FOR_TESTS, UserDTO.class))
+                .data(mapperService.toDTO(getUserForTests(), UserDTO.class))
                 .build();
 
         ApiResponse<TelegramChatDTO> telegramChatResponse = ApiResponse.<TelegramChatDTO>builder()
@@ -161,7 +161,7 @@ public class TelegramBotTests {
 
         telegramChatResponse.addIncludeObject("telegram_user", TELEGRAM_USER_FOR_TESTS);
 
-        verificationCodeResponse.addIncludeObject("user", mapperService.toDTO(USER_FOR_TESTS, UserDTO.class));
+        verificationCodeResponse.addIncludeObject("user", mapperService.toDTO(getUserForTests(), UserDTO.class));
 
         responses.put(USER.getKeyValue(), userDTOApiResponse);
         responses.put(TELEGRAM_CHAT.getKeyValue(), telegramChatResponse);
@@ -1030,7 +1030,7 @@ public class TelegramBotTests {
         mockServerClient
                 .when(request()
                         .withMethod("GET")
-                        .withPath("/api/v1/user/username/" + USER_FOR_TESTS.getUsername()))
+                        .withPath("/api/v1/user/username/" + getUserForTests().getUsername()))
                 .respond(response()
                         .withStatusCode(200)
                         .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)

@@ -22,6 +22,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.utility.DockerImageName;
 
 
 import static org.mockito.ArgumentMatchers.any;
@@ -35,10 +36,14 @@ public abstract class DataProviderTestsBaseClass {
 
     @Value("${api.key.header.name}")
     protected String apiKeyHeaderName;
+    @Value("${telegram.data.api.version}")
+    protected String dataProviderEndpoint;
     @Autowired
     protected WebTestClient client;
-    protected static ObjectMapper objectMapper;
-    protected static ModelMapperService mapperService;
+    @Autowired
+    protected ObjectMapper objectMapper;
+    @Autowired
+    protected ModelMapperService mapperService;
     protected static PostgreSQLContainer<?> postgres;
     @Autowired
     protected UserService userService;
@@ -46,7 +51,7 @@ public abstract class DataProviderTestsBaseClass {
     protected JWTService jwtService;
 
     static {
-        postgres = new PostgreSQLContainer<>("pgvector/pgvector:pg16");
+        postgres = new PostgreSQLContainer<>(DockerImageName.parse("postgres:16-alpine"));
 
         postgres.start();
 
@@ -55,18 +60,6 @@ public abstract class DataProviderTestsBaseClass {
                 .locations("classpath:db/migration")
                 .load();
         flyway.migrate();
-
-        mapperService = new ModelMapperService(new ModelMapper());
-    }
-
-    @BeforeAll
-    public static void init() {
-        log.debug("init");
-
-        objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-
     }
 
     @BeforeEach

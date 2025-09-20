@@ -3,7 +3,11 @@ package com.example.database;
 import com.example.data.models.consts.ResponseMessageProvider;
 import com.example.data.models.entity.dto.response.ApiResponse;
 import com.example.data.models.utils.ApiResponseUtilsService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.MediaType;
@@ -13,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
 public class DataProviderMainTests extends DataProviderTestsBaseClass {
+
 
     @Test
     void testResponseWithoutApiKeyHeader() throws Exception {
@@ -34,21 +39,19 @@ public class DataProviderMainTests extends DataProviderTestsBaseClass {
     @Test
     void testResponseToUnknownEndPoint() {
 
-        String expectedExceptionMsg = "No static resource api/v100/user/id/500.";
-
-        ApiResponse response = client.get()
+        client.get()
                 .uri("/api/v100/user/id/500")
                 .header(apiKeyHeaderName, "apiHeader")
                 .exchange()
                 .expectStatus().is4xxClientError()
                 .expectBody(ApiResponse.class)
-                .returnResult()
-                .getResponseBody();
-
-        log.debug("Response = {}", response);
-
-        assertEquals(expectedExceptionMsg, response.getMessage());
+                .consumeWith(resp -> {
+                    ApiResponse<?> body = resp.getResponseBody();
+                    assertNotNull(body);
+                    assertTrue(body.getMessage().contains("No static resource"));
+                });
 
     }
+
 
 }

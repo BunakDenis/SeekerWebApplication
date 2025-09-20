@@ -32,8 +32,10 @@ public class UserDataController {
 
     @PostMapping("/user/add/")
     public ResponseEntity<ApiResponse<UserDTO>> save(
-            @RequestBody ApiResponse<UserDTO> request
+            @RequestBody ApiRequest<UserDTO> request
     ) {
+        log.debug("Запрос на сохранения User {}", request);
+
         UserDTO dto = request.getData();
         User user = mapperService.toEntity(dto, User.class);
 
@@ -47,6 +49,8 @@ public class UserDataController {
     public ResponseEntity<ApiResponse<UserDTO>> update(
             @RequestBody ApiRequest<UserDTO> request
     ) {
+        log.debug("Запрос на обновление User {}", request);
+
         UserDTO dto = request.getData();
         User user = mapperService.toEntity(dto, User.class);
 
@@ -61,7 +65,7 @@ public class UserDataController {
             @PathVariable("id") Long id
     ) {
 
-        log.debug("Запрос на получение User по {}", id);
+        log.debug("Запрос на получение User по id={}", id);
 
         ApiResponse<UserDTO> response = userService.getUserById(id);
 

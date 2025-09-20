@@ -32,7 +32,6 @@ public class DataProviderSecurityConfig {
                 .authorizeExchange(exchanges -> exchanges
                         .anyExchange().authenticated()
                 )
-                .addFilterBefore(authFilter, SecurityWebFiltersOrder.AUTHENTICATION)
                 .build();
     }
 

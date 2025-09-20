@@ -1,4 +1,4 @@
-package com.example.telegram.api.clients;
+package com.example.data.models.consts;
 
 import lombok.Data;
 import java.text.MessageFormat;

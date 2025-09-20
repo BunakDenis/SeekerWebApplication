@@ -1,7 +1,6 @@
 package com.example.telegram.api.clients;
 
 
-import com.example.data.models.entity.TelegramUser;
 import com.example.data.models.entity.dto.VerificationCodeDTO;
 import com.example.data.models.entity.dto.response.CheckUserResponse;
 import com.example.data.models.entity.dto.telegram.*;
@@ -11,7 +10,6 @@ import com.example.data.models.entity.dto.response.ApiResponse;
 import com.example.data.models.exception.ApiException;
 import com.example.data.models.entity.TelegramChat;
 import com.example.telegram.bot.service.ModelMapperService;
-import io.swagger.annotations.Api;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import static com.example.telegram.api.clients.DataProviderEndpointsConsts.*;
+import static com.example.data.models.consts.DataProviderEndpointsConsts.*;
 
 import reactor.core.publisher.Mono;
 

@@ -27,7 +27,7 @@ import static com.example.data.models.consts.ResponseMessageProvider.*;
 public class RestControllerExceptionHandler {
 
     @ExceptionHandler(NoResourceFoundException.class)
-    protected ResponseEntity<ApiResponse> endPointNotFoundExceptionHandler(NoResourceFoundException e) {
+    protected ResponseEntity<ApiResponse<Object>> endPointNotFoundExceptionHandler(NoResourceFoundException e) {
 
         ApiResponse response = ApiResponse.builder()
                 .status(HttpStatus.NOT_FOUND)
@@ -38,21 +38,15 @@ public class RestControllerExceptionHandler {
         return ResponseEntity.status(response.getStatus()).body(response);
     }
     @ExceptionHandler(EntityNotFoundException.class)
-    protected ResponseEntity<ApiResponse> entityNotFoundExceptionHandle(EntityNotFoundException e) {
+    protected ResponseEntity<ApiResponse<Object>> entityNotFoundExceptionHandle(EntityNotFoundException e) {
 
-        log.debug("entityNotFoundExceptionHandle");
-
-        log.debug("EntityNotFoundException message = {}", e.getMessage());
-
-        ApiResponse resp = getResponse(HttpStatus.NOT_FOUND, e);
-
-        log.debug(resp.toString());
+        ApiResponse<Object> resp = getResponse(HttpStatus.NOT_FOUND, e);
 
         return ResponseEntity.status(resp.getStatus()).body(resp);
 
     }
     @ExceptionHandler(UserNotFoundException.class)
-    protected ResponseEntity<ApiResponse> userNotFoundExceptionHandle(UserNotFoundException e) {
+    protected ResponseEntity<ApiResponse<Object>> userNotFoundExceptionHandle(UserNotFoundException e) {
 
         ApiResponse resp = getResponse(HttpStatus.NOT_FOUND, e);
 
@@ -61,14 +55,14 @@ public class RestControllerExceptionHandler {
         return ResponseEntity.status(resp.getStatus()).body(resp);
     }
     @ExceptionHandler(NoSuchElementException.class)
-    protected ResponseEntity<ApiResponse> noSuchElementExceptionHandle(NoSuchElementException e) {
+    protected ResponseEntity<ApiResponse<Object>> noSuchElementExceptionHandle(NoSuchElementException e) {
 
         ApiResponse resp = getResponse(HttpStatus.NOT_FOUND, e);
 
         return ResponseEntity.status(resp.getStatus()).body(resp);
     }
     @ExceptionHandler(ApiException.class)
-    protected ResponseEntity<ApiResponse> apiExceptionHandle(ApiException e) {
+    protected ResponseEntity<ApiResponse<Object>> apiExceptionHandle(ApiException e) {
 
         ApiResponse resp = getResponse(HttpStatus.BAD_REQUEST, e);
 
@@ -78,7 +72,7 @@ public class RestControllerExceptionHandler {
 
     }
     @ExceptionHandler(Exception.class)
-    protected ResponseEntity<ApiResponse> notSupportedExceptionHandler(Exception e) {
+    protected ResponseEntity<ApiResponse<Object>> notSupportedExceptionHandler(Exception e) {
 
         ApiResponse resp = getResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Неизвестная ошибка - " + e.getMessage(), e);
 
@@ -86,7 +80,7 @@ public class RestControllerExceptionHandler {
 
         return ResponseEntity.status(resp.getStatus()).body(resp);
     }
-    private ApiResponse getResponse(HttpStatus status, Exception e) {
+    private ApiResponse<Object> getResponse(HttpStatus status, Exception e) {
 
         return ApiResponse.builder()
                 .status(status)
@@ -95,7 +89,7 @@ public class RestControllerExceptionHandler {
                 .build();
 
     }
-    private ApiResponse getResponse(HttpStatus status, String msg, Exception e) {
+    private ApiResponse<Object> getResponse(HttpStatus status, String msg, Exception e) {
 
         return ApiResponse
                 .builder()
