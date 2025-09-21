@@ -167,8 +167,18 @@ public class UserService implements UserDetailsService {
         return resp;
     }
     public ApiResponse<Boolean> delete(Long id) {
-        repo.deleteById(id);
-        return ApiResponseUtilsService.success(true);
+        try {
+            ApiResponse<UserDTO> getResponse = getUserById(id);
+
+            repo.deleteById(id);
+            return ApiResponseUtilsService.success(true);
+        } catch (EntityNotFoundException e) {
+            ApiResponse<Boolean> response = success(false);
+
+            response.setMessage(e.getMessage());
+
+            return response;
+        }
     }
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

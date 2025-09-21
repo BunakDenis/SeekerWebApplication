@@ -130,7 +130,6 @@ public class TelegramBotTests {
         objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-
     }
     @BeforeEach
     public void initVariables() {

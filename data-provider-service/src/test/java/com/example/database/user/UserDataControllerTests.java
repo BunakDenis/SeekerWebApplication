@@ -2,6 +2,7 @@ package com.example.database.user;
 
 
 import com.example.data.models.enums.ResponseIncludeDataKeys;
+import com.example.data.models.enums.UserRoles;
 import com.example.data.models.exception.*;
 import com.example.database.entity.TelegramUser;
 import com.example.database.entity.User;
@@ -14,9 +15,15 @@ import com.example.database.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
+import org.mockserver.client.MockServerClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.MockServerContainer;
+import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -32,8 +39,31 @@ import static org.junit.jupiter.api.Assertions.*;
 @Slf4j
 public class UserDataControllerTests extends DataProviderTestsBaseClass {
 
+
     @Autowired
     private UserService userService;
+    @Container
+    static MockServerContainer mockServerContainer =
+            new MockServerContainer(DockerImageName.parse("mockserver/mockserver:5.15.0"));
+    static MockServerClient mockServerClient;
+
+/*
+    TODO
+        1. Сконфигурировать mockServerClient под mysticSchoolClient
+        2. Дописать тесты для оставшихся ендпоинтов
+ */
+
+    @DynamicPropertySource
+    static void overrideProperties(DynamicPropertyRegistry registry) {
+        mockServerClient = new MockServerClient(
+                mockServerContainer.getHost(),
+                mockServerContainer.getServerPort()
+        );
+
+        log.debug("MockServerContainer endpoint = {}", mockServerContainer.getEndpoint());
+
+        registry.add("data.provide.api.url", mockServerContainer::getEndpoint);
+    }
 
 
     @Test
@@ -623,7 +653,103 @@ public class UserDataControllerTests extends DataProviderTestsBaseClass {
                 });
 
 
+    }
 
+    @Test
+    void testDeleteUserMethod() throws JsonProcessingException {
+
+        ApiRequest apiRequest = getUserRequest();
+
+        //Then
+        client.post()
+                .uri(dataProviderEndpoint + getApiUserEndpoint("add/"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(apiKeyHeaderName, "apiHeader")
+                .bodyValue(objectMapper.writeValueAsString(apiRequest))
+                .exchange()
+                .expectStatus().is2xxSuccessful()
+                .expectBody(ApiResponse.class)
+                .consumeWith(apiResponse -> {
+
+                    ApiResponse response = apiResponse.getResponseBody();
+
+                    assertNotNull(response.getData());
+
+                    UserDTO savedUserDto = objectMapper.convertValue(response.getData(), UserDTO.class);
+
+                    client.post()
+                            .uri(dataProviderEndpoint + getApiUserEndpoint("delete/" + savedUserDto.getId()))
+                            .header(apiKeyHeaderName, "apiHeader")
+                            .exchange()
+                            .expectStatus().is2xxSuccessful()
+                            .expectBody(ApiResponse.class)
+                            .consumeWith(deleteResp -> {
+
+                                ApiResponse deleteResponseBody = deleteResp.getResponseBody();
+
+                                assertNotNull(deleteResponseBody.getData());
+
+                                Boolean expectedDeleteAnswer = objectMapper.convertValue(
+                                        deleteResponseBody.getData(),
+                                        Boolean.class
+                                );
+
+                                assertTrue(expectedDeleteAnswer);
+                            });
+                });
+
+    }
+
+    @Test
+    void testDeleteUserMethodWithInvalidId() throws JsonProcessingException {
+
+        long userId = 500L;
+        ApiRequest apiRequest = getUserRequest();
+
+        //Then
+        client.post()
+                .uri(dataProviderEndpoint + getApiUserEndpoint("delete/" + userId))
+                .header(apiKeyHeaderName, "apiHeader")
+                .exchange()
+                .expectStatus().is2xxSuccessful()
+                .expectBody(ApiResponse.class)
+                .consumeWith(deleteResp -> {
+
+                    ApiResponse deleteResponseBody = deleteResp.getResponseBody();
+
+                    assertNotNull(deleteResponseBody.getData());
+
+                    EntityNotFoundException entityNotFoundException = assertThrows(
+                            EntityNotFoundException.class, () ->
+                                    userService.getUserById(userId)
+                    );
+
+                    String expectedExceptionMsg = entityNotFoundException.getMessage();
+                    String actualExceptionMsg = deleteResponseBody.getMessage();
+
+                    Boolean expectedDeleteAnswer = objectMapper.convertValue(
+                            deleteResponseBody.getData(),
+                            Boolean.class
+                    );
+
+                    assertFalse(expectedDeleteAnswer);
+                    assertEquals(expectedExceptionMsg, actualExceptionMsg);
+                });
+    }
+
+    private ApiRequest getUserRequest() {
+
+        User vasya = User.builder()
+                .username("vasya")
+                .password("12345")
+                .role(UserRoles.USER.getRole())
+                .email("vs@gmail.com")
+                .isActive(true)
+                .build();
+
+        UserDTO userDTO = mapperService.toDTO(vasya, UserDTO.class);
+
+        return new ApiRequest(userDTO);
     }
 
 }

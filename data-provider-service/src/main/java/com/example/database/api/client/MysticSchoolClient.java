@@ -37,7 +37,7 @@ public class MysticSchoolClient {
     private String apiVersion;
 
     @Value("${mystic.school.api.key}")
-    private String apiKey; // вынесите ключ в конфиг/секрет
+    private String apiKey;
 
     @Value("${proxy.tor.enabled:true}")
     private boolean proxyEnabled;
