@@ -90,7 +90,7 @@ public class UserService implements UserDetailsService {
         if (Objects.nonNull(user))
             return success(mapper.toDTO(user, UserDTO.class));
 
-        throw new  UserNotFoundException("User with telegram user id " + id + " is not found");
+        throw new UserNotFoundException("User with telegram user id " + id + " is not found");
 
     }
     public ApiResponse<UserDTO> getUserByTelegramUserIdWithUserDetails(Long id) throws UserNotFoundException {
@@ -207,7 +207,6 @@ public class UserService implements UserDetailsService {
                 .roles(UserRoles.TOURIST.getRole())
                 .build();
     }
-
     private void checkUser(User user) {
 
         if (isNull(user)) throw new EntityNullException(

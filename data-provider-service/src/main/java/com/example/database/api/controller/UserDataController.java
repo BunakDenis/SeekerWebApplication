@@ -21,6 +21,7 @@ import reactor.core.publisher.Mono;
 import java.util.Objects;
 
 import static com.example.data.models.utils.ApiResponseUtilsService.success;
+import static com.example.data.models.utils.EntityUtilsService.*;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -160,8 +161,14 @@ public class UserDataController {
 
         return Mono.just(userService.getUserByTelegramUserId(id))
                 .flatMap(response -> {
-                    User user = mapperService.toEntity(response.getData(), User.class);
-                    return mysticSchoolClient.checkUserAuthentication(user.getEmail());
+                    if (!isNull(response.getData())) {
+                        User user = mapperService.toEntity(response.getData(), User.class);
+                        return mysticSchoolClient.checkUserAuthentication(user.getEmail());
+                    }
+
+                    return Mono.just(CheckUserResponse.builder()
+                            .found(false)
+                            .build());
                 })
                 .map(mysticSchoolResponse -> {
 

@@ -1,9 +1,11 @@
 package com.example.database.user;
 
 
+import com.example.data.models.entity.dto.response.CheckUserResponse;
 import com.example.data.models.enums.ResponseIncludeDataKeys;
 import com.example.data.models.enums.UserRoles;
 import com.example.data.models.exception.*;
+import com.example.database.api.client.MysticSchoolClient;
 import com.example.database.entity.TelegramUser;
 import com.example.database.entity.User;
 import com.example.data.models.entity.dto.UserDTO;
@@ -13,25 +15,31 @@ import com.example.database.DataProviderTestsBaseClass;
 import com.example.database.entity.UserDetails;
 import com.example.database.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import io.github.cdimascio.dotenv.Dotenv;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
+import org.mockito.Mockito;
 import org.mockserver.client.MockServerClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.MockServerContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
+import reactor.core.publisher.Mono;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.data.models.consts.DataProviderEndpointsConsts.getApiUserEndpoint;
 import static com.example.database.constants.UserConstantsForTests.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockserver.model.HttpRequest.request;
+import static org.mockserver.model.HttpResponse.response;
 
 
 @Testcontainers
@@ -42,10 +50,35 @@ public class UserDataControllerTests extends DataProviderTestsBaseClass {
 
     @Autowired
     private UserService userService;
+    private static GenericContainer<?> torProxyContainer;
+    private static String mysticSchoolBaseUrl;
     @Container
-    static MockServerContainer mockServerContainer =
+    static MockServerContainer mysticSchoolServerContainer =
             new MockServerContainer(DockerImageName.parse("mockserver/mockserver:5.15.0"));
-    static MockServerClient mockServerClient;
+    static MockServerClient mysticSchoolClient;
+    @MockBean
+    private MysticSchoolClient mockMysticSchoolClient;
+
+    static {
+
+        // Загружаем .env ещё до запуска Spring
+        Dotenv dotenv = Dotenv.configure()
+                .directory("../.env")
+                .ignoreIfMissing()
+                .load();
+
+        String portStr = System.getenv("PROXY_TOR_PORT");
+        if (portStr == null) {
+            portStr = dotenv.get("PROXY_TOR_PORT", "9050");
+        }
+
+        int torPort = Integer.parseInt(portStr);
+
+        torProxyContainer = new GenericContainer<>(DockerImageName.parse("dperson/torproxy:latest"))
+                .withExposedPorts(torPort);
+
+        mysticSchoolBaseUrl = dotenv.get("MYSTIC_SCHOOL_API_URL") + dotenv.get("MYSTIC_SCHOOL_API_VERSION");
+    }
 
 /*
     TODO
@@ -55,14 +88,22 @@ public class UserDataControllerTests extends DataProviderTestsBaseClass {
 
     @DynamicPropertySource
     static void overrideProperties(DynamicPropertyRegistry registry) {
-        mockServerClient = new MockServerClient(
-                mockServerContainer.getHost(),
-                mockServerContainer.getServerPort()
-        );
 
-        log.debug("MockServerContainer endpoint = {}", mockServerContainer.getEndpoint());
+        torProxyContainer.start();
 
-        registry.add("data.provide.api.url", mockServerContainer::getEndpoint);
+        if (torProxyContainer.isRunning()) {
+
+            mysticSchoolClient = new MockServerClient(
+                    mysticSchoolServerContainer.getHost(),
+                    mysticSchoolServerContainer.getServerPort()
+            );
+
+            log.debug("torProxyServerContainer host = {}", mysticSchoolServerContainer.getHost());
+            log.debug("torProxyServerContainer port = {}", mysticSchoolServerContainer.getServerPort());
+
+            registry.add("proxy.tor.host", () -> mysticSchoolServerContainer.getHost());
+            registry.add("proxy.tor.port", () -> mysticSchoolServerContainer.getServerPort());
+        }
     }
 
 
@@ -734,6 +775,109 @@ public class UserDataControllerTests extends DataProviderTestsBaseClass {
 
                     assertFalse(expectedDeleteAnswer);
                     assertEquals(expectedExceptionMsg, actualExceptionMsg);
+                });
+    }
+
+    @Test
+    void testCheckUserAuthInMysticSchoolBdByTelegramUserId() throws JsonProcessingException {
+
+        //Given
+        Long id = TELEGRAM_USER_FOR_TESTS.getId();
+        CheckUserResponse expectedCheckUserResponse = CheckUserResponse.builder()
+                .found(true)
+                .active(true)
+                .access_level((byte) 2)
+                .build();
+
+        ApiRequest<CheckUserResponse> apiRequest = new ApiRequest(expectedCheckUserResponse);
+
+        //When
+        mysticSchoolClient.when(
+                request()
+                        .withMethod("GET")
+                        .withPath(getApiUserEndpoint("check/auth/" + id)))
+                .respond(response()
+                        .withStatusCode(200)
+                        .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
+                        .withBody(objectMapper.writeValueAsString(apiRequest))
+        );
+
+        Mockito.when(
+                mockMysticSchoolClient.checkUserAuthentication(any())
+        ).thenReturn(Mono.just(expectedCheckUserResponse));
+
+        //Then
+        client.get()
+                .uri(dataProviderEndpoint + getApiUserEndpoint("check/auth/" + id))
+                .header(apiKeyHeaderName, "apiHeader")
+                .exchange()
+                .expectStatus().is2xxSuccessful()
+                .expectBody(ApiResponse.class)
+                .consumeWith(apiResp -> {
+
+                    ApiResponse responseBody = apiResp.getResponseBody();
+
+                    log.debug("Response body = {}", responseBody);
+
+                    assertNotNull(responseBody.getData());
+
+                    CheckUserResponse checkUserResponse = objectMapper.convertValue(
+                            responseBody.getData(), CheckUserResponse.class
+                    );
+
+                    assertTrue(checkUserResponse.isFound());
+                    assertEquals(checkUserResponse.getAccess_level(), expectedCheckUserResponse.getAccess_level());
+                    assertTrue(checkUserResponse.isActive());
+
+                });
+    }
+
+    @Test
+    void testCheckUserAuthInMysticSchoolBdByTelegramUserIdWithNotAuthUser() throws JsonProcessingException {
+
+        //Given
+        Long id = 55555L;
+        CheckUserResponse expectedCheckUserResponse = CheckUserResponse.builder()
+                .found(false)
+                .build();
+
+        ApiRequest<CheckUserResponse> apiRequest = new ApiRequest(expectedCheckUserResponse);
+
+        //When
+        mysticSchoolClient.when(
+                        request()
+                                .withMethod("GET")
+                                .withPath(getApiUserEndpoint("check/auth/" + id)))
+                .respond(response()
+                        .withStatusCode(200)
+                        .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
+                        .withBody(objectMapper.writeValueAsString(apiRequest))
+                );
+
+        Mockito.when(
+                mockMysticSchoolClient.checkUserAuthentication(any())
+        ).thenReturn(Mono.just(expectedCheckUserResponse));
+
+        //Then
+        client.get()
+                .uri(dataProviderEndpoint + getApiUserEndpoint("check/auth/" + id))
+                .header(apiKeyHeaderName, "apiHeader")
+                .exchange()
+                .expectStatus().is2xxSuccessful()
+                .expectBody(ApiResponse.class)
+                .consumeWith(apiResp -> {
+
+                    ApiResponse responseBody = apiResp.getResponseBody();
+
+                    log.debug("Response body = {}", responseBody);
+
+                    assertNotNull(responseBody.getData());
+
+                    CheckUserResponse checkUserResponse = objectMapper.convertValue(
+                            responseBody.getData(), CheckUserResponse.class
+                    );
+
+                    assertFalse(checkUserResponse.isFound());
                 });
     }
 
