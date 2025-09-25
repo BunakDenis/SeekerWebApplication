@@ -22,6 +22,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.utility.DockerImageName;
 
 
@@ -36,6 +37,10 @@ import static org.mockito.ArgumentMatchers.any;
 @Slf4j
 public abstract class DataProviderTestsBaseClass {
 
+
+    @Container
+    protected static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(DockerImageName.parse("postgres:16-alpine"));
+
     @Value("${api.key.header.name}")
     protected String apiKeyHeaderName;
     @Value("${telegram.data.api.version}")
@@ -43,30 +48,13 @@ public abstract class DataProviderTestsBaseClass {
     @Autowired
     protected WebTestClient client;
     @Autowired
-    protected ObjectMapper objectMapper;
+    protected static ObjectMapper objectMapper;
     @Autowired
     protected ModelMapperService mapperService;
-    protected static PostgreSQLContainer<?> postgres;
     @Autowired
     protected UserService userService;
     @MockBean
     protected JWTService jwtService;
-
-    static {
-
-        log.debug("DataProviderTestsBaseClass static initial block");
-
-        postgres = new PostgreSQLContainer<>(DockerImageName.parse("postgres:16-alpine"));
-
-        postgres.start();
-
-        Flyway flyway = Flyway.configure()
-                .dataSource(postgres.getJdbcUrl(), postgres.getUsername(), postgres.getPassword())
-                .locations("classpath:db/migration-test")
-                .load();
-
-        flyway.migrate();
-    }
 
     @BeforeEach
     public void mockMethodCalls() {

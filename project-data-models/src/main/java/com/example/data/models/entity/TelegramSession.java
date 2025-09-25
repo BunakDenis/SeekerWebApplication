@@ -19,10 +19,6 @@ public class TelegramSession {
 
     private String sessionData;
 
-    private boolean isActive;
-
-    private LocalDateTime expirationTime;
-
     @ToString.Exclude
     @JsonIgnore
     private TelegramUser telegramUser;

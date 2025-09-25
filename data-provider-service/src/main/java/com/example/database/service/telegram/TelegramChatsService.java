@@ -1,9 +1,9 @@
 package com.example.database.service.telegram;
 
 import com.example.data.models.consts.ResponseMessageProvider;
-import com.example.data.models.entity.telegram.TelegramChatDTO;
+import com.example.data.models.entity.dto.telegram.TelegramChatDTO;
 import com.example.data.models.entity.response.ApiResponse;
-import com.example.data.models.entity.telegram.TelegramUserDTO;
+import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
 import com.example.data.models.enums.ResponseIncludeDataKeys;
 import com.example.data.models.exception.EntityNotFoundException;
 import com.example.data.models.utils.ApiResponseUtilsService;

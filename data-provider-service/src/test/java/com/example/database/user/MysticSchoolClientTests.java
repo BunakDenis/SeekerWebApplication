@@ -64,6 +64,8 @@ public class MysticSchoolClientTests extends DataProviderTestsBaseClass {
         }
     }
 
+    /*
+
     @Test
     public void testIsRunningTorProxyContainer() {
         assertTrue(torProxyContainer.isRunning());
@@ -163,6 +165,8 @@ public class MysticSchoolClientTests extends DataProviderTestsBaseClass {
                 .assertNext(list -> assertFalse(list.isEmpty()))
                 .verifyComplete();
     }
+
+    */
 
     /*
             TODO

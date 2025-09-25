@@ -5,7 +5,7 @@ import com.example.data.models.entity.dto.UserDTO;
 import com.example.data.models.entity.dto.UserDetailsDTO;
 import com.example.data.models.entity.response.ApiResponse;
 import com.example.data.models.enums.ResponseIncludeDataKeys;
-import com.example.data.models.entity.telegram.TelegramUserDTO;
+import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
 import com.example.data.models.enums.UserRoles;
 import com.example.data.models.exception.*;
 import com.example.data.models.utils.ApiResponseUtilsService;

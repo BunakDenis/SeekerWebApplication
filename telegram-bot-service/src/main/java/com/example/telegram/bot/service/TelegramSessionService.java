@@ -5,7 +5,7 @@ import com.example.data.models.entity.TelegramSession;
 import com.example.data.models.entity.TelegramUser;
 import com.example.data.models.entity.TransientSession;
 import com.example.data.models.entity.jwt.JwtTelegramDataImpl;
-import com.example.data.models.entity.telegram.TelegramSessionDTO;
+import com.example.data.models.entity.dto.telegram.TelegramSessionDTO;
 import com.example.data.models.enums.JWTDataSubjectKeys;
 import com.example.data.models.enums.ResponseIncludeDataKeys;
 import com.example.data.models.service.JWTService;
@@ -50,9 +50,7 @@ public class TelegramSessionService {
 
     public Mono<TelegramSession> save(TelegramSession telegramSession) {
 
-        TelegramSessionDTO dto = modelMapperService.toDTO(telegramSession, TelegramSessionDTO.class);
-
-        return dataProviderClient.createTelegramSession(dto)
+        return dataProviderClient.saveTelegramSession(telegramSession)
                 .flatMap(session -> Mono.just(modelMapperService.toEntity(session, TelegramSession.class)));
     }
     public Mono<TelegramSession> getFull(Long telegramUserId) {

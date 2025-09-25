@@ -1,10 +1,10 @@
 package com.example.database.service.telegram;
 
 
-import com.example.data.models.entity.telegram.PersistentSessionDTO;
-import com.example.data.models.entity.telegram.TelegramSessionDTO;
+import com.example.data.models.entity.dto.telegram.PersistentSessionDTO;
+import com.example.data.models.entity.dto.telegram.TelegramSessionDTO;
 import com.example.data.models.entity.response.ApiResponse;
-import com.example.data.models.entity.telegram.TransientSessionDTO;
+import com.example.data.models.entity.dto.telegram.TransientSessionDTO;
 import com.example.data.models.enums.ResponseIncludeDataKeys;
 import com.example.data.models.exception.EntityNotFoundException;
 import com.example.data.models.exception.EntityNotSavedException;
@@ -33,7 +33,7 @@ public class TelegramSessionService {
     private final ModelMapperService mapperService;
 
 
-    public ApiResponse<TelegramSessionDTO> create(TelegramSession session) {
+    public ApiResponse<TelegramSessionDTO> save(TelegramSession session) {
 
         Optional<TelegramSession> save = Optional.of(repo.save(session));
 
@@ -46,7 +46,7 @@ public class TelegramSessionService {
     }
     public ApiResponse<TelegramSessionDTO> update(TelegramSession session) {
 
-        ApiResponse<TelegramSessionDTO> response = create(session);
+        ApiResponse<TelegramSessionDTO> response = save(session);
 
         response.setStatus(HttpStatus.OK);
 

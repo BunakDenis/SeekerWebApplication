@@ -19,6 +19,9 @@ public class TelegramSession {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "session_data")
+    private String sessionData;
+
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "telegram_user_id", referencedColumnName = "id", nullable = false)
     @ToString.Exclude

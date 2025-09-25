@@ -20,7 +20,7 @@ public interface VerificationCodeRepo extends JpaRepository<VerificationCode, Lo
             "JOIN vc.user u " +
             "JOIN u.telegramUsers tu " +
             "WHERE vc.isActive = true AND " +
-            "tu.id = :telegramUserId")
+            "tu.telegramUserId = :telegramUserId")
     Optional<VerificationCode> findActiveByTelegramUserId(Long telegramUserId);
     @Query("SELECT vc FROM VerificationCode vc " +
             "JOIN FETCH vc.user u " +

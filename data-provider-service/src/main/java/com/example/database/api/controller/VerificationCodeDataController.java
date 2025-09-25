@@ -91,7 +91,7 @@ public class VerificationCodeDataController {
     public ResponseEntity<ApiResponse<VerificationCodeDTO>> getVerificationCodeByTelegramUserId(
             @PathVariable("id") Long id
     ) {
-        log.debug("Запрос на получение VerificationCode по user_id {}", id);
+        log.debug("Запрос на получение VerificationCode по telegram_user_id {}", id);
 
         ApiResponse<VerificationCodeDTO> response = verificationCodeService.getCodeByTelegramUserId(id);
 

@@ -1,4 +1,4 @@
-package com.example.data.models.entity.telegram;
+package com.example.data.models.entity.dto.telegram;
 
 import lombok.*;
 
@@ -6,7 +6,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class TransientSessionDTO {
+public class PersistentSessionDTO {
 
     private Long id;
 

@@ -3,7 +3,7 @@ package com.example.database.api.controller;
 
 import com.example.data.models.entity.request.ApiRequest;
 import com.example.data.models.entity.response.ApiResponse;
-import com.example.data.models.entity.telegram.TelegramChatDTO;
+import com.example.data.models.entity.dto.telegram.TelegramChatDTO;
 import com.example.database.entity.TelegramChat;
 import com.example.database.entity.TelegramUser;
 import com.example.database.service.ModelMapperService;

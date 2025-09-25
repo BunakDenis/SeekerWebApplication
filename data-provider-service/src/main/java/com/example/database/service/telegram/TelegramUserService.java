@@ -1,7 +1,7 @@
 package com.example.database.service.telegram;
 
 import com.example.data.models.entity.response.ApiResponse;
-import com.example.data.models.entity.telegram.TelegramUserDTO;
+import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
 import com.example.data.models.exception.EntityNotFoundException;
 import com.example.data.models.utils.ApiResponseUtilsService;
 import com.example.database.entity.TelegramUser;
@@ -30,7 +30,7 @@ public class TelegramUserService {
     public ApiResponse<TelegramUserDTO> update(TelegramUser telegramUser) {
         return save(telegramUser);
     }
-    public ApiResponse<TelegramUserDTO> getById(Long telegramUserId) {
+    public ApiResponse<TelegramUserDTO> getByTelegramUserId(Long telegramUserId) {
 
         Optional<TelegramUser> optionalUser = repo.findByTelegramUserId(telegramUserId);
 

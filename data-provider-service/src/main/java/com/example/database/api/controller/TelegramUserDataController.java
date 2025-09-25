@@ -3,7 +3,7 @@ package com.example.database.api.controller;
 
 import com.example.data.models.entity.request.ApiRequest;
 import com.example.data.models.entity.response.ApiResponse;
-import com.example.data.models.entity.telegram.TelegramUserDTO;
+import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
 import com.example.data.models.enums.ResponseIncludeDataKeys;
 import com.example.database.entity.TelegramUser;
 import com.example.database.entity.User;
@@ -60,7 +60,7 @@ public class TelegramUserDataController {
     ) {
         log.debug("Запрос на получение TelegramUser по id {}", id);
 
-        ApiResponse<TelegramUserDTO> response = telegramUserService.getById(id);
+        ApiResponse<TelegramUserDTO> response = telegramUserService.getByTelegramUserId(id);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
 

@@ -1,7 +1,7 @@
 package com.example.telegram.bot.service;
 
 import com.example.data.models.entity.PersistentSession;
-import com.example.data.models.entity.telegram.PersistentSessionDTO;
+import com.example.data.models.entity.dto.telegram.PersistentSessionDTO;
 import com.example.data.models.enums.ResponseIncludeDataKeys;
 import com.example.telegram.api.clients.DataProviderClient;
 import lombok.RequiredArgsConstructor;

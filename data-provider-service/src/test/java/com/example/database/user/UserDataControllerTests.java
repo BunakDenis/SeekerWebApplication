@@ -395,23 +395,22 @@ public class UserDataControllerTests extends DataProviderTestsBaseClass {
                     ApiRequest<UserDTO> userApiRequest = new ApiRequest<>(expectedUser);
 
                     //Then
-                    try {
-                        client.post()
-                                    .uri(dataProviderEndpoint + getApiUserEndpoint("update/"))
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .header(apiKeyHeaderName, "apiHeader")
-                                    .bodyValue(objectMapper.writeValueAsString(userApiRequest))
-                                    .exchange()
-                                    .expectBody(ApiResponse.class)
-                                    .consumeWith(saveResp -> {
+                    client.post()
+                            .uri(dataProviderEndpoint + getApiUserEndpoint("update/"))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header(apiKeyHeaderName, "apiHeader")
+                            .bodyValue(userApiRequest)
+                            .exchange()
+                            .expectBody(ApiResponse.class)
+                            .consumeWith(saveResp -> {
 
-                                        ApiResponse savedResponse = saveResp.getResponseBody();
+                                ApiResponse savedResponse = saveResp.getResponseBody();
 
-                                        assertNotNull(savedResponse.getData());
+                                assertNotNull(savedResponse.getData());
 
-                                        UserDTO actualUser = objectMapper.convertValue(
-                                                savedResponse.getData(), UserDTO.class
-                                        );
+                                UserDTO actualUser = objectMapper.convertValue(
+                                        savedResponse.getData(), UserDTO.class
+                                );
 
                                         assertEquals(expectedUser.getUsername(), actualUser.getUsername());
                                         assertEquals(expectedUser.getPassword(), actualUser.getPassword());
@@ -419,9 +418,6 @@ public class UserDataControllerTests extends DataProviderTestsBaseClass {
                                         assertEquals(expectedUser.getRole(), actualUser.getRole());
 
                                     });
-                    } catch (JsonProcessingException e) {
-                        throw new RuntimeException(e);
-                    }
                 });
     }
     @Test

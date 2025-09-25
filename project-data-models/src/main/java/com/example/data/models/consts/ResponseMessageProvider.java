@@ -13,7 +13,7 @@ public class ResponseMessageProvider {
     public static final String REQUEST_BODY_DO_NOT_CONTAINS_TELEGRAM_UPDATE = "Request don't contains update";
 
     public static String getEntityNotFoundMessage(Object object) {
-        return MessageFormat.format(ENTITY_NOT_FOUND_MSG, object.getClass().getSimpleName());
+        return MessageFormat.format(ENTITY_NOT_FOUND_MSG, object.getClass().getName());
     }
     public static String getFailedToSaveEntity(Object object) {
         return MessageFormat.format(FAILED_TO_SAVE_ENTITY, object.getClass());

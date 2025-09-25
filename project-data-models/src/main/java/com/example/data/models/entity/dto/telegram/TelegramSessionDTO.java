@@ -1,4 +1,4 @@
-package com.example.data.models.entity.telegram;
+package com.example.data.models.entity.dto.telegram;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -15,10 +15,5 @@ public class TelegramSessionDTO {
     private Long id;
 
     private String sessionData;
-
-    private boolean isActive;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss", timezone = "${default.time.zone.utc}")
-    private LocalDateTime expirationTime;
 
 }

@@ -19,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -107,11 +108,17 @@ public class VerificationCodeService {
                     modelMapperService.toDTO(code, VerificationCodeDTO.class)
         );
 
-        throw new EntityNotFoundException(ResponseMessageProvider.getEntityNotFoundMessage(User.class), new User());
+        throw new EntityNotFoundException(ResponseMessageProvider.getEntityNotFoundMessage(new User()), new User());
     }
     public ApiResponse<Object> getAllActiveByUserId(Long userId) {
 
         List<VerificationCode> all = verificationCodeRepo.findAllActiveByUserId(userId);
+
+        if (all.isEmpty()) return ApiResponse.builder()
+                .status(HttpStatus.NOT_FOUND)
+                .includeList(ResponseIncludeDataKeys.VERIFICATION_CODE.getKeyValue(), Collections.EMPTY_LIST)
+                .includeObject(ResponseIncludeDataKeys.USER.getKeyValue(),new UserDTO())
+                .build();
 
         List dtoList = listEntityToDto(all);
         User user = all.get(0).getUser();

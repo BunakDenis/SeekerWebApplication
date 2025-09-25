@@ -3,7 +3,7 @@ package com.example.database.api.controller;
 import com.example.database.entity.PersistentSession;
 import com.example.data.models.entity.request.ApiRequest;
 import com.example.data.models.entity.response.ApiResponse;
-import com.example.data.models.entity.telegram.PersistentSessionDTO;
+import com.example.data.models.entity.dto.telegram.PersistentSessionDTO;
 import com.example.database.service.ModelMapperService;
 import com.example.database.service.telegram.PersistentSessionService;
 import lombok.RequiredArgsConstructor;

@@ -1,5 +1,6 @@
 package com.example.database.constants;
 
+import com.example.database.entity.TelegramSession;
 import com.example.database.entity.TelegramUser;
 import com.example.database.entity.User;
 import com.example.data.models.entity.request.CheckUserRequest;
@@ -55,6 +56,10 @@ public class UserConstantsForTests {
             .telegramUserId(55555L)
             .username("vterk")
             .isActive(true)
+            .build();
+
+    public static final TelegramSession TELEGRAM_SESSION_FOR_TESTS = TelegramSession.builder()
+            .telegramUser(TELEGRAM_USER_FOR_TESTS)
             .build();
 
     public static User getUserForTests() {

@@ -6,6 +6,7 @@ public enum ResponseIncludeDataKeys {
     USER_DETAILS ("user_details"),
     TELEGRAM_USER ("telegram_user"),
     TELEGRAM_CHAT ("telegram_chat"),
+    TELEGRAM_SESSION("telegram_session"),
     TRANSIENT_SESSION("transient_session"),
     PERSISTENT_SESSION("persistent-session"),
     VERIFICATION_CODE ("verification_code");

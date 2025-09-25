@@ -110,7 +110,6 @@ public class AuthCommandHandlerImpl implements CommandHandler {
                         })
                 );
     }
-
     private Mono<Tuple2<SendMessage, TelegramChat>> emailInputtingStateHandler(Update update, TelegramChat chat) {
         return Mono.just("")
                 .flatMap(some -> {
@@ -129,7 +128,6 @@ public class AuthCommandHandlerImpl implements CommandHandler {
                 });
 
     }
-
     private Mono<Tuple2<SendMessage, TelegramChat>> emailCheckingStateHandler(Update update, TelegramChat chat) {
 
         final long chatId = UpdateUtilsService.getChatId(update);
@@ -198,7 +196,7 @@ public class AuthCommandHandlerImpl implements CommandHandler {
                                                         return Mono.just(chat);
                                                     })
                                     )
-                                    .flatMap(savedChat -> Mono.zip(Mono.just(okMsg), Mono.just(savedChat)))
+                                    .flatMap(chatForSave -> Mono.zip(Mono.just(okMsg), Mono.just(chatForSave)))
                                     .onErrorResume(err -> {
 
                                         log.error("Ошибка в методе emailCheckingStateHandler {}", err.getMessage());
@@ -218,7 +216,6 @@ public class AuthCommandHandlerImpl implements CommandHandler {
                     });
         });
     }
-
     private Mono<Tuple2<SendMessage, TelegramChat>> verificationCodeValidatingStateHandler(Update update, TelegramChat chat) {
 
         log.info("Стадия проверки введённого юзером кода верификации");
@@ -245,7 +242,6 @@ public class AuthCommandHandlerImpl implements CommandHandler {
                     return telegramUserService.getById(telegramUserId)
                             .flatMap(tgUser -> {
                                 TelegramSession session = TelegramSession.builder()
-                                        .isActive(true)
                                         .telegramUser(tgUser)
                                         .build();
 

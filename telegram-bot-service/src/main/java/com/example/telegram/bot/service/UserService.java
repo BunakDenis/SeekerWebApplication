@@ -6,7 +6,7 @@ import com.example.data.models.entity.response.CheckUserResponse;
 import com.example.data.models.enums.UserRoles;
 import com.example.data.models.entity.dto.UserDTO;
 import com.example.data.models.entity.response.ApiResponse;
-import com.example.data.models.entity.telegram.TelegramUserDTO;
+import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
 import com.example.telegram.api.clients.DataProviderClient;
 import com.example.data.models.entity.TelegramUser;
 import com.example.data.models.entity.User;

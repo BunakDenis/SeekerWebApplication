@@ -1,13 +1,14 @@
 package com.example.telegram.api.clients;
 
 
+import com.example.data.models.entity.TelegramSession;
 import com.example.data.models.entity.dto.VerificationCodeDTO;
+import com.example.data.models.entity.dto.telegram.*;
 import com.example.data.models.entity.response.CheckUserResponse;
-import com.example.data.models.entity.telegram.*;
 import com.example.data.models.entity.dto.UserDTO;
 import com.example.data.models.entity.request.ApiRequest;
 import com.example.data.models.entity.response.ApiResponse;
-import com.example.data.models.enums.QueryParameters;
+import com.example.data.models.enums.ResponseIncludeDataKeys;
 import com.example.data.models.exception.ApiException;
 import com.example.data.models.entity.TelegramChat;
 import com.example.telegram.bot.service.ModelMapperService;
@@ -455,7 +456,14 @@ public class DataProviderClient {
     }
 
     //TELEGRAM SESSION SECTION
-    public Mono<ApiResponse<TelegramSessionDTO>> createTelegramSession(TelegramSessionDTO dto) {
+    public Mono<ApiResponse<TelegramSessionDTO>> saveTelegramSession(TelegramSession session) {
+
+        TelegramSessionDTO dto = mapperService.toDTO(session, TelegramSessionDTO.class);
+        TelegramUserDTO telegramUserDTO = mapperService.toDTO(session.getTelegramUser(), TelegramUserDTO.class);
+
+        ApiRequest<TelegramSessionDTO> request = new ApiRequest<>(dto);
+
+        request.addIncludeObject(ResponseIncludeDataKeys.TELEGRAM_USER.getKeyValue(), telegramUserDTO);
 
         StringBuilder endpoint = new StringBuilder(getApiSessionEndpoint("add/"));
 
@@ -466,7 +474,7 @@ public class DataProviderClient {
                 .uri(endpoint.toString())
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(dto)
+                .bodyValue(request)
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<>() {
                 });
@@ -488,13 +496,13 @@ public class DataProviderClient {
     }
     public Mono<ApiResponse<TransientSessionDTO>> saveTransientSession(TransientSessionDTO dto) {
 
-        ApiRequest<TransientSessionDTO> response = new ApiRequest<>(dto);
+        ApiRequest<TransientSessionDTO> request = new ApiRequest<>(dto);
 
         return webClient.post()
                 .uri(getApiTransientSessionEndpoint("add/"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
-                .bodyValue(response)
+                .bodyValue(request)
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<>() {
                 });

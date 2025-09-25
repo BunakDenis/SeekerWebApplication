@@ -1,7 +1,7 @@
 package com.example.telegram.bot.service;
 
 import com.example.data.models.entity.TelegramUser;
-import com.example.data.models.entity.telegram.TelegramUserDTO;
+import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
 import com.example.data.models.exception.EntityNotFoundException;
 import com.example.telegram.api.clients.DataProviderClient;
 import org.springframework.stereotype.Service;

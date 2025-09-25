@@ -1,7 +1,7 @@
 package com.example.telegram.bot.service;
 
 import com.example.data.models.entity.response.ApiResponse;
-import com.example.data.models.entity.telegram.TelegramChatDTO;
+import com.example.data.models.entity.dto.telegram.TelegramChatDTO;
 import com.example.data.models.enums.ResponseIncludeDataKeys;
 import com.example.data.models.exception.EntityNotFoundException;
 import com.example.data.models.exception.EntityNotSavedException;

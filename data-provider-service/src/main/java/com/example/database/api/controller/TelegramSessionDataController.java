@@ -3,10 +3,13 @@ package com.example.database.api.controller;
 
 import com.example.data.models.entity.request.ApiRequest;
 import com.example.data.models.entity.response.ApiResponse;
-import com.example.data.models.entity.telegram.TelegramSessionDTO;
+import com.example.data.models.entity.dto.telegram.TelegramSessionDTO;
+import com.example.data.models.enums.ResponseIncludeDataKeys;
 import com.example.database.entity.TelegramSession;
+import com.example.database.entity.TelegramUser;
 import com.example.database.service.ModelMapperService;
 import com.example.database.service.telegram.TelegramSessionService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -21,18 +24,30 @@ public class TelegramSessionDataController {
 
     private final TelegramSessionService sessionService;
     private final ModelMapperService mapperService;
+    private final ObjectMapper objectMapper;
 
-    @PostMapping(path = {"/session/add", "/session/add"})
+    @PostMapping(path = {"/session/add/", "/session/add"})
     public ResponseEntity<ApiResponse<TelegramSessionDTO>> addSession(
             @RequestBody ApiRequest<TelegramSessionDTO> request
     ) {
         log.debug("Запрос на сохранение TelegramSession {}", request);
 
-        ApiResponse<TelegramSessionDTO> response = sessionService.create(
-                mapperService.toEntity(request.getData(), TelegramSession.class)
+        TelegramSessionDTO dto = request.getData();
+
+        TelegramSession telegramSessionForSave = mapperService.toEntity(dto, TelegramSession.class);
+        TelegramUser telegramUser = objectMapper.convertValue(
+                request.getIncludeObject(ResponseIncludeDataKeys.TELEGRAM_USER.getKeyValue()),
+                TelegramUser.class
         );
 
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        telegramSessionForSave.setTelegramUser(telegramUser);
+
+        log.debug("Telegram user = {}", telegramUser);
+        log.debug("Telegram session = {}", telegramSessionForSave);
+
+        ApiResponse<TelegramSessionDTO> response = sessionService.save(telegramSessionForSave);
+
+        return ResponseEntity.ok().body(response);
     }
 
     @PostMapping(path = {"/session/update/", "/session/update"})

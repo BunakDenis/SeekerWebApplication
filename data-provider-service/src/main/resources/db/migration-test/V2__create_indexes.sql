@@ -19,9 +19,6 @@ CREATE INDEX IF NOT EXISTS idx_telegram_chats_telegram_user_id ON telegram_chats
 -- Индекс для telegram_user_id в таблице telegram_sessions
 CREATE INDEX IF NOT EXISTS idx_telegram_sessions_telegram_user_id ON telegram_sessions (telegram_user_id);
 
--- Индекс для telegram_chat_id в таблице telegram_sessions
-CREATE INDEX IF NOT EXISTS idx_telegram_sessions_telegram_chat_id ON telegram_sessions (telegram_chat_id);
-
 -- Индекс для telegram_session_id в таблице persistent_sessions
 CREATE INDEX IF NOT EXISTS idx_persistent_sessions_telegram_session_id ON persistent_sessions (telegram_session_id);
 

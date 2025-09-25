@@ -71,8 +71,8 @@ CREATE TABLE IF NOT EXISTS transient_sessions (
 -- Сессии пользователя Telegram
 CREATE TABLE IF NOT EXISTS telegram_sessions (
     id BIGSERIAL PRIMARY KEY,
+    session_data VARCHAR(255),
     telegram_user_id BIGINT REFERENCES telegram_users(id) NOT NULL,
-    telegram_chat_id BIGINT REFERENCES telegram_chats(id) NOT NULL,
     persistent_session_id BIGINT,
     transient_session_id BIGINT
 );
