@@ -2,9 +2,9 @@ package com.example.database.api.controller;
 
 
 import com.example.database.entity.TransientSession;
-import com.example.data.models.entity.dto.request.ApiRequest;
-import com.example.data.models.entity.dto.response.ApiResponse;
-import com.example.data.models.entity.dto.telegram.TransientSessionDTO;
+import com.example.data.models.entity.request.ApiRequest;
+import com.example.data.models.entity.response.ApiResponse;
+import com.example.data.models.entity.telegram.TransientSessionDTO;
 import com.example.database.service.ModelMapperService;
 import com.example.database.service.telegram.TransientSessionService;
 import lombok.RequiredArgsConstructor;

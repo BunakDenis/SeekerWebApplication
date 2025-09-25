@@ -7,12 +7,12 @@ import com.example.data.models.entity.TransientSession;
 import com.example.data.models.entity.VerificationCode;
 import com.example.data.models.entity.dto.UserDTO;
 import com.example.data.models.entity.dto.VerificationCodeDTO;
-import com.example.data.models.entity.dto.jwt.JwtTelegramDataImpl;
-import com.example.data.models.entity.dto.response.ApiResponse;
-import com.example.data.models.entity.dto.telegram.PersistentSessionDTO;
-import com.example.data.models.entity.dto.telegram.TelegramChatDTO;
-import com.example.data.models.entity.dto.telegram.TelegramSessionDTO;
-import com.example.data.models.entity.dto.telegram.TransientSessionDTO;
+import com.example.data.models.entity.jwt.JwtTelegramDataImpl;
+import com.example.data.models.entity.response.ApiResponse;
+import com.example.data.models.entity.telegram.PersistentSessionDTO;
+import com.example.data.models.entity.telegram.TelegramChatDTO;
+import com.example.data.models.entity.telegram.TelegramSessionDTO;
+import com.example.data.models.entity.telegram.TransientSessionDTO;
 import com.example.data.models.enums.JWTDataSubjectKeys;
 import com.example.data.models.service.JWTService;
 import com.example.data.models.utils.ApiResponseUtilsService;
@@ -37,6 +37,7 @@ import org.junit.jupiter.api.*;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.mockserver.client.MockServerClient;
+import org.mockserver.mock.Expectation;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -195,6 +196,20 @@ public class TelegramBotTests {
                         .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
                         .withBody(objectMapper.writeValueAsString(telegramChatResponse)));
 
+        log.debug("Зарегистрированые GET запросы mockServerClient");
+        Expectation[] getExpectations = mockServerClient.retrieveActiveExpectations(request().withMethod("GET"));
+
+        for (Expectation expectation : getExpectations) {
+            log.debug("Запрос = {}", expectation);
+        }
+
+        log.debug("Зарегистрированые POST запросы mockServerClient");
+        Expectation[] postExpectations = mockServerClient.retrieveActiveExpectations(request().withMethod("POST"));
+
+        for (Expectation expectation : postExpectations) {
+            log.debug("Запрос = {}", expectation);
+        }
+
         WebTestClient.ResponseSpec exchange = client.post()
                 .uri("/api/bot/")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -302,7 +317,8 @@ public class TelegramBotTests {
                 .expirationTime(0)
                 .subjects(
                         Map.of(
-                                JWTDataSubjectKeys.TELEGRAM_USER_ID.getSubjectKey(), TELEGRAM_USER_FOR_TESTS.getId()
+                                JWTDataSubjectKeys.TELEGRAM_USER_ID.getSubjectKey(),
+                                TELEGRAM_USER_FOR_TESTS.getTelegramUserId()
                         )
                 )
                 .build();
@@ -312,7 +328,8 @@ public class TelegramBotTests {
                 .expirationTime(0)
                 .subjects(
                         Map.of(
-                                JWTDataSubjectKeys.TELEGRAM_USER_ID.getSubjectKey(), TELEGRAM_USER_FOR_TESTS.getId()
+                                JWTDataSubjectKeys.TELEGRAM_USER_ID.getSubjectKey(),
+                                TELEGRAM_USER_FOR_TESTS.getTelegramUserId()
                         )
                 )
                 .build();
@@ -713,7 +730,7 @@ public class TelegramBotTests {
         mockServerClient
                 .when(request()
                         .withMethod("GET")
-                        .withPath("/api/v1/otp_code/telegram_user_id/" + TELEGRAM_USER_FOR_TESTS.getId()))
+                        .withPath("/api/v1/otp_code/telegram_user_id/" + TELEGRAM_USER_FOR_TESTS.getTelegramUserId()))
                 .respond(response()
                         .withStatusCode(200)
                         .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
@@ -798,7 +815,7 @@ public class TelegramBotTests {
         mockServerClient
                 .when(request()
                         .withMethod("GET")
-                        .withPath("/api/v1/otp_code/telegram_user_id/" + TELEGRAM_USER_FOR_TESTS.getId()))
+                        .withPath("/api/v1/otp_code/telegram_user_id/" + TELEGRAM_USER_FOR_TESTS.getTelegramUserId()))
                 .respond(response()
                         .withStatusCode(200)
                         .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
@@ -884,7 +901,7 @@ public class TelegramBotTests {
         mockServerClient
                 .when(request()
                         .withMethod("GET")
-                        .withPath("/api/v1/otp_code/telegram_user_id/" + TELEGRAM_USER_FOR_TESTS.getId()))
+                        .withPath("/api/v1/otp_code/telegram_user_id/" + TELEGRAM_USER_FOR_TESTS.getTelegramUserId()))
                 .respond(response()
                         .withStatusCode(200)
                         .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
@@ -1041,7 +1058,8 @@ public class TelegramBotTests {
                 .expirationTime(DateTimeService.convertDaysToMillis(persistentSessionExpirationTime))
                 .subjects(
                         Map.of(
-                                JWTDataSubjectKeys.TELEGRAM_USER_ID.getSubjectKey(), TELEGRAM_USER_FOR_TESTS.getId()
+                                JWTDataSubjectKeys.TELEGRAM_USER_ID.getSubjectKey(),
+                                TELEGRAM_USER_FOR_TESTS.getTelegramUserId()
                         )
                 )
                 .build();
@@ -1051,7 +1069,8 @@ public class TelegramBotTests {
                 .expirationTime(DateTimeService.convertMinutesToMillis(transientSessionExpirationTime))
                 .subjects(
                         Map.of(
-                                JWTDataSubjectKeys.TELEGRAM_USER_ID.getSubjectKey(), TELEGRAM_USER_FOR_TESTS.getId()
+                                JWTDataSubjectKeys.TELEGRAM_USER_ID.getSubjectKey(),
+                                TELEGRAM_USER_FOR_TESTS.getTelegramUserId()
                         )
                 )
                 .build();

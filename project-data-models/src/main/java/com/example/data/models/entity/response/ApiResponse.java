@@ -1,4 +1,4 @@
-package com.example.data.models.entity.dto.response;
+package com.example.data.models.entity.response;
 
 import com.example.data.models.consts.ResponseMessageProvider;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -22,10 +22,8 @@ public class ApiResponse<T> {
     private Map<String, Object> included;
     private Map<String, List<Object>> includedList;
     private String debugMsg;
-
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm", timezone = "${default.time.zone.utc}")
     private LocalDateTime timestamp;
-
     @JsonIgnore
     @ToString.Exclude
     private HttpStatus status;
@@ -42,21 +40,17 @@ public class ApiResponse<T> {
     public Object getIncludedObject(String key) {
         return included.get(key);
     }
-
     public void addIncludeListObjects(String key, List<Object> objectList) {
         includedList.put(key, objectList);
     }
-
     public List<Object> getIncludedListObjects(String key) {
         return includedList.get(key);
     }
 
     // ==== Builder ====
-
     public static <T> Builder<T> builder() {
         return new Builder<>();
     }
-
     public static class Builder<T> {
         private final ApiResponse<T> instance = new ApiResponse<>();
 

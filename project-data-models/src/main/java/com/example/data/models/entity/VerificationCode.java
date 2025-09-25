@@ -21,6 +21,8 @@ public class VerificationCode {
 
     private LocalDateTime expiresAt;
 
+    private Boolean isActive;
+
     private Integer attempts;
 
     @ToString.Exclude

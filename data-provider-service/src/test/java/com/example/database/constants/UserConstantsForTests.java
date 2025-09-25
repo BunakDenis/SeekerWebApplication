@@ -2,10 +2,9 @@ package com.example.database.constants;
 
 import com.example.database.entity.TelegramUser;
 import com.example.database.entity.User;
-import com.example.data.models.entity.dto.request.CheckUserRequest;
-import com.example.data.models.entity.dto.response.CheckUserResponse;
+import com.example.data.models.entity.request.CheckUserRequest;
+import com.example.data.models.entity.response.CheckUserResponse;
 import com.example.data.models.enums.UserRoles;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
@@ -53,7 +52,7 @@ public class UserConstantsForTests {
             .build();
 
     public static final TelegramUser TELEGRAM_USER_FOR_TESTS = TelegramUser.builder()
-            .id(55555L)
+            .telegramUserId(55555L)
             .username("vterk")
             .isActive(true)
             .build();

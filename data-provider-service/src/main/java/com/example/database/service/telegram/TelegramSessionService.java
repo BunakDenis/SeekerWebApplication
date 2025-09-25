@@ -1,10 +1,10 @@
 package com.example.database.service.telegram;
 
 
-import com.example.data.models.entity.dto.telegram.PersistentSessionDTO;
-import com.example.data.models.entity.dto.telegram.TelegramSessionDTO;
-import com.example.data.models.entity.dto.response.ApiResponse;
-import com.example.data.models.entity.dto.telegram.TransientSessionDTO;
+import com.example.data.models.entity.telegram.PersistentSessionDTO;
+import com.example.data.models.entity.telegram.TelegramSessionDTO;
+import com.example.data.models.entity.response.ApiResponse;
+import com.example.data.models.entity.telegram.TransientSessionDTO;
 import com.example.data.models.enums.ResponseIncludeDataKeys;
 import com.example.data.models.exception.EntityNotFoundException;
 import com.example.data.models.exception.EntityNotSavedException;

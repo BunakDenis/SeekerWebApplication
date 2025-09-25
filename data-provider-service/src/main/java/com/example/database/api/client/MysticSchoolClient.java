@@ -1,8 +1,8 @@
 package com.example.database.api.client;
 
 
-import com.example.data.models.entity.dto.mysticschool.ArticleCategory;
-import com.example.data.models.entity.dto.response.CheckUserResponse;
+import com.example.data.models.entity.mysticschool.ArticleCategory;
+import com.example.data.models.entity.response.CheckUserResponse;
 import com.example.data.models.exception.ApiException;
 import io.netty.channel.ChannelOption;
 import io.netty.handler.timeout.ReadTimeoutHandler;
@@ -125,35 +125,6 @@ public class MysticSchoolClient {
                 .doOnError(e -> log.error("Ошибка при вызове MysticSchool API: {}", e.toString()))
                 .onErrorMap(e -> new ApiException("Failed to call Mystic School API"));
     }
-
-    public Mono<List<ArticleCategory>> getArticleCategoryById(int id) {
-
-        log.debug("Запрос Mystic School API на получение всех статей категории id = " + id);
-
-        return webClient.get()
-                .uri(builder -> builder.path(articlesEndpoint).queryParam("id", id).build())
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
-                        response -> response.bodyToMono(String.class)
-                                .flatMap(body -> {
-                                    String msg = String.format("Mystic API returned %d: %s",
-                                            response.statusCode().value(), body);
-                                    return Mono.error(new ApiException(msg));
-                                }))
-                .bodyToFlux(ArticleCategory.class)
-                .collectList()
-                .timeout(Duration.ofSeconds(30))
-                // небольшой retry на кратковременные сетевые ошибки (настройте по потребности)
-                .retryWhen(Retry.backoff(2, Duration.ofMillis(500)).filter(throwable -> {
-                    log.warn("Retrying due to {}", throwable.toString());
-                    return true;
-                }))
-                .doOnError(e -> log.error("Ошибка при вызове MysticSchool API: {}", e.toString()))
-                .onErrorMap(e -> new ApiException("Failed to call Mystic School API"));
-
-    }
-
     public Mono<List<ArticleCategory>> getArticleCategories() {
 
         log.debug("Запрос Mystic School API на получение категорий статей.");
@@ -171,6 +142,33 @@ public class MysticSchoolClient {
                                 }))
                 .bodyToFlux(ArticleCategory.class) // Use bodyToFlux to get a Flux
                 .collectList() // Collect the Flux into a List
+                .timeout(Duration.ofSeconds(30))
+                // небольшой retry на кратковременные сетевые ошибки (настройте по потребности)
+                .retryWhen(Retry.backoff(2, Duration.ofMillis(500)).filter(throwable -> {
+                    log.warn("Retrying due to {}", throwable.toString());
+                    return true;
+                }))
+                .doOnError(e -> log.error("Ошибка при вызове MysticSchool API: {}", e.toString()))
+                .onErrorMap(e -> new ApiException("Failed to call Mystic School API"));
+
+    }
+    public Mono<List<ArticleCategory>> getArticleByArticleCategoryId(int id) {
+
+        log.debug("Запрос Mystic School API на получение всех статей категории id = " + id);
+
+        return webClient.get()
+                .uri(builder -> builder.path(articlesEndpoint).queryParam("id", id).build())
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+                        response -> response.bodyToMono(String.class)
+                                .flatMap(body -> {
+                                    String msg = String.format("Mystic API returned %d: %s",
+                                            response.statusCode().value(), body);
+                                    return Mono.error(new ApiException(msg));
+                                }))
+                .bodyToFlux(ArticleCategory.class)
+                .collectList()
                 .timeout(Duration.ofSeconds(30))
                 // небольшой retry на кратковременные сетевые ошибки (настройте по потребности)
                 .retryWhen(Retry.backoff(2, Duration.ofMillis(500)).filter(throwable -> {

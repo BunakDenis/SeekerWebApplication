@@ -2,11 +2,12 @@ package com.example.telegram.api.clients;
 
 
 import com.example.data.models.entity.dto.VerificationCodeDTO;
-import com.example.data.models.entity.dto.response.CheckUserResponse;
-import com.example.data.models.entity.dto.telegram.*;
+import com.example.data.models.entity.response.CheckUserResponse;
+import com.example.data.models.entity.telegram.*;
 import com.example.data.models.entity.dto.UserDTO;
-import com.example.data.models.entity.dto.request.ApiRequest;
-import com.example.data.models.entity.dto.response.ApiResponse;
+import com.example.data.models.entity.request.ApiRequest;
+import com.example.data.models.entity.response.ApiResponse;
+import com.example.data.models.enums.QueryParameters;
 import com.example.data.models.exception.ApiException;
 import com.example.data.models.entity.TelegramChat;
 import com.example.telegram.bot.service.ModelMapperService;
@@ -63,6 +64,7 @@ public class DataProviderClient {
                 .build();
     }
 
+    //USER SECTION
     public Mono<ApiResponse<UserDTO>> createUser(UserDTO dto) {
         StringBuilder endpoint = new StringBuilder(getApiUserEndpoint("add/"));
 
@@ -281,6 +283,8 @@ public class DataProviderClient {
                 .bodyToMono(new ParameterizedTypeReference<>() {
                 });
     }
+
+    //TELEGRAM USER SECTION
     public Mono<ApiResponse<TelegramUserDTO>> createTelegramUser(TelegramUserDTO dto) {
 
         StringBuilder endpoint = new StringBuilder(getApiTelegramUserEndpoint("add/"));
@@ -311,7 +315,7 @@ public class DataProviderClient {
                 .bodyToMono(new ParameterizedTypeReference<>() {
                 });
     }
-    public Mono<ApiResponse<TelegramUserDTO>> getTelegramUserById(Long id) {
+    public Mono<ApiResponse<TelegramUserDTO>> getTelegramUserByTelegramUserId(Long id) {
 
         StringBuilder endpoint = new StringBuilder(getApiTelegramUserEndpoint(""));
         endpoint.append(id);
@@ -338,6 +342,8 @@ public class DataProviderClient {
                 .bodyToMono(new ParameterizedTypeReference<>() {
                 });
     }
+
+    //TELEGRAM CHAT SECTION
     public Mono<ApiResponse<TelegramChatDTO>> saveTelegramChat(TelegramChat chat) {
 
         StringBuilder endpoint = new StringBuilder(getApiChatEndpoint("add/"));
@@ -407,7 +413,7 @@ public class DataProviderClient {
                 .bodyToMono(new ParameterizedTypeReference<>() {
                 });
     }
-    public Mono<ApiResponse<TelegramChatDTO>> getTelegramChatWithTelegramUser(Long id) {
+    public Mono<ApiResponse<TelegramChatDTO>> getTelegramChatByIdWithTgUser(Long id) {
 
         StringBuilder endpoint = new StringBuilder(getApiChatEndpoint("telegram_user/"));
         endpoint.append(id);
@@ -416,7 +422,11 @@ public class DataProviderClient {
         log.debug("Отправка на endpoint {}", endpoint);
 
         return webClient.get()
-                .uri(endpoint.toString()).accept(MediaType.APPLICATION_JSON)
+                .uri(builder ->
+                        builder.path(endpoint.toString())
+                                .build()
+                )
+                .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<>() {
                 });
@@ -443,6 +453,8 @@ public class DataProviderClient {
                 .bodyToMono(new ParameterizedTypeReference<>() {
                 });
     }
+
+    //TELEGRAM SESSION SECTION
     public Mono<ApiResponse<TelegramSessionDTO>> createTelegramSession(TelegramSessionDTO dto) {
 
         StringBuilder endpoint = new StringBuilder(getApiSessionEndpoint("add/"));
@@ -544,6 +556,8 @@ public class DataProviderClient {
                 .bodyToMono(new ParameterizedTypeReference<>() {
                 });
     }
+
+    //VERIFICATION CODE SECTION
     public Mono<ApiResponse<VerificationCodeDTO>> getVerificationCodeById(Long id) {
 
         StringBuilder endpoint = new StringBuilder(getApiOtpCodeEndpoint(Long.toString(id)));

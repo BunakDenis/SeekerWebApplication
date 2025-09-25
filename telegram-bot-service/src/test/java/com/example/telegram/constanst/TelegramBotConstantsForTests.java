@@ -1,8 +1,8 @@
 package com.example.telegram.constanst;
 
 import com.example.data.models.entity.*;
-import com.example.data.models.entity.dto.request.CheckUserRequest;
-import com.example.data.models.entity.dto.response.CheckUserResponse;
+import com.example.data.models.entity.request.CheckUserRequest;
+import com.example.data.models.entity.response.CheckUserResponse;
 import com.example.data.models.enums.UserRoles;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.telegram.telegrambots.meta.api.objects.Chat;
@@ -45,7 +45,7 @@ public class TelegramBotConstantsForTests {
             null, null, null, null, null);
 
     public static final TelegramUser TELEGRAM_USER_FOR_TESTS = TelegramUser.builder()
-            .id(12345L)
+            .telegramUserId(12345L)
             .username("max")
             .isActive(true)
             .build();

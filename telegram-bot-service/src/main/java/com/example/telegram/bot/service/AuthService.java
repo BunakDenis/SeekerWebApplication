@@ -2,8 +2,6 @@ package com.example.telegram.bot.service;
 
 import com.example.data.models.consts.WarnMessageProvider;
 import com.example.data.models.entity.TelegramUser;
-import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
-import com.example.data.models.utils.UserRoleConverterUtilService;
 import com.example.telegram.bot.message.TelegramBotMessageSender;
 import com.example.telegram.bot.utils.update.UpdateUtilsService;
 import lombok.RequiredArgsConstructor;
@@ -25,9 +23,7 @@ import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.User;
 import reactor.core.publisher.Mono;
-import reactor.util.context.Context;
 
 import java.util.Objects;
 

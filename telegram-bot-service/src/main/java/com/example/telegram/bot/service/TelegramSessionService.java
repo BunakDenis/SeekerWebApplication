@@ -4,8 +4,8 @@ import com.example.data.models.entity.PersistentSession;
 import com.example.data.models.entity.TelegramSession;
 import com.example.data.models.entity.TelegramUser;
 import com.example.data.models.entity.TransientSession;
-import com.example.data.models.entity.dto.jwt.JwtTelegramDataImpl;
-import com.example.data.models.entity.dto.telegram.TelegramSessionDTO;
+import com.example.data.models.entity.jwt.JwtTelegramDataImpl;
+import com.example.data.models.entity.telegram.TelegramSessionDTO;
 import com.example.data.models.enums.JWTDataSubjectKeys;
 import com.example.data.models.enums.ResponseIncludeDataKeys;
 import com.example.data.models.service.JWTService;
@@ -23,7 +23,6 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -155,7 +154,8 @@ public class TelegramSessionService {
                                     )
                                     .subjects(
                                             Map.of(
-                                                    JWTDataSubjectKeys.TELEGRAM_USER_ID.getSubjectKey(), session.getTelegramUser().getId()
+                                                    JWTDataSubjectKeys.TELEGRAM_USER_ID.getSubjectKey(),
+                                                    session.getTelegramUser().getTelegramUserId()
                                             )
                                     )
                                     .build();
@@ -213,7 +213,8 @@ public class TelegramSessionService {
                             )
                             .subjects(
                                     Map.of(
-                                            JWTDataSubjectKeys.TELEGRAM_USER_ID.getSubjectKey(), session.getTelegramUser().getId()
+                                            JWTDataSubjectKeys.TELEGRAM_USER_ID.getSubjectKey(),
+                                            session.getTelegramUser().getTelegramUserId()
                                     )
                             )
                             .build();

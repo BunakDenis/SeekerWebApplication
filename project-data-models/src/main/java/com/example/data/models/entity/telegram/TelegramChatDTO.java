@@ -1,4 +1,4 @@
-package com.example.data.models.entity.dto.telegram;
+package com.example.data.models.entity.telegram;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,6 +13,8 @@ import lombok.NoArgsConstructor;
 public class TelegramChatDTO {
 
     private Long id;
+
+    private Long telegramChatId;
 
     private String uiElement;
 

@@ -1,4 +1,4 @@
-package com.example.data.models.entity.dto.response;
+package com.example.data.models.entity.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;

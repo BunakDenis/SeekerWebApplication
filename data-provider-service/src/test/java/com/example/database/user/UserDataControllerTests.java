@@ -1,7 +1,7 @@
 package com.example.database.user;
 
 
-import com.example.data.models.entity.dto.response.CheckUserResponse;
+import com.example.data.models.entity.response.CheckUserResponse;
 import com.example.data.models.enums.ResponseIncludeDataKeys;
 import com.example.data.models.enums.UserRoles;
 import com.example.data.models.exception.*;
@@ -9,8 +9,8 @@ import com.example.database.api.client.MysticSchoolClient;
 import com.example.database.entity.TelegramUser;
 import com.example.database.entity.User;
 import com.example.data.models.entity.dto.UserDTO;
-import com.example.data.models.entity.dto.request.ApiRequest;
-import com.example.data.models.entity.dto.response.ApiResponse;
+import com.example.data.models.entity.request.ApiRequest;
+import com.example.data.models.entity.response.ApiResponse;
 import com.example.database.DataProviderTestsBaseClass;
 import com.example.database.entity.UserDetails;
 import com.example.database.service.UserService;
@@ -80,11 +80,6 @@ public class UserDataControllerTests extends DataProviderTestsBaseClass {
         mysticSchoolBaseUrl = dotenv.get("MYSTIC_SCHOOL_API_URL") + dotenv.get("MYSTIC_SCHOOL_API_VERSION");
     }
 
-/*
-    TODO
-        1. Сконфигурировать mockServerClient под mysticSchoolClient
-        2. Дописать тесты для оставшихся ендпоинтов
- */
 
     @DynamicPropertySource
     static void overrideProperties(DynamicPropertyRegistry registry) {
@@ -139,7 +134,6 @@ public class UserDataControllerTests extends DataProviderTestsBaseClass {
 
                 });
     }
-
     @Test
     void testSaveNullUser() throws JsonProcessingException {
 
@@ -171,7 +165,6 @@ public class UserDataControllerTests extends DataProviderTestsBaseClass {
 
                 });
     }
-
     @Test
     void testSaveUserWithEmptyUsername() throws JsonProcessingException {
 
@@ -207,7 +200,6 @@ public class UserDataControllerTests extends DataProviderTestsBaseClass {
 
                 });
     }
-
     @Test
     void testSaveUserWithNullableUsername() throws JsonProcessingException {
 
@@ -243,7 +235,6 @@ public class UserDataControllerTests extends DataProviderTestsBaseClass {
 
                 });
     }
-
     @Test
     void testSaveUserWithEmptyPassword() throws JsonProcessingException {
 
@@ -279,7 +270,6 @@ public class UserDataControllerTests extends DataProviderTestsBaseClass {
 
                 });
     }
-
     @Test
     void testSaveUserWithNullablePassword() throws JsonProcessingException {
 
@@ -315,7 +305,6 @@ public class UserDataControllerTests extends DataProviderTestsBaseClass {
 
                 });
     }
-
     @Test
     void testSaveUserWithEmptyEmail() throws JsonProcessingException {
 
@@ -351,7 +340,6 @@ public class UserDataControllerTests extends DataProviderTestsBaseClass {
 
                 });
     }
-
     @Test
     void testSaveUserWithNullableEmail() throws JsonProcessingException {
 
@@ -387,7 +375,6 @@ public class UserDataControllerTests extends DataProviderTestsBaseClass {
 
                 });
     }
-
     @Test
     void testUpdateUser() throws JsonProcessingException {
 
@@ -437,7 +424,6 @@ public class UserDataControllerTests extends DataProviderTestsBaseClass {
                     }
                 });
     }
-
     @Test
     void testGetUserById() {
 
@@ -459,7 +445,6 @@ public class UserDataControllerTests extends DataProviderTestsBaseClass {
                     assertNotNull(apiResponse.getData());
                 });
     }
-
     @Test
     void testGetUserByUsername() {
 
@@ -485,7 +470,6 @@ public class UserDataControllerTests extends DataProviderTestsBaseClass {
                     assertEquals(username, actualUser.getUsername());
                 });
     }
-
     @Test
     void testGetUserByEmail() {
 
@@ -511,7 +495,6 @@ public class UserDataControllerTests extends DataProviderTestsBaseClass {
                     assertEquals(email, actualUser.getEmail());
                 });
     }
-
     @Test
     void testGetUserByTelegramUserId() {
 
@@ -534,7 +517,6 @@ public class UserDataControllerTests extends DataProviderTestsBaseClass {
 
                 });
     }
-
     @Test
     void testGetUserByTelegramUserIdWithTelegramUser() {
 
@@ -567,10 +549,9 @@ public class UserDataControllerTests extends DataProviderTestsBaseClass {
 
                     actualUser.setTelegramUsers(List.of(actualTelegramUser));
 
-                    assertEquals(tgUserId, actualUser.getTelegramUsers().get(0).getId());
+                    assertEquals(tgUserId, actualUser.getTelegramUsers().get(0).getTelegramUserId());
                 });
     }
-
     @Test
     void testGetUserByTelegramUserIdWithUserDetails() {
 
@@ -613,7 +594,6 @@ public class UserDataControllerTests extends DataProviderTestsBaseClass {
                     assertEquals(expectedUserDetails.getCurator(), actualUserDetails.getCurator());
                 });
     }
-
     @Test
     void testGetUserFullByTelegramUserId() {
 
@@ -662,13 +642,12 @@ public class UserDataControllerTests extends DataProviderTestsBaseClass {
                     assertEquals(expectedUserDetails.getDateStartStudyingSchool(), actualUserDetails.getDateStartStudyingSchool());
                     assertEquals(expectedUserDetails.getCurator(), actualUserDetails.getCurator());
 
-                    assertEquals(expectedTelegramUser.getId(), actualTelegramUser.getId());
+                    assertEquals(expectedTelegramUser.getTelegramUserId(), actualTelegramUser.getTelegramUserId());
                     assertEquals(expectedTelegramUser.getUsername(), actualTelegramUser.getUsername());
                     assertEquals(expectedTelegramUser.isActive(), actualTelegramUser.isActive());
 
                 });
     }
-
     @Test
     void testGetUserWithInvalidId() {
 
@@ -695,7 +674,6 @@ public class UserDataControllerTests extends DataProviderTestsBaseClass {
 
 
     }
-
     @Test
     void testDeleteUserMethod() throws JsonProcessingException {
 
@@ -740,7 +718,6 @@ public class UserDataControllerTests extends DataProviderTestsBaseClass {
                 });
 
     }
-
     @Test
     void testDeleteUserMethodWithInvalidId() throws JsonProcessingException {
 
@@ -777,12 +754,11 @@ public class UserDataControllerTests extends DataProviderTestsBaseClass {
                     assertEquals(expectedExceptionMsg, actualExceptionMsg);
                 });
     }
-
     @Test
     void testCheckUserAuthInMysticSchoolBdByTelegramUserId() throws JsonProcessingException {
 
         //Given
-        Long id = TELEGRAM_USER_FOR_TESTS.getId();
+        Long id = TELEGRAM_USER_FOR_TESTS.getTelegramUserId();
         CheckUserResponse expectedCheckUserResponse = CheckUserResponse.builder()
                 .found(true)
                 .active(true)
@@ -831,7 +807,6 @@ public class UserDataControllerTests extends DataProviderTestsBaseClass {
 
                 });
     }
-
     @Test
     void testCheckUserAuthInMysticSchoolBdByTelegramUserIdWithNotAuthUser() throws JsonProcessingException {
 
@@ -880,7 +855,6 @@ public class UserDataControllerTests extends DataProviderTestsBaseClass {
                     assertFalse(checkUserResponse.isFound());
                 });
     }
-
     private ApiRequest getUserRequest() {
 
         User vasya = User.builder()

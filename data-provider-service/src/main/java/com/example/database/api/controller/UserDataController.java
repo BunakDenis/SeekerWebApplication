@@ -3,9 +3,9 @@ package com.example.database.api.controller;
 
 import com.example.data.models.consts.ExceptionMessageProvider;
 import com.example.data.models.entity.dto.UserDTO;
-import com.example.data.models.entity.dto.request.ApiRequest;
-import com.example.data.models.entity.dto.response.ApiResponse;
-import com.example.data.models.entity.dto.response.CheckUserResponse;
+import com.example.data.models.entity.request.ApiRequest;
+import com.example.data.models.entity.response.ApiResponse;
+import com.example.data.models.entity.response.CheckUserResponse;
 import com.example.data.models.exception.EntityNullException;
 import com.example.database.api.client.MysticSchoolClient;
 import com.example.database.entity.User;

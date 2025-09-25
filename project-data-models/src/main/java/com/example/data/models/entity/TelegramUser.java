@@ -13,17 +13,13 @@ import java.util.List;
 public class TelegramUser {
 
     private Long id;
-
+    private Long telegramUserId;
     private String username;
-
     private boolean isActive;
-
     @ToString.Exclude
     private User user;
-
     @ToString.Exclude
     private List<TelegramChat> telegramChats;
-
     @ToString.Exclude
     private TelegramSession telegramSession;
 

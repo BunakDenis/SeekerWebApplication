@@ -4,7 +4,7 @@ import com.example.data.models.entity.User;
 import com.example.data.models.entity.VerificationCode;
 import com.example.data.models.entity.dto.UserDTO;
 import com.example.data.models.entity.dto.VerificationCodeDTO;
-import com.example.data.models.entity.dto.request.ApiRequest;
+import com.example.data.models.entity.request.ApiRequest;
 import com.example.data.models.exception.ExpiredVerificationCodeException;
 import com.example.data.models.exception.NotValidVerificationCodeException;
 import com.example.telegram.api.clients.DataProviderClient;
@@ -18,7 +18,6 @@ import reactor.core.publisher.Mono;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -72,6 +71,7 @@ public class VerificationCodeService {
         code.setOtpHash(hashCode);
         code.setCreatedAt(createdAt);
         code.setExpiresAt(expiresAt);
+        code.setIsActive(true);
 
         User user = code.getUser();
 
@@ -107,7 +107,9 @@ public class VerificationCodeService {
                         return Mono.error(new NotValidVerificationCodeException(codeForCheck + " is not valid"));
 
                     if (!checkExpiration(code))
-                        return Mono.error(new ExpiredVerificationCodeException("Verification code " + code.getOtpHash() + " is expired"));
+                        return Mono.error(
+                                new ExpiredVerificationCodeException("Verification code " + code.getOtpHash() + " is expired")
+                        );
 
                     return Mono.just(true);
                 });

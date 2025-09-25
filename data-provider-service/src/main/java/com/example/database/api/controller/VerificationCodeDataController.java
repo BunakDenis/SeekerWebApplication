@@ -1,12 +1,14 @@
 package com.example.database.api.controller;
 
 
+import com.example.data.models.entity.dto.UserDTO;
 import com.example.data.models.entity.dto.VerificationCodeDTO;
-import com.example.data.models.entity.dto.request.ApiRequest;
-import com.example.data.models.entity.dto.response.ApiResponse;
+import com.example.data.models.entity.request.ApiRequest;
+import com.example.data.models.entity.response.ApiResponse;
 import com.example.database.entity.User;
 import com.example.database.entity.VerificationCode;
 import com.example.database.service.ModelMapperService;
+import com.example.database.service.UserService;
 import com.example.database.service.telegram.VerificationCodeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,43 +22,11 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class VerificationCodeDataController {
 
-    private final VerificationCodeService verificationCodeService;
 
+    private final UserService userService;
+    private final VerificationCodeService verificationCodeService;
     private final ModelMapperService mapperService;
 
-
-    @GetMapping("/otp_code/get/{id}")
-    public ResponseEntity<ApiResponse<VerificationCodeDTO>> getVerificationCodeById(
-            @PathVariable("id") Long id
-    ) {
-        log.debug("Запрос на получение VerificationCode по id {}", id);
-
-        ApiResponse<VerificationCodeDTO> response = verificationCodeService.getCodeById(id);
-
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-
-    @GetMapping("/otp_code/get/user_id/{id}")
-    public ResponseEntity<ApiResponse<VerificationCodeDTO>> getVerificationCodeByUserId(
-            @PathVariable("id") Long id
-    ) {
-        log.debug("Запрос на получение VerificationCode по user_id {}", id);
-
-        ApiResponse<VerificationCodeDTO> response = verificationCodeService.getCodeByUserId(id);
-
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-
-    @GetMapping("/otp_code/get/telegram_user_id/{id}")
-    public ResponseEntity<ApiResponse<VerificationCodeDTO>> getVerificationCodeByTelegramUserId(
-            @PathVariable("id") Long id
-    ) {
-        log.debug("Запрос на получение VerificationCode по user_id {}", id);
-
-        ApiResponse<VerificationCodeDTO> response = verificationCodeService.getCodeByUserId(id);
-
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
 
     @PostMapping("/otp_code/add/")
     public ResponseEntity<ApiResponse<VerificationCodeDTO>> saveVerificationCode(
@@ -70,6 +40,10 @@ public class VerificationCodeDataController {
                 request.getIncludeObject("user"),
                 User.class
         );
+
+        ApiResponse<UserDTO> findUser = userService.getUserById(user.getId());
+
+        userService.checkUser(mapperService.toEntity(findUser.getData(), User.class));
 
         verificationCode.setUser(user);
 
@@ -87,6 +61,39 @@ public class VerificationCodeDataController {
         ApiResponse<VerificationCodeDTO> response = verificationCodeService.update(
                 mapperService.toEntity(request.getData(), VerificationCode.class)
         );
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/otp_code/{id}")
+    public ResponseEntity<ApiResponse<VerificationCodeDTO>> getVerificationCodeById(
+            @PathVariable("id") Long id
+    ) {
+        log.debug("Запрос на получение VerificationCode по id {}", id);
+
+        ApiResponse<VerificationCodeDTO> response = verificationCodeService.getCodeById(id);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/otp_code/user_id/{id}")
+    public ResponseEntity<ApiResponse<VerificationCodeDTO>> getVerificationCodeByUserId(
+            @PathVariable("id") Long id
+    ) {
+        log.debug("Запрос на получение VerificationCode по user_id {}", id);
+
+        ApiResponse<VerificationCodeDTO> response = verificationCodeService.getCodeByUserId(id);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/otp_code/telegram_user_id/{id}")
+    public ResponseEntity<ApiResponse<VerificationCodeDTO>> getVerificationCodeByTelegramUserId(
+            @PathVariable("id") Long id
+    ) {
+        log.debug("Запрос на получение VerificationCode по user_id {}", id);
+
+        ApiResponse<VerificationCodeDTO> response = verificationCodeService.getCodeByTelegramUserId(id);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

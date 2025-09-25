@@ -1,11 +1,6 @@
-package com.example.data.models.entity.dto.request;
+package com.example.data.models.entity.request;
 
-import com.example.data.models.entity.dto.response.ApiResponse;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.stereotype.Component;
 
 import java.util.LinkedHashMap;
 import java.util.List;

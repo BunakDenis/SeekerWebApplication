@@ -1,4 +1,4 @@
-package com.example.data.models.entity.dto.jwt;
+package com.example.data.models.entity.jwt;
 
 import java.util.Map;
 

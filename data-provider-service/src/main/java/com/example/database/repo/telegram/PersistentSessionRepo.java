@@ -1,6 +1,5 @@
 package com.example.database.repo.telegram;
 
-import com.example.data.models.entity.dto.telegram.PersistentSessionDTO;
 import com.example.database.entity.PersistentSession;
 import org.springframework.data.jpa.repository.JpaRepository;
 

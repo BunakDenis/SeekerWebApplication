@@ -1,4 +1,4 @@
-package com.example.data.models.entity.dto.telegram;
+package com.example.data.models.entity.telegram;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;

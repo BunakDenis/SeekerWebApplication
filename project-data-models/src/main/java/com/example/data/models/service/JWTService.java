@@ -1,8 +1,7 @@
 package com.example.data.models.service;
 
 
-import com.example.data.models.entity.dto.jwt.JwtData;
-import com.example.data.models.entity.dto.jwt.JwtTelegramDataImpl;
+import com.example.data.models.entity.jwt.JwtData;
 import com.example.utils.datetime.DateTimeService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

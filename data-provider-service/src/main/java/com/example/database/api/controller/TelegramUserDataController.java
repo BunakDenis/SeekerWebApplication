@@ -1,9 +1,9 @@
 package com.example.database.api.controller;
 
 
-import com.example.data.models.entity.dto.request.ApiRequest;
-import com.example.data.models.entity.dto.response.ApiResponse;
-import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
+import com.example.data.models.entity.request.ApiRequest;
+import com.example.data.models.entity.response.ApiResponse;
+import com.example.data.models.entity.telegram.TelegramUserDTO;
 import com.example.data.models.enums.ResponseIncludeDataKeys;
 import com.example.database.entity.TelegramUser;
 import com.example.database.entity.User;
@@ -12,7 +12,6 @@ import com.example.database.service.telegram.TelegramUserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +26,7 @@ public class TelegramUserDataController {
     private final ModelMapperService mapperService;
     private final ObjectMapper objectMapper;
 
-    @PostMapping("/telegram-user/add/")
+    @PostMapping("/telegram_user/add/")
     public ResponseEntity<ApiResponse<TelegramUserDTO>> save(
             @RequestBody ApiRequest<TelegramUserDTO> request
             ) {
@@ -44,7 +43,7 @@ public class TelegramUserDataController {
         return ResponseEntity.status(result.getStatus()).body(result);
     }
 
-    @PostMapping("/telegram-user/update/")
+    @PostMapping("/telegram_user/update/")
     public ResponseEntity<ApiResponse<TelegramUserDTO>> update(
             @RequestBody ApiRequest<TelegramUserDTO> request
     ) {
@@ -55,7 +54,7 @@ public class TelegramUserDataController {
         return ResponseEntity.status(result.getStatus()).body(result);
     }
 
-    @GetMapping("/telegram-user/{id}")
+    @GetMapping("/telegram_user/{id}")
     public ResponseEntity<ApiResponse<TelegramUserDTO>> getTelegramUserById(
             @PathVariable("id") Long id
     ) {
@@ -67,7 +66,7 @@ public class TelegramUserDataController {
 
     }
 
-    @PostMapping("/telegram-user/delete/{id}")
+    @PostMapping("/telegram_user/delete/{id}")
     public ResponseEntity<ApiResponse<Boolean>> delete(
             @PathVariable("id") Long id
     ) {

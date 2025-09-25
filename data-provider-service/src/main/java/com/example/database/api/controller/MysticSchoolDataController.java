@@ -1,8 +1,8 @@
 package com.example.database.api.controller;
 
 
-import com.example.data.models.entity.dto.mysticschool.ArticleCategory;
-import com.example.data.models.entity.dto.response.ApiResponseWithDataList;
+import com.example.data.models.entity.mysticschool.ArticleCategory;
+import com.example.data.models.entity.response.ApiResponseWithDataList;
 import com.example.database.api.client.MysticSchoolClient;
 import com.example.database.service.ModelMapperService;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +28,7 @@ public class MysticSchoolDataController {
     public Mono<ResponseEntity<ApiResponseWithDataList>> getArticleCategories(
             @RequestParam("id") int id
     ) {
-        return client.getArticleCategoryById(id)
+        return client.getArticleByArticleCategoryId(id)
                 .map(resp ->  {
 
                     ApiResponseWithDataList<ArticleCategory> articleCategoryApiResponse =

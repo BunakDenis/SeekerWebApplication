@@ -1,12 +1,11 @@
 package com.example.telegram.bot.service;
 
 import com.example.data.models.entity.TelegramUser;
-import com.example.data.models.entity.dto.response.ApiResponse;
-import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
+import com.example.data.models.entity.telegram.TelegramUserDTO;
+import com.example.data.models.exception.EntityNotFoundException;
 import com.example.telegram.api.clients.DataProviderClient;
 import org.springframework.stereotype.Service;
 import lombok.*;
-import org.modelmapper.ModelMapper;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
@@ -40,8 +39,21 @@ public class TelegramUserService {
                         Mono.empty()
                 );
     }
-    public Mono<ApiResponse<TelegramUserDTO>> getById(long id) {
-        return dataProviderClient.getTelegramUserById(id);
+    public Mono<TelegramUser> getById(long id) {
+        return dataProviderClient.getTelegramUserByTelegramUserId(id)
+                .flatMap(resp -> {
+
+                    if (Objects.isNull(resp.getData())) {
+                        return Mono.error(
+                                new EntityNotFoundException("Telegram user with id=" + id + ", is not found",
+                                        new TelegramUser())
+                        );
+                    }
+
+                    TelegramUser result = mapperService.toEntity(resp.getData(), TelegramUser.class);
+
+                    return Mono.just(result);
+                });
     }
     public Mono<Boolean> delete(Long id) {
         return dataProviderClient.deleteTelegramUser(id)

@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString
+@ToString(exclude = "user")
 public class UserDetails {
 
     private Long id;
@@ -30,5 +30,7 @@ public class UserDetails {
     private LocalDateTime dateStartStudyingSchool;
 
     private String curator;
+
+    private User user;
 
 }

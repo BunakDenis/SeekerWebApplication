@@ -28,13 +28,15 @@ CREATE TABLE verification_codes (
     otp_hash VARCHAR(255) NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
     attempts INT DEFAULT 0,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
 -- Информация о пользователе Telegram
 CREATE TABLE IF NOT EXISTS telegram_users (
-    id BIGINT PRIMARY KEY, -- Telegram user id
+    id BIGSERIAL PRIMARY KEY,
+    telegram_user_id BIGINT,
     username VARCHAR(255),
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     user_id BIGINT REFERENCES users(id) NOT NULL

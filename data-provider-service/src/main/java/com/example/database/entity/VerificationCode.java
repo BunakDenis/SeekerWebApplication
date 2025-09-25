@@ -14,12 +14,6 @@ import java.time.LocalDateTime;
 @Table(name = "verification_codes")
 public class VerificationCode {
 
-/*
-        TODO
-            1. Добавить поле active
-            2. Добавить процедуру проверки строка активности сессии и верификационного кода
- */
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -33,10 +27,13 @@ public class VerificationCode {
     @Column(name = "expires_at", nullable = false)
     private LocalDateTime expiresAt;
 
+    @Column(name = "is_active", nullable = false, columnDefinition = "BOOLEAN DEFAULT true")
+    private Boolean isActive;
+
     @Column(name = "attempts")
     private Integer attempts;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     @ToString.Exclude
     private User user;

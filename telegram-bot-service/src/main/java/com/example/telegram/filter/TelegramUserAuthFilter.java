@@ -16,7 +16,6 @@ import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
@@ -26,11 +25,6 @@ import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import reactor.core.publisher.Mono;
-
-
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 
 @Component
 @RequiredArgsConstructor
@@ -61,29 +55,10 @@ public class TelegramUserAuthFilter implements WebFilter {
 
         log.debug("Request URI path = {}", path);
 
-        return DataBufferUtils.join(request.getBody())
-                //Базовая проверка запроса
-                .flatMap(buffer -> {
+        return appFilterService.getBodyFromRequest(exchange)
+                .flatMap(bodyStringBuffer -> {
 
-                    byte[] bytes;
-                    StringBuffer body = new StringBuffer();
-
-                    //Записываем buffer body в StringBuffer
-                    try {
-                        bytes = buffer.asInputStream().readAllBytes();
-                        ByteBuffer byteBuffer = ByteBuffer.wrap(bytes);
-
-                        body.append(StandardCharsets.UTF_8.decode(byteBuffer));
-                        DataBufferUtils.release(buffer);
-                    } catch (IOException e) {
-                        log.error("Request body is empty");
-                    }
-
-                    log.debug("Body от Telegram API: {}", body);
-
-                    return Mono.just(body.toString());
-                })
-                .flatMap(body -> {
+                    String body = bodyStringBuffer.toString();
 
                     if (path.equals(webHookPath)) {
 
@@ -108,7 +83,7 @@ public class TelegramUserAuthFilter implements WebFilter {
                         this.requestBody = body;
                         this.update = update;
 
-                        Long telegramUserId = UpdateUtilsService.getTelegramUserId(update);
+                        Long chatId = UpdateUtilsService.getChatId(update);
 
                         log.debug("Проверка запроса от Telegram API");
                         // Пропускаем запросы с командами /auth и /register
@@ -124,7 +99,7 @@ public class TelegramUserAuthFilter implements WebFilter {
                                     .build());
                         }
 
-                        return telegramChatService.getTelegramChatByTelegramUserId(telegramUserId)
+                        return telegramChatService.getTelegramChatByIdWithTgUser(chatId)
                                 .flatMap(chat -> {
 
                                     log.debug("Проверка запроса от Telegram API");

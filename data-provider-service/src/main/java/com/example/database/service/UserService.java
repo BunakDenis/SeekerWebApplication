@@ -3,17 +3,15 @@ package com.example.database.service;
 import com.example.data.models.consts.ExceptionMessageProvider;
 import com.example.data.models.entity.dto.UserDTO;
 import com.example.data.models.entity.dto.UserDetailsDTO;
-import com.example.data.models.entity.dto.response.ApiResponse;
+import com.example.data.models.entity.response.ApiResponse;
 import com.example.data.models.enums.ResponseIncludeDataKeys;
-import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
+import com.example.data.models.entity.telegram.TelegramUserDTO;
 import com.example.data.models.enums.UserRoles;
 import com.example.data.models.exception.*;
 import com.example.data.models.utils.ApiResponseUtilsService;
 import com.example.database.entity.TelegramUser;
 import com.example.database.entity.User;
-import com.example.database.exception.UserNotFoundException;
 import com.example.database.repo.telegram.UserRepo;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,7 +19,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -35,7 +33,6 @@ import static com.example.data.models.utils.EntityUtilsService.*;
 public class UserService implements UserDetailsService {
 
     private final UserRepo repo;
-
     private final ModelMapperService mapper;
 
 
@@ -80,25 +77,25 @@ public class UserService implements UserDetailsService {
 
         if (userOptional.isPresent())
             return success(mapper.toDTO(userOptional.get(), UserDTO.class));
-
-        throw new UserNotFoundException("User with email " + email + " is not found");
+        
+        throw new EntityNotFoundException("Entity User with email " + email + " is not found", new User());
     }
-    public ApiResponse<UserDTO> getUserByTelegramUserId(Long id) throws UserNotFoundException {
+    public ApiResponse<UserDTO> getUserByTelegramUserId(Long id) throws EntityNotFoundException {
 
-        User user = repo.findUserByTelegramUsers_Id(id);
+        Optional<User> userOptional = repo.findByTelegramUserId(id);
 
-        if (Objects.nonNull(user))
-            return success(mapper.toDTO(user, UserDTO.class));
+        if (userOptional.isPresent()) return success(mapper.toDTO(userOptional.get(), UserDTO.class));
 
-        throw new UserNotFoundException("User with telegram user id " + id + " is not found");
+        throw new EntityNotFoundException("User with telegram user id " + id + " is not found", new User());
 
     }
-    public ApiResponse<UserDTO> getUserByTelegramUserIdWithUserDetails(Long id) throws UserNotFoundException {
+    public ApiResponse<UserDTO> getUserByTelegramUserIdWithUserDetails(Long id) throws EntityNotFoundException {
 
         Optional<User> optionalUser = repo.findByTelegramUsers_IdWithUserDetails(id);
 
-        if (!optionalUser.isPresent()) throw new UserNotFoundException(
-                "User with telegram user id " + id + " is not found"
+        if (!optionalUser.isPresent()) throw new EntityNotFoundException(
+                "User with telegram user id " + id + " is not found",
+                new User()
         );
 
         User user = optionalUser.get();
@@ -112,7 +109,7 @@ public class UserService implements UserDetailsService {
         return resp;
 
     }
-    public ApiResponse<UserDTO> getUserByTelegramUserIdWithTelegramUser(Long id) throws UserNotFoundException {
+    public ApiResponse<UserDTO> getUserByTelegramUserIdWithTelegramUser(Long id) throws EntityNotFoundException {
 
         Optional<User> userOptional = repo.findByTelegramUserIdWithTelegramUsers(id);
 
@@ -120,38 +117,29 @@ public class UserService implements UserDetailsService {
                 "User by telegram user id=" + id + ", is not found", new User()
         );
 
-        log.debug("getUserByTelegramUserIdWithTelegramUser = {}", userOptional.get());
-
         User user = userOptional.get();
-
-        if (Objects.isNull(user)) throw new UserNotFoundException(
-                "User with telegram user id " + id + " is not found"
-        );
-
 
         ApiResponse<UserDTO> resp = success(mapper.toDTO(user, UserDTO.class));
 
         List<TelegramUser> telegramUsers = user.getTelegramUsers();
 
-        Optional<TelegramUser> telegramUserOptional = telegramUsers.stream()
-                .filter(u -> u.getId().equals(id))
-                .findFirst();
+        telegramUsers.forEach(tgUser -> log.debug("Telegram user = {}", tgUser));
 
         TelegramUserDTO telegramUserDTO = new TelegramUserDTO();
 
-        if (telegramUserOptional.isPresent())
-            telegramUserDTO = mapper.toDTO(telegramUserOptional.get(), TelegramUserDTO.class);
+        if (!isNull(telegramUsers.get(0)))
+            telegramUserDTO = mapper.toDTO(telegramUsers.get(0), TelegramUserDTO.class);
 
         resp.addIncludeObject(ResponseIncludeDataKeys.TELEGRAM_USER.getKeyValue(), telegramUserDTO);
 
         return resp;
     }
-    public ApiResponse<UserDTO> getUserByTelegramUserIdFull(Long id) throws UserNotFoundException {
+    public ApiResponse<UserDTO> getUserByTelegramUserIdFull(Long id) throws EntityNotFoundException {
 
         Optional<User> optionalUser = repo.findFullByTelegramUser_id(id);
 
         if (!optionalUser.isPresent())
-            throw new UserNotFoundException("User with telegram user id " + id + " is not found");
+            throw new EntityNotFoundException("User with telegram user id " + id + " is not found", new User());
 
         User user = optionalUser.get();
 
@@ -207,7 +195,7 @@ public class UserService implements UserDetailsService {
                 .roles(UserRoles.TOURIST.getRole())
                 .build();
     }
-    private void checkUser(User user) {
+    public void checkUser(User user) {
 
         if (isNull(user)) throw new EntityNullException(
                 ExceptionMessageProvider.getEntityNullExceptionText(new User())

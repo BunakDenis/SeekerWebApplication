@@ -1,10 +1,11 @@
 package com.example.database.service.telegram;
 
 import com.example.data.models.consts.ResponseMessageProvider;
-import com.example.data.models.entity.dto.telegram.TelegramChatDTO;
-import com.example.data.models.entity.dto.response.ApiResponse;
-import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
+import com.example.data.models.entity.telegram.TelegramChatDTO;
+import com.example.data.models.entity.response.ApiResponse;
+import com.example.data.models.entity.telegram.TelegramUserDTO;
 import com.example.data.models.enums.ResponseIncludeDataKeys;
+import com.example.data.models.exception.EntityNotFoundException;
 import com.example.data.models.utils.ApiResponseUtilsService;
 import com.example.database.entity.TelegramChat;
 import com.example.database.entity.TelegramUser;
@@ -27,8 +28,10 @@ import java.util.Optional;
 @Slf4j
 public class TelegramChatsService {
 
+
     private final TelegramChatRepo chatRepo;
     private final ModelMapperService mapperService;
+
 
     public ApiResponse<TelegramChatDTO> create(TelegramChat chat) {
 
@@ -48,9 +51,15 @@ public class TelegramChatsService {
         return response;
 
     }
-    public ApiResponse getTelegramChatById(Long id) {
 
-        Optional<TelegramChat> findChat = chatRepo.findFirstByIdOrderByIdDesc(id);
+    /*
+        TODO
+            1. Добавить метод получение чата по id без TelegramUser
+     */
+
+    public ApiResponse getTelegramChatByIdWithTelegramUser(Long id) {
+
+        Optional<TelegramChat> findChat = chatRepo.findFirstByTelegramChatIdOrderByIdDesc(id);
 
         if (findChat.isPresent()) {
 
@@ -72,7 +81,7 @@ public class TelegramChatsService {
 
         log.debug("Метод getTelegramChatByIdWithTelegramUser {}", id);
 
-        Optional<TelegramChat> findChat = chatRepo.findFirstByTelegramUserIdOrderByIdDesc(id);
+        Optional<TelegramChat> findChat = chatRepo.findFirstByTelegramUser_TelegramUserIdOrderByIdDesc(id);
 
         log.debug("findChat.isPresent() = {}", findChat.isPresent());
 
@@ -101,7 +110,15 @@ public class TelegramChatsService {
     }
     public ApiResponse<TelegramChatDTO> getTelegramChatByTelegramUserId(Long id) {
 
-        TelegramChat chat = chatRepo.findFirstByTelegramUserIdOrderByIdDesc(id).get();
+        Optional<TelegramChat> findChat = chatRepo.findFirstByTelegramUser_TelegramUserIdOrderByIdDesc(id);
+
+        if (!findChat.isPresent())
+            throw new EntityNotFoundException(
+                    "Telegram chat by telegram_user_id=" + id + "is not found",
+                    new TelegramChat()
+            );
+
+        TelegramChat chat = findChat.get();
 
         return success(mapperService.toDTO(chat, TelegramChatDTO.class));
 

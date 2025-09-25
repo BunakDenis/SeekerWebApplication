@@ -1,28 +1,19 @@
 package com.example.database.user;
 
-import com.example.data.models.entity.dto.response.CheckUserResponse;
+import com.example.data.models.entity.mysticschool.ArticleCategory;
 import com.example.database.DataProviderTestsBaseClass;
 import com.example.database.api.client.MysticSchoolClient;
-import com.example.database.service.UserService;
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.utility.DockerImageName;
-import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static com.example.data.models.consts.DataProviderEndpointsConsts.*;
 
 
 @Slf4j
@@ -32,6 +23,7 @@ public class MysticSchoolClientTests extends DataProviderTestsBaseClass {
     @Autowired
     private MysticSchoolClient mysticSchoolClient;
     private static GenericContainer<?> torProxyContainer;
+
 
     static {
 
@@ -76,7 +68,7 @@ public class MysticSchoolClientTests extends DataProviderTestsBaseClass {
     public void testIsRunningTorProxyContainer() {
         assertTrue(torProxyContainer.isRunning());
     }
-/*
+
     @Test
     public void testCheckUser() {
 
@@ -88,6 +80,8 @@ public class MysticSchoolClientTests extends DataProviderTestsBaseClass {
                 .assertNext(resp -> {
                     log.debug("Response = {}", resp);
                     assertTrue(resp.isFound());
+                    assertEquals(3, resp.getAccess_level());
+                    assertTrue(resp.isActive());
                 })
                 .verifyComplete();
     }
@@ -103,6 +97,8 @@ public class MysticSchoolClientTests extends DataProviderTestsBaseClass {
                 .assertNext(resp -> {
                     log.debug("Response = {}", resp);
                     assertFalse(resp.isFound());
+                    assertEquals(0, resp.getAccess_level());
+                    assertFalse(resp.isActive());
                 })
                 .verifyComplete();
     }
@@ -110,16 +106,88 @@ public class MysticSchoolClientTests extends DataProviderTestsBaseClass {
     @Test
     public void testGetArticleCategories() {
 
+        ArticleCategory expectedDescipleWordArticle = getDescipleWordArticleCategory();
+        ArticleCategory expectedMasterArticle = getMasterArticleCategory();
+        ArticleCategory expectedMysticLiteratureArticle = getMysticLiteratureArticleCategory();
+
         StepVerifier.create(mysticSchoolClient.getArticleCategories())
                 .assertNext(list -> {
 
-                    list.forEach(articleCategory -> log.debug("Категория статьи = {}", articleCategory));
+                    ArticleCategory actualDescipleWordArticle = list.stream()
+                            .filter(articleCategory -> articleCategory.getId() == expectedDescipleWordArticle.getId())
+                            .findFirst().get();
+                    ArticleCategory actualMasterArticle = list.stream()
+                            .filter(articleCategory -> articleCategory.getId() == expectedMasterArticle.getId())
+                            .findFirst().get();
+                    ArticleCategory actualMysticLiteratureArticle = list.stream()
+                            .filter(articleCategory -> articleCategory.getId() == expectedMysticLiteratureArticle.getId())
+                            .findFirst().get();
 
                     assertFalse(list.isEmpty());
+                    assertEquals(expectedDescipleWordArticle.getName(), actualDescipleWordArticle.getName());
+                    assertEquals(expectedMasterArticle.getName(), actualMasterArticle.getName());
+                    assertEquals(expectedMysticLiteratureArticle.getName(), actualMysticLiteratureArticle.getName());
 
                 })
                 .verifyComplete();
 
     }
-*/
+
+    @Test
+    public void testGetArticlesByDescipleWordArticleCategoryId() {
+
+        ArticleCategory expectedDescipleWordArticleCategory = getDescipleWordArticleCategory();
+
+        StepVerifier
+                .create(mysticSchoolClient.getArticleByArticleCategoryId(expectedDescipleWordArticleCategory.getId()))
+                .assertNext(list -> assertFalse(list.isEmpty()))
+                .verifyComplete();
+    }
+    @Test
+    public void testGetArticlesByMasterArticleCategoryId() {
+
+        ArticleCategory expectedMasterArticleCategory = getMasterArticleCategory();
+
+        StepVerifier
+                .create(mysticSchoolClient.getArticleByArticleCategoryId(expectedMasterArticleCategory.getId()))
+                .assertNext(list -> assertFalse(list.isEmpty()))
+                .verifyComplete();
+    }
+    @Test
+    public void testGetArticlesByMysticLiteratureArticleCategoryId() {
+
+        ArticleCategory expectedMysticLiteratureArticleCategory = getMysticLiteratureArticleCategory();
+
+        StepVerifier
+                .create(mysticSchoolClient.getArticleByArticleCategoryId(expectedMysticLiteratureArticleCategory.getId()))
+                .assertNext(list -> assertFalse(list.isEmpty()))
+                .verifyComplete();
+    }
+
+    /*
+            TODO
+                1. Дописать тесты для получения статьи в рамках категории по ID категории
+                2. Дописать тесты для получения книг
+                3. Дописать тесты для получения практик
+     */
+
+    private ArticleCategory getDescipleWordArticleCategory() {
+        return ArticleCategory.builder()
+                .id(1)
+                .name("Слово учеников")
+                .build();
+    }
+    private ArticleCategory getMasterArticleCategory() {
+        return ArticleCategory.builder()
+                .id(2)
+                .name("Статьи Мастера")
+                .build();
+    }
+    private ArticleCategory getMysticLiteratureArticleCategory() {
+        return ArticleCategory.builder()
+                .id(3)
+                .name("Учебная литература")
+                .build();
+    }
+
 }

@@ -1,7 +1,7 @@
 package com.example.telegram.bot.service;
 
-import com.example.data.models.entity.dto.response.ApiResponse;
-import com.example.data.models.entity.dto.telegram.TelegramChatDTO;
+import com.example.data.models.entity.response.ApiResponse;
+import com.example.data.models.entity.telegram.TelegramChatDTO;
 import com.example.data.models.enums.ResponseIncludeDataKeys;
 import com.example.data.models.exception.EntityNotFoundException;
 import com.example.data.models.exception.EntityNotSavedException;
@@ -61,14 +61,14 @@ public class TelegramChatService {
                 });
 
     }
-    public Mono<TelegramChat> getTelegramChatByIdWithTelegramUser(Long id) {
+    public Mono<TelegramChat> getTelegramChatByIdWithTgUser(Long id) {
 
-        return dataProviderClient.getTelegramChatWithTelegramUser(id)
+        return dataProviderClient.getTelegramChatByIdWithTgUser(id)
                 .flatMap(resp -> {
                     if (resp.getData() instanceof TelegramChatDTO) {
                         TelegramChat telegramChat = toEntity(resp);
 
-                        return Mono.just(toEntity(resp));
+                        return Mono.just(telegramChat);
                     } else {
                         log.debug("Телеграм чат с id " + id + ", не найден");
                         throw new EntityNotFoundException("Телеграм чат с id " + id + ", не найден",  new TelegramChat());

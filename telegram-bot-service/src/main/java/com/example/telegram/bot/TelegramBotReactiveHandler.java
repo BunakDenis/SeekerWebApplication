@@ -4,7 +4,6 @@ import com.example.data.models.consts.WarnMessageProvider;
 import com.example.data.models.entity.TelegramChat;
 import com.example.telegram.bot.chat.UiElements;
 import com.example.telegram.bot.commands.CommandsHandler;
-import com.example.telegram.bot.message.MessageProvider;
 import com.example.telegram.bot.message.TelegramBotMessageSender;
 import com.example.telegram.bot.multimedia.MultimediaHandler;
 import com.example.telegram.bot.queries.QueriesHandler;
@@ -41,7 +40,7 @@ public class TelegramBotReactiveHandler {
 
         long chatId = UpdateUtilsService.getChatId(update);
 
-        return telegramChatService.getTelegramChatByIdWithTelegramUser(chatId)
+        return telegramChatService.getTelegramChatByIdWithTgUser(chatId)
                 .flatMap(lastTelegramChat -> {
                     if (update.hasMessage()) {
                         return handleMessage(update, lastTelegramChat);

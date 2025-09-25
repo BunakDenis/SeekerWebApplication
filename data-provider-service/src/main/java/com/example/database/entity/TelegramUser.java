@@ -11,12 +11,15 @@ import java.util.List;
 @Builder
 @Entity
 @Table(name = "telegram_users")
-@ToString
+@ToString(exclude = {"user", "telegramChats", "telegramSession"})
 public class TelegramUser {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "telegram_user_id")
+    private Long telegramUserId;
 
     @Column(name = "username")
     private String username;
@@ -26,14 +29,12 @@ public class TelegramUser {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    @ToString.Exclude
     private User user;
 
     @OneToMany(mappedBy = "telegramUser", fetch = FetchType.EAGER)
     private List<TelegramChat> telegramChats;
 
     @OneToOne(mappedBy = "telegramUser", cascade = CascadeType.REFRESH, fetch = FetchType.EAGER, optional = false)
-    @ToString.Exclude
     private TelegramSession telegramSession;
 
 }

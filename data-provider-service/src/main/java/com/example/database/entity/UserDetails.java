@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@ToString
+@ToString(exclude = "user")
 public class UserDetails {
 
     @Id
@@ -46,6 +46,5 @@ public class UserDetails {
 
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
-    @ToString.Exclude
     private User user;
 }

@@ -1,7 +1,7 @@
 package com.example.database.service.telegram;
 
-import com.example.data.models.entity.dto.response.ApiResponse;
-import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
+import com.example.data.models.entity.response.ApiResponse;
+import com.example.data.models.entity.telegram.TelegramUserDTO;
 import com.example.data.models.exception.EntityNotFoundException;
 import com.example.data.models.utils.ApiResponseUtilsService;
 import com.example.database.entity.TelegramUser;
@@ -30,8 +30,9 @@ public class TelegramUserService {
     public ApiResponse<TelegramUserDTO> update(TelegramUser telegramUser) {
         return save(telegramUser);
     }
-    public ApiResponse<TelegramUserDTO> getById(Long id) {
-        Optional<TelegramUser> optionalUser = repo.findById(id);
+    public ApiResponse<TelegramUserDTO> getById(Long telegramUserId) {
+
+        Optional<TelegramUser> optionalUser = repo.findByTelegramUserId(telegramUserId);
 
         if (optionalUser.isPresent()) {
             TelegramUser user = optionalUser.get();
@@ -39,7 +40,7 @@ public class TelegramUserService {
             return ApiResponseUtilsService.success(mapperService.toDTO(user, TelegramUserDTO.class));
         }
 
-        throw new EntityNotFoundException("Telegram user with id=" + id + " is not found", TelegramUser.class);
+        throw new EntityNotFoundException("Telegram user with id=" + telegramUserId + " is not found", TelegramUser.class);
 
     }
     public ApiResponse<Boolean> delete(Long id) {

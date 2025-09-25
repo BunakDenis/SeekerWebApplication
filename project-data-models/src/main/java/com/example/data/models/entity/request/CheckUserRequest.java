@@ -1,4 +1,4 @@
-package com.example.data.models.entity.dto.request;
+package com.example.data.models.entity.request;
 
 import lombok.Builder;
 import lombok.Data;

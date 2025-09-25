@@ -1,9 +1,7 @@
 package com.example.database.exception;
 
 
-import com.example.data.models.consts.ResponseMessageProvider;
-import com.example.data.models.entity.User;
-import com.example.data.models.entity.dto.response.ApiResponse;
+import com.example.data.models.entity.response.ApiResponse;
 import com.example.data.models.exception.*;
 import com.example.utils.text.ExceptionServiceUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -17,8 +15,6 @@ import org.springframework.web.reactive.resource.NoResourceFoundException;
 
 
 import java.util.NoSuchElementException;
-
-import static com.example.data.models.consts.ResponseMessageProvider.*;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
@@ -61,16 +57,6 @@ public class RestControllerExceptionHandler {
 
         return ResponseEntity.status(resp.getStatus()).body(resp);
 
-    }
-
-    @ExceptionHandler(UserNotFoundException.class)
-    protected ResponseEntity<ApiResponse<Object>> userNotFoundExceptionHandle(UserNotFoundException e) {
-
-        log.error(LOG_EXCEPTION_HANDLE_MSG, e.getClass().getCanonicalName(), e.getMessage(), e);
-
-        ApiResponse<Object> resp = getResponse(HttpStatus.NOT_FOUND, e);
-
-        return ResponseEntity.status(resp.getStatus()).body(resp);
     }
 
     @ExceptionHandler(EntityNotSavedException.class)

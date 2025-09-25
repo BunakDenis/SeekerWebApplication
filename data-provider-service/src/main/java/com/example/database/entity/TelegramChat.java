@@ -14,6 +14,7 @@ public class TelegramChat {
 
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(name = "telegram_chat_id")
     private Long telegramChatId;
@@ -27,7 +28,6 @@ public class TelegramChat {
     @JoinColumn(name = "telegram_user_id", nullable = false)
     @JsonIgnore
     private TelegramUser telegramUser;
-
     @Override
     public String toString() {
         return "TelegramChat{" +

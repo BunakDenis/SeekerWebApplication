@@ -22,6 +22,8 @@ public class VerificationCodeDTO {
 
     private LocalDateTime expiresAt;
 
+    private Boolean isActive;
+
     private Integer attempts;
 
 }

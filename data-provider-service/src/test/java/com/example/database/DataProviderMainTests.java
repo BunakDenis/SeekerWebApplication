@@ -1,17 +1,11 @@
 package com.example.database;
 
 import com.example.data.models.consts.ResponseMessageProvider;
-import com.example.data.models.entity.dto.response.ApiResponse;
+import com.example.data.models.entity.response.ApiResponse;
 import com.example.data.models.utils.ApiResponseUtilsService;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.http.MediaType;
-import org.springframework.web.reactive.resource.NoResourceFoundException;
 
 import static org.junit.jupiter.api.Assertions.*;
 

@@ -1,4 +1,4 @@
-package com.example.data.models.entity.dto.telegram;
+package com.example.data.models.entity.telegram;
 
 import lombok.*;
 
@@ -11,9 +11,8 @@ import java.util.List;
 public class TelegramUserDTO {
 
     private Long id;
-
+    private Long telegramUserId;
     private String username;
-
     private boolean isActive;
 
 }

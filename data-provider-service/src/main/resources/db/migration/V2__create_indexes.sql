@@ -10,6 +10,9 @@ CREATE INDEX IF NOT EXISTS idx_verification_codes_user_id ON verification_codes 
 -- Индекс для user_id в таблице telegram_users
 CREATE INDEX IF NOT EXISTS idx_telegram_users_user_id ON telegram_users (user_id);
 
+-- Индекс для telegram_user_id в таблице telegram_users
+CREATE INDEX IF NOT EXISTS idx_telegram_users_telegram_user_id ON telegram_users (telegram_user_id);
+
 -- Индекс для telegram_chat_id в таблице telegram_chats
 CREATE INDEX IF NOT EXISTS idx_telegram_chats_telegram_chat_id ON telegram_chats (telegram_chat_id);
 

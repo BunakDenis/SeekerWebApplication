@@ -1,8 +1,8 @@
 package com.example.database.service.telegram;
 
 
-import com.example.data.models.entity.dto.response.ApiResponse;
-import com.example.data.models.entity.dto.telegram.PersistentSessionDTO;
+import com.example.data.models.entity.response.ApiResponse;
+import com.example.data.models.entity.telegram.PersistentSessionDTO;
 import com.example.data.models.exception.EntityNotFoundException;
 import com.example.data.models.utils.ApiResponseUtilsService;
 import com.example.database.entity.PersistentSession;

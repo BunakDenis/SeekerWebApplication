@@ -1,9 +1,9 @@
 package com.example.database.api.controller;
 
 
-import com.example.data.models.entity.dto.request.ApiRequest;
-import com.example.data.models.entity.dto.response.ApiResponse;
-import com.example.data.models.entity.dto.telegram.TelegramChatDTO;
+import com.example.data.models.entity.request.ApiRequest;
+import com.example.data.models.entity.response.ApiResponse;
+import com.example.data.models.entity.telegram.TelegramChatDTO;
 import com.example.database.entity.TelegramChat;
 import com.example.database.entity.TelegramUser;
 import com.example.database.service.ModelMapperService;
@@ -70,7 +70,7 @@ public class TelegramChatDataController {
 
         log.debug("Запрос на получения чатов по id {}", id);
 
-        ApiResponse<TelegramChatDTO> response = chatsService.getTelegramChatById(id);
+        ApiResponse<TelegramChatDTO> response = chatsService.getTelegramChatByIdWithTelegramUser(id);
 
         log.debug("Ответ {}", response);
 
@@ -83,7 +83,7 @@ public class TelegramChatDataController {
 
         log.debug("Запрос на получения чатов с телеграм юзером по id {}", id);
 
-        ApiResponse<TelegramChatDTO> response = chatsService.getTelegramChatByTelegramUserIdWithTelegramUser(id);
+        ApiResponse<TelegramChatDTO> response = chatsService.getTelegramChatByIdWithTelegramUser(id);
 
         log.debug("Ответ {}", response);
 

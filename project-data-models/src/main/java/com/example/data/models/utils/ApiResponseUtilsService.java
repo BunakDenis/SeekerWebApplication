@@ -1,6 +1,6 @@
 package com.example.data.models.utils;
 
-import com.example.data.models.entity.dto.response.ApiResponse;
+import com.example.data.models.entity.response.ApiResponse;
 import com.example.data.models.consts.ResponseMessageProvider;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;

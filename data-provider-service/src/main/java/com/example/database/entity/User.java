@@ -39,8 +39,8 @@ public class User {
     @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
     private UserDetails userDetails;
 
-    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
-    private VerificationCode verificationCode;
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<VerificationCode> verificationCode;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<TelegramUser> telegramUsers;
