@@ -51,7 +51,27 @@ public class TelegramSessionService {
     public Mono<TelegramSession> save(TelegramSession telegramSession) {
 
         return dataProviderClient.saveTelegramSession(telegramSession)
-                .flatMap(session -> Mono.just(modelMapperService.toEntity(session, TelegramSession.class)));
+                .flatMap(session -> {
+
+                    log.debug("Telegram session {}", session);
+
+                    TelegramSession savedTelegramSession =
+                            modelMapperService.toEntity(session.getData(), TelegramSession.class);
+
+                    TelegramUser telegramUser = modelMapperService.toEntity(
+                            session.getIncludedObject(ResponseIncludeDataKeys.TELEGRAM_USER.getKeyValue()),
+                            TelegramUser.class
+                    );
+
+                    savedTelegramSession.setTelegramUser(telegramUser);
+
+                    log.debug("Telegram session {}", savedTelegramSession);
+
+                    return Mono.just(savedTelegramSession);
+                });
+    }
+    public Mono<TelegramSession> update(TelegramSession telegramSession) {
+        return save(telegramSession);
     }
     public Mono<TelegramSession> getFull(Long telegramUserId) {
 

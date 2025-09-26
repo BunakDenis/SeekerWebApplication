@@ -1,7 +1,9 @@
 package com.example.telegram.api.clients;
 
 
+import com.example.data.models.entity.PersistentSession;
 import com.example.data.models.entity.TelegramSession;
+import com.example.data.models.entity.TransientSession;
 import com.example.data.models.entity.dto.VerificationCodeDTO;
 import com.example.data.models.entity.dto.telegram.*;
 import com.example.data.models.entity.response.CheckUserResponse;
@@ -494,9 +496,19 @@ public class DataProviderClient {
                 .bodyToMono(new ParameterizedTypeReference<>() {
                 });
     }
-    public Mono<ApiResponse<TransientSessionDTO>> saveTransientSession(TransientSessionDTO dto) {
+    public Mono<ApiResponse<TransientSessionDTO>> saveTransientSession(TransientSession session) {
+
+        log.debug("Запрос на сохранение TransientSession {}", session);
+        log.debug("Telegram Session {}", session.getTelegramSession());
+
+
+        TransientSessionDTO dto = mapperService.toDTO(session, TransientSessionDTO.class);
+        TelegramSessionDTO telegramSessionDTO =
+                mapperService.toDTO(session.getTelegramSession(), TelegramSessionDTO.class);
 
         ApiRequest<TransientSessionDTO> request = new ApiRequest<>(dto);
+
+        request.addIncludeObject(ResponseIncludeDataKeys.TELEGRAM_SESSION.getKeyValue(), telegramSessionDTO);
 
         return webClient.post()
                 .uri(getApiTransientSessionEndpoint("add/"))
@@ -507,15 +519,20 @@ public class DataProviderClient {
                 .bodyToMono(new ParameterizedTypeReference<>() {
                 });
     }
-    public Mono<ApiResponse<TransientSessionDTO>> updateTransientSession(TransientSessionDTO dto) {
+    public Mono<ApiResponse<TransientSessionDTO>> updateTransientSession(TransientSession session) {
 
-        ApiRequest<TransientSessionDTO> response = new ApiRequest<>(dto);
+        TransientSessionDTO dto = mapperService.toDTO(session, TransientSessionDTO.class);
+        TelegramSessionDTO telegramSessionDTO = mapperService.toDTO(session.getTelegramSession(), TelegramSessionDTO.class);
+
+        ApiRequest<TransientSessionDTO> request = new ApiRequest<>(dto);
+
+        request.addIncludeObject(ResponseIncludeDataKeys.TELEGRAM_SESSION.getKeyValue(), telegramSessionDTO);
 
         return webClient.post()
                 .uri(getApiTransientSessionEndpoint("update/"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
-                .bodyValue(response)
+                .bodyValue(request)
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<>() {
                 });
@@ -529,28 +546,41 @@ public class DataProviderClient {
                 .bodyToMono(new ParameterizedTypeReference<>() {
                 });
     }
-    public Mono<ApiResponse<PersistentSessionDTO>> savePersistentSession(PersistentSessionDTO dto) {
+    public Mono<ApiResponse<PersistentSessionDTO>> savePersistentSession(PersistentSession session) {
 
-        ApiRequest<PersistentSessionDTO> response = new ApiRequest<>(dto);
+        log.debug("Запрос на сохранение Persistent Session {}", session);
+        log.debug("Telegram Session {}", session.getTelegramSession());
+
+        PersistentSessionDTO dto = mapperService.toDTO(session, PersistentSessionDTO.class);
+        TelegramSessionDTO telegramSessionDTO = mapperService.toDTO(session.getTelegramSession(), TelegramSessionDTO.class);
+
+        ApiRequest<PersistentSessionDTO> request = new ApiRequest<>(dto);
+
+        request.addIncludeObject(ResponseIncludeDataKeys.TELEGRAM_SESSION.getKeyValue(), telegramSessionDTO);
 
         return webClient.post()
                 .uri(getApiPersistentSessionEndpoint("add/"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
-                .bodyValue(response)
+                .bodyValue(request)
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<>() {
                 });
     }
-    public Mono<ApiResponse<PersistentSessionDTO>> updatePersistentSession(PersistentSessionDTO dto) {
+    public Mono<ApiResponse<PersistentSessionDTO>> updatePersistentSession(PersistentSession session) {
 
-        ApiRequest<PersistentSessionDTO> response = new ApiRequest<>(dto);
+        PersistentSessionDTO dto = mapperService.toDTO(session, PersistentSessionDTO.class);
+        TelegramSessionDTO telegramSessionDTO = mapperService.toDTO(session.getTelegramSession(), TelegramSessionDTO.class);
+
+        ApiRequest<PersistentSessionDTO> request = new ApiRequest<>(dto);
+
+        request.addIncludeObject(ResponseIncludeDataKeys.TELEGRAM_SESSION.getKeyValue(), telegramSessionDTO);
 
         return webClient.post()
                 .uri(getApiPersistentSessionEndpoint("update/"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
-                .bodyValue(response)
+                .bodyValue(request)
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<>() {
                 });

@@ -21,9 +21,7 @@ public class PersistentSessionService {
 
     public Mono<PersistentSession> save(PersistentSession session) {
 
-        PersistentSessionDTO dto = mapperService.toDTO(session, PersistentSessionDTO.class);
-
-        return dataClient.savePersistentSession(dto)
+        return dataClient.savePersistentSession(session)
                 .flatMap(resp -> {
 
                     if (Objects.nonNull(resp.getData())) {
@@ -38,9 +36,7 @@ public class PersistentSessionService {
     }
     public Mono<PersistentSession> update(PersistentSession session) {
 
-        PersistentSessionDTO dto = mapperService.toDTO(session, PersistentSessionDTO.class);
-
-        return dataClient.savePersistentSession(dto)
+        return dataClient.savePersistentSession(session)
                 .flatMap(resp -> {
 
                     if (Objects.nonNull(resp.getData())) {

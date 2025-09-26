@@ -58,6 +58,8 @@ public class TelegramSessionService {
 
         response.addIncludeObject(ResponseIncludeDataKeys.TELEGRAM_USER.getKeyValue(), telegramUserDTO);
 
+        log.debug("Response {}", response);
+
         return response;
     }
     public ApiResponse<TelegramSessionDTO> update(TelegramSession session) {

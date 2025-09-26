@@ -53,7 +53,6 @@ public class TelegramBotConstantsForTests {
     public static final TelegramSession TELEGRAM_SESSION_FOR_TESTS = TelegramSession.builder()
             .id(23456L)
             .telegramUser(TELEGRAM_USER_FOR_TESTS)
-            .isActive(true)
             .build();
 
     public static final Integer TELEGRAM_UPDATE_ID = 789456;

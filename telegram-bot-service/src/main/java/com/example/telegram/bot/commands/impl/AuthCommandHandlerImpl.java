@@ -249,6 +249,8 @@ public class AuthCommandHandlerImpl implements CommandHandler {
                             })
                             .flatMap(session -> {
 
+                                log.debug("Saved Telegram session {}", session);
+
                                 TransientSession transientSession = TransientSession.builder()
                                         .telegramSession(session)
                                         .isActive(true)
@@ -270,7 +272,7 @@ public class AuthCommandHandlerImpl implements CommandHandler {
                                         .flatMap(savedPersistentSession -> {
                                             session.setTransientSessions(List.of(transientSession));
                                             session.setPersistentSessions(List.of(savedPersistentSession));
-                                            return telegramSessionService.save(session);
+                                            return telegramSessionService.update(session);
                                         });
                             })
                             .then(
@@ -280,7 +282,7 @@ public class AuthCommandHandlerImpl implements CommandHandler {
                                     )
                             );
                 })
-                .doOnError(error -> log.error("Ошибка проверки верификационного кода - {}", error))
+                .doOnError(error -> log.error("Ошибка проверки верификационного кода - {}", error.getMessage()))
                 .onErrorResume(error -> {
 
                     ReplyKeyboardMarkup notValidEmailKeyboard = ReplyKeyboardMarkupProvider.getNotValidEmailKeyboard();
