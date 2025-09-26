@@ -1,4 +1,4 @@
-package com.example.database.repo.telegram;
+package com.example.database.repo.jpa.telegram;
 
 import com.example.database.entity.TransientSession;
 import org.springframework.data.jpa.repository.JpaRepository;

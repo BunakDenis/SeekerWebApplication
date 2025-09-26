@@ -3,6 +3,7 @@ package com.example.database.service.telegram;
 
 import com.example.data.models.entity.dto.telegram.PersistentSessionDTO;
 import com.example.data.models.entity.dto.telegram.TelegramSessionDTO;
+import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
 import com.example.data.models.entity.response.ApiResponse;
 import com.example.data.models.entity.dto.telegram.TransientSessionDTO;
 import com.example.data.models.enums.ResponseIncludeDataKeys;
@@ -12,10 +13,10 @@ import com.example.database.entity.PersistentSession;
 import com.example.database.entity.TelegramSession;
 import com.example.database.entity.TelegramUser;
 import com.example.database.entity.TransientSession;
-import com.example.database.repo.telegram.TelegramSessionRepo;
+import com.example.database.repo.jpa.telegram.TelegramSessionRepo;
 import com.example.database.service.ModelMapperService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +28,7 @@ import static com.example.data.models.utils.ApiResponseUtilsService.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TelegramSessionService {
 
     private final TelegramSessionRepo repo;
@@ -37,12 +39,26 @@ public class TelegramSessionService {
 
         Optional<TelegramSession> save = Optional.of(repo.save(session));
 
-        if (save.isPresent()) return success(
-                    HttpStatus.CREATED,
-                    mapperService.toDTO(save, TelegramSessionDTO.class)
-            );
+        if (!save.isPresent()) throw new EntityNotSavedException(TelegramSession.class + " not saved");
 
-        throw new EntityNotSavedException(TelegramSession.class + " not saved");
+        TelegramSession telegramSession = save.get();
+        TelegramSession sessionWithTelegramUser = repo.findWithTelegramUserById(session.getId()).get();
+
+
+        log.debug("Saved Telegram session {}", telegramSession);
+        log.debug("Telegram user of saved telegram session {}", sessionWithTelegramUser.getTelegramUser());
+
+        TelegramSessionDTO dto = mapperService.toDTO(telegramSession, TelegramSessionDTO.class);
+        ApiResponse<TelegramSessionDTO> response = success(
+                HttpStatus.CREATED,
+                dto);
+
+        TelegramUser telegramUser = sessionWithTelegramUser.getTelegramUser();
+        TelegramUserDTO telegramUserDTO = mapperService.toDTO(telegramUser, TelegramUserDTO.class);
+
+        response.addIncludeObject(ResponseIncludeDataKeys.TELEGRAM_USER.getKeyValue(), telegramUserDTO);
+
+        return response;
     }
     public ApiResponse<TelegramSessionDTO> update(TelegramSession session) {
 
@@ -60,43 +76,30 @@ public class TelegramSessionService {
 
         throw new EntityNotFoundException(TelegramSession.class + " not found", new TelegramSession());
     }
-    @Transactional
-    public ApiResponse<TelegramSessionDTO> getByTelegramUserId(Long telegramUserId) {
+    public ApiResponse<TelegramSessionDTO> getByTelegramUserIdWithTelegramUser(Long telegramUserId) {
 
         Optional<TelegramSession> session = repo.getTelegramSessionByTelegramUserId(telegramUserId);
 
-        if (session.isPresent()) {
+        log.debug("Found session {}", session);
 
-            TelegramSession telegramSession = session.get();
-            TelegramSessionDTO telegramSessionDTO = mapperService.toDTO(telegramSession, TelegramSessionDTO.class);
+        if (!session.isPresent())
+            throw new EntityNotFoundException(TelegramSession.class + " not found", new TelegramSession());
 
-            TelegramUser telegramUser = telegramSession.getTelegramUser();
-            List<PersistentSession> persistentSessions = telegramSession.getPersistentSessions();
-            List<TransientSession> transientSessions = telegramSession.getTransientSessions();
+        TelegramSession telegramSession = session.get();
 
-            List<Object> prSessionDTOList = new ArrayList<>();
-            List<Object> trSessionDTOList = new ArrayList<>();
+        TelegramSessionDTO telegramSessionDTO = mapperService.toDTO(telegramSession, TelegramSessionDTO.class);
 
-            persistentSessions.forEach(prSession ->
-                    prSessionDTOList.add(mapperService.toDTO(prSession, PersistentSessionDTO.class)));
+        TelegramUser telegramUser = telegramSession.getTelegramUser();
+        TelegramUserDTO telegramUserDTO = mapperService.toDTO(telegramUser, TelegramUserDTO.class);
 
-            transientSessions.forEach(trSession ->
-                    trSessionDTOList.add(mapperService.toDTO(trSession, TransientSessionDTO.class)));
-
-            ApiResponse<TelegramSessionDTO> response = success(telegramSessionDTO);
+        ApiResponse<TelegramSessionDTO> response = success(telegramSessionDTO);
 
             response.addIncludeObject(
                     ResponseIncludeDataKeys.TELEGRAM_USER.getKeyValue(),
-                    mapperService.toDTO(telegramUser, TelegramUser.class)
-            );
-            response.addIncludeListObjects(ResponseIncludeDataKeys.PERSISTENT_SESSION.getKeyValue(), prSessionDTOList);
-            response.addIncludeListObjects(ResponseIncludeDataKeys.TRANSIENT_SESSION.getKeyValue(), trSessionDTOList);
+                    telegramUserDTO
+                    );
 
             return response;
-        }
-
-        throw new EntityNotFoundException(TelegramSession.class + " not found", new TelegramSession());
-
     }
     public ApiResponse<Boolean> delete(Long id) {
 

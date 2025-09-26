@@ -64,6 +64,17 @@ WHERE u.email = 'xisi926@ukr.net'
       SELECT 1 FROM telegram_chats tc WHERE tc.telegram_chat_id = 465963651
   );
 
+-- telegram_session для dbunak: используем PK из telegram_users
+INSERT INTO telegram_sessions (session_data, telegram_user_id)
+SELECT '', tu.id
+FROM telegram_users tu
+JOIN users u ON tu.user_id = u.id
+WHERE u.email = 'xisi926@ukr.net'
+  AND tu.telegram_user_id = 465963651
+  AND NOT EXISTS (
+      SELECT 1 FROM telegram_sessions tc WHERE tc.telegram_user_id = 465963651
+  );
+
 
 -- ============================
 -- 3) Для tourist: аналогично
@@ -106,4 +117,15 @@ WHERE u.email = 'tourist@gmail.com'
   AND tu.telegram_user_id = 55555
   AND NOT EXISTS (
       SELECT 1 FROM telegram_chats tc WHERE tc.telegram_chat_id = 55555
+  );
+
+-- telegram_sessions для tourist
+INSERT INTO telegram_sessions (session_data, telegram_user_id)
+SELECT '', tu.id
+FROM telegram_users tu
+JOIN users u ON tu.user_id = u.id
+WHERE u.email = 'tourist@gmail.com'
+  AND tu.telegram_user_id = 55555
+  AND NOT EXISTS (
+      SELECT 1 FROM telegram_sessions tc WHERE tc.telegram_user_id = 55555
   );

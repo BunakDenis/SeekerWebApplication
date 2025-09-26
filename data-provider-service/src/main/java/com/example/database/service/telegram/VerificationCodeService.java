@@ -10,7 +10,7 @@ import com.example.data.models.exception.EntityNotSavedException;
 import com.example.database.entity.TelegramSession;
 import com.example.database.entity.User;
 import com.example.database.entity.VerificationCode;
-import com.example.database.repo.telegram.VerificationCodeRepo;
+import com.example.database.repo.jpa.telegram.VerificationCodeRepo;
 import com.example.database.service.ModelMapperService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;

@@ -11,7 +11,7 @@ import com.example.data.models.exception.*;
 import com.example.data.models.utils.ApiResponseUtilsService;
 import com.example.database.entity.TelegramUser;
 import com.example.database.entity.User;
-import com.example.database.repo.telegram.UserRepo;
+import com.example.database.repo.jpa.telegram.UserRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;

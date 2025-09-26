@@ -1,6 +1,5 @@
 package com.example.database.api.controller;
 
-
 import com.example.data.models.entity.request.ApiRequest;
 import com.example.data.models.entity.response.ApiResponse;
 import com.example.data.models.entity.dto.telegram.TelegramSessionDTO;
@@ -56,9 +55,17 @@ public class TelegramSessionDataController {
     ) {
         log.debug("Запрос на обновление TelegramSession {}", request);
 
-        ApiResponse<TelegramSessionDTO> response = sessionService.update(
-                mapperService.toEntity(request.getData(), TelegramSession.class)
+        TelegramSessionDTO dto = request.getData();
+
+        TelegramSession telegramSessionForUpdate = mapperService.toEntity(dto, TelegramSession.class);
+        TelegramUser telegramUser = objectMapper.convertValue(
+                request.getIncludeObject(ResponseIncludeDataKeys.TELEGRAM_USER.getKeyValue()),
+                TelegramUser.class
         );
+
+        telegramSessionForUpdate.setTelegramUser(telegramUser);
+
+        ApiResponse<TelegramSessionDTO> response = sessionService.update(telegramSessionForUpdate);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -81,7 +88,7 @@ public class TelegramSessionDataController {
 
         log.debug("Запрос на получение TelegramSession по telegramUserId {}", telegramUserId);
 
-        ApiResponse<TelegramSessionDTO> response = sessionService.getByTelegramUserId(telegramUserId);
+        ApiResponse<TelegramSessionDTO> response = sessionService.getByTelegramUserIdWithTelegramUser(telegramUserId);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
 

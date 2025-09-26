@@ -2,18 +2,12 @@ package com.example.database;
 
 
 import com.example.data.models.service.JWTService;
-import com.example.database.exception.RestControllerExceptionHandler;
 import com.example.database.service.ModelMapperService;
 import com.example.database.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
-import org.flywaydb.core.Flyway;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mockito;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
@@ -26,9 +20,8 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.utility.DockerImageName;
 
 
-import java.io.File;
-
 import static org.mockito.ArgumentMatchers.any;
+
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         properties = "spring.main.web-application-type=reactive")
@@ -48,7 +41,7 @@ public abstract class DataProviderTestsBaseClass {
     @Autowired
     protected WebTestClient client;
     @Autowired
-    protected static ObjectMapper objectMapper;
+    protected ObjectMapper objectMapper;
     @Autowired
     protected ModelMapperService mapperService;
     @Autowired

@@ -9,7 +9,7 @@ import com.example.data.models.exception.EntityNotFoundException;
 import com.example.data.models.utils.ApiResponseUtilsService;
 import com.example.database.entity.TelegramChat;
 import com.example.database.entity.TelegramUser;
-import com.example.database.repo.telegram.TelegramChatRepo;
+import com.example.database.repo.jpa.telegram.TelegramChatRepo;
 import com.example.database.service.ModelMapperService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
