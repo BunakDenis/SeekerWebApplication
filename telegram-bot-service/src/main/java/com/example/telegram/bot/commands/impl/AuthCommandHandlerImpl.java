@@ -13,11 +13,10 @@ import com.example.telegram.bot.message.MessageProvider;
 import com.example.telegram.bot.commands.Commands;
 import com.example.telegram.bot.service.*;
 import com.example.telegram.bot.utils.update.UpdateUtilsService;
-import com.example.utils.generator.GenerationService;
+import com.example.data.models.utils.generator.GenerationService;
 import com.example.utils.sender.EmailService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -53,6 +52,7 @@ public class AuthCommandHandlerImpl implements CommandHandler {
     private final PersistentSessionService persistentSessionService;
     private final VerificationCodeService verificationCodeService;
     private final EmailService emailService;
+    private final GenerationService generationService;
 
 
     @Override
@@ -90,6 +90,12 @@ public class AuthCommandHandlerImpl implements CommandHandler {
 
                         return verificationCodeValidatingStateHandler(update, newChat);
 
+                    } else if (msgText.equals(DialogStates.REPEAT_SEND_VERIFICATION_CODE.getDialogState())) {
+                        return userService.getUserByTelegramUserId(chat.getTelegramUser().getId())
+                                .flatMap(user -> {
+                                   update.getMessage().setText(user.getEmail());
+                                   return emailCheckingStateHandler(update, chat);
+                                });
                     }
 
                     return Mono.zip(
@@ -137,8 +143,15 @@ public class AuthCommandHandlerImpl implements CommandHandler {
         return Mono.defer(() -> {
             // 1) Валидация email — синхронно -> map / just
             if (!emailService.isEmailAddressValid(email)) {
+
+                chat.setChatState(DialogStates.ENTER_EMAIL.getDialogState());
+
                 return Mono.zip(
-                        Mono.just(new SendMessage(String.valueOf(chatId), getNotValidEmailAddress(email))),
+                        Mono.just(
+                                new SendMessage(String.valueOf(chatId),
+                                        getNotValidEmailAddress(email, Commands.REGISTER.getCommand())
+                                )
+                        ),
                         Mono.just(chat)
                 );
             }
@@ -151,7 +164,7 @@ public class AuthCommandHandlerImpl implements CommandHandler {
                         if (isRegistered) {
 
                             // 2) Генерация и подготовка сообщений
-                            final String code = GenerationService.generateEmailVerificationCode();
+                            final String code = generationService.generateEmailVerificationCode();
 
                             chat.setChatState(DialogStates.EMAIL_VERIFICATION.getDialogState());
                             final SendMessage okMsg = new SendMessage(String.valueOf(chatId), MessageProvider.getEmailVerificationMsg(email));
@@ -204,6 +217,9 @@ public class AuthCommandHandlerImpl implements CommandHandler {
                                     });
 
                         } else {
+
+                            chat.setChatState(DialogStates.ENTER_EMAIL.getDialogState());
+
                             return Mono.zip(Mono.just(
                                             new SendMessage(
                                                     Long.toString(chatId),
@@ -239,6 +255,11 @@ public class AuthCommandHandlerImpl implements CommandHandler {
 
                     result.setText(MessageProvider.getSuccessesAuthorizationMsg(currentUserFullName));
 
+                    /*
+                        TODO
+                            1. Извенить на метод getByIdWithUser
+                            2. Перед сохранением сессий убрать запросы на получение User
+                     */
                     return telegramUserService.getById(telegramUserId)
                             .flatMap(tgUser -> {
                                 TelegramSession session = TelegramSession.builder()
@@ -256,7 +277,17 @@ public class AuthCommandHandlerImpl implements CommandHandler {
                                         .isActive(true)
                                         .build();
 
-                                return Mono.zip(Mono.just(session), transientSessionService.save(transientSession));
+                                return userService.getUserByTelegramUserId(telegramUserId)
+                                        .flatMap(user -> userService.findByUsername(user.getUsername()))
+                                        .flatMap(userDetails -> {
+
+                                            String transientSessionDataToken =
+                                                    generationService.generateTransientSessionDataToken(userDetails, telegramUserId);
+
+                                            transientSession.setData(transientSessionDataToken);
+
+                                            return Mono.zip(Mono.just(session), transientSessionService.save(transientSession));
+                                        });
                             })
                             .flatMap(tuple -> {
 
@@ -264,11 +295,21 @@ public class AuthCommandHandlerImpl implements CommandHandler {
                                 TransientSession transientSession = tuple.getT2();
 
                                 PersistentSession persistentSession = PersistentSession.builder()
-                                        .telegramSession(session)
                                         .isActive(true)
+                                        .telegramSession(session)
                                         .build();
 
-                                return persistentSessionService.save(persistentSession)
+                                return userService.getUserByTelegramUserId(telegramUserId)
+                                        .flatMap(user -> userService.findByUsername(user.getUsername()))
+                                        .flatMap(userDetails -> {
+
+                                            String persistentSessionDataToken =
+                                                    generationService.generatePersistentSessionDataToken(userDetails, telegramUserId);
+
+                                            persistentSession.setData(persistentSessionDataToken);
+
+                                            return persistentSessionService.save(persistentSession);
+                                        })
                                         .flatMap(savedPersistentSession -> {
                                             session.setTransientSessions(List.of(transientSession));
                                             session.setPersistentSessions(List.of(savedPersistentSession));

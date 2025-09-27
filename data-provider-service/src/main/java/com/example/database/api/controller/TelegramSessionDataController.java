@@ -4,8 +4,10 @@ import com.example.data.models.entity.request.ApiRequest;
 import com.example.data.models.entity.response.ApiResponse;
 import com.example.data.models.entity.dto.telegram.TelegramSessionDTO;
 import com.example.data.models.enums.ResponseIncludeDataKeys;
+import com.example.database.entity.PersistentSession;
 import com.example.database.entity.TelegramSession;
 import com.example.database.entity.TelegramUser;
+import com.example.database.entity.TransientSession;
 import com.example.database.service.ModelMapperService;
 import com.example.database.service.telegram.TelegramSessionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,6 +16,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+import static com.example.data.models.utils.EntityUtilsService.*;
+
 
 @RestController
 @RequestMapping("/api/v1")
@@ -63,7 +70,31 @@ public class TelegramSessionDataController {
                 TelegramUser.class
         );
 
+        TransientSession transientSession;
+
+        if (!isNull(request.getIncludeObject(ResponseIncludeDataKeys.TRANSIENT_SESSION.getKeyValue()))) {
+            transientSession = objectMapper.convertValue(
+                    request.getIncludeObject(ResponseIncludeDataKeys.TRANSIENT_SESSION.getKeyValue()),
+                    TransientSession.class
+            );
+
+            telegramSessionForUpdate.setTransientSessions(List.of(transientSession));
+        }
+
+        PersistentSession persistentSession;
+
+        if (!isNull(request.getIncludeObject(ResponseIncludeDataKeys.PERSISTENT_SESSION.getKeyValue()))) {
+            persistentSession = objectMapper.convertValue(
+                    request.getIncludeObject(ResponseIncludeDataKeys.PERSISTENT_SESSION.getKeyValue()),
+                    PersistentSession.class
+            );
+
+            telegramSessionForUpdate.setPersistentSessions(List.of(persistentSession));
+        }
+
         telegramSessionForUpdate.setTelegramUser(telegramUser);
+
+        log.debug("Telegram session for update {}", telegramSessionForUpdate);
 
         ApiResponse<TelegramSessionDTO> response = sessionService.update(telegramSessionForUpdate);
 

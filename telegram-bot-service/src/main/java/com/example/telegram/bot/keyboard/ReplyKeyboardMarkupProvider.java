@@ -1,5 +1,6 @@
 package com.example.telegram.bot.keyboard;
 
+import com.example.telegram.bot.chat.states.DialogStates;
 import com.example.telegram.bot.queries.Queries;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
@@ -12,7 +13,7 @@ import java.util.Collections;
 public class ReplyKeyboardMarkupProvider {
 
     public static ReplyKeyboardMarkup getNotValidEmailKeyboard() {
-        KeyboardButton repeatedSendVerificationCodeBtn = new KeyboardButton(Queries.REPEAT_SEND_VERIFICATION_CODE.getQuery());
+        KeyboardButton repeatedSendVerificationCodeBtn = new KeyboardButton(DialogStates.REPEAT_SEND_VERIFICATION_CODE.getDialogState());
 
         KeyboardRow row = new KeyboardRow();
         row.add(repeatedSendVerificationCodeBtn);

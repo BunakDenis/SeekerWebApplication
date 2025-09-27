@@ -122,7 +122,8 @@ public class AuthService {
                                 .flatMap(resp -> Mono.just(resp.isActive()));
                     }
 
-                });
+                })
+                .switchIfEmpty(Mono.just(false));
     }
 
     /**

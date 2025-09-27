@@ -8,7 +8,7 @@ public enum ResponseIncludeDataKeys {
     TELEGRAM_CHAT ("telegram_chat"),
     TELEGRAM_SESSION("telegram_session"),
     TRANSIENT_SESSION("transient_session"),
-    PERSISTENT_SESSION("persistent-session"),
+    PERSISTENT_SESSION("persistent_session"),
     VERIFICATION_CODE ("verification_code");
 
     private String includeDataKeyValue;

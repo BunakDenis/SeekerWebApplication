@@ -1,6 +1,7 @@
 package com.example.database.api.controller;
 
 
+import com.example.data.models.entity.dto.telegram.PersistentSessionDTO;
 import com.example.data.models.enums.ResponseIncludeDataKeys;
 import com.example.database.entity.TelegramSession;
 import com.example.database.entity.TransientSession;
@@ -69,6 +70,24 @@ public class TransientSessionDataController {
             @PathVariable("id") Long id
     ) {
         ApiResponse<TransientSessionDTO> response = sessionService.getById(id);
+
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    @GetMapping("/transient_session/active/{id}")
+    public ResponseEntity<ApiResponse<TransientSessionDTO>> getActiveById(
+            @PathVariable("id") Long id
+    ) {
+        ApiResponse<TransientSessionDTO> response = sessionService.getActiveById(id);
+
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    @GetMapping("/transient_session/active/telegram_user_id/{id}")
+    public ResponseEntity<ApiResponse<TransientSessionDTO>> getActiveByTgUserId (
+            @PathVariable("id") Long id
+    ) {
+        ApiResponse<TransientSessionDTO> response = sessionService.getActiveByTelegramUserId(id);
 
         return ResponseEntity.status(response.getStatus()).body(response);
     }

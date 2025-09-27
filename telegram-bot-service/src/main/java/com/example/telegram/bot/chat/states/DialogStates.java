@@ -4,6 +4,7 @@ public enum DialogStates {
 
     ENTER_EMAIL ("enter_email"),
     EMAIL_VERIFICATION ("email_verification"),
+    REPEAT_SEND_VERIFICATION_CODE ("Отправить код повторно"),
     ENTER_PASSWORD ("enter_password");
 
     private String dialogState;

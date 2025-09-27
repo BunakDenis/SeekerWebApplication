@@ -28,11 +28,9 @@ public class TelegramSession {
     private TelegramUser telegramUser;
 
     @OneToMany(mappedBy = "telegramSession", fetch = FetchType.EAGER)
-    @ToString.Exclude
     private List<PersistentSession> persistentSessions;
 
     @OneToMany(mappedBy = "telegramSession", fetch = FetchType.EAGER)
-    @ToString.Exclude
     private List<TransientSession> transientSessions;
 
 }

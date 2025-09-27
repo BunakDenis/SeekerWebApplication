@@ -15,6 +15,10 @@ import java.util.List;
 @ToString
 public class TelegramSession {
 
+    /*
+        TODO
+            1. Добавить поле "isActive"
+     */
     private Long id;
 
     private String sessionData;

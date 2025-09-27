@@ -70,6 +70,15 @@ public class PersistentSessionDataController {
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 
+    @GetMapping("/persistent_session/active/telegram_user_id/{id}")
+    public ResponseEntity<ApiResponse<PersistentSessionDTO>> getActiveByTgUserId (
+            @PathVariable("id") Long id
+    ) {
+        ApiResponse<PersistentSessionDTO> response = sessionService.getActiveByTelegramUserId(id);
+
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
     @PostMapping("/persistent_session/delete/{id}")
     public ResponseEntity<ApiResponse<Boolean>> delete(
             @PathVariable("id") Long id
