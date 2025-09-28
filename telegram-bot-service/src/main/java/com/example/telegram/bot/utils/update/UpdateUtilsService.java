@@ -26,11 +26,15 @@ public class UpdateUtilsService {
         String userFirstName = telegramUser.getFirstName();
         String userLastName = telegramUser.getLastName();
 
-        if (Objects.nonNull(userFirstName) || !userFirstName.isEmpty()) result.append(userFirstName);
+        if (Objects.nonNull(userFirstName)) {
+            if (!userFirstName.isEmpty()) result.append(userFirstName);
+        }
 
-        if (Objects.nonNull(userLastName) || !userLastName.isEmpty()) {
-            result.append(" ");
-            result.append(userLastName);
+        if (Objects.nonNull(userLastName)) {
+            if (!userLastName.isEmpty()) {
+                result.append(" ");
+                result.append(userLastName);
+            }
         }
 
         return result.toString();

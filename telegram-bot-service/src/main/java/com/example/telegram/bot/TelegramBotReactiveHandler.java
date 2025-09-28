@@ -7,7 +7,7 @@ import com.example.telegram.bot.commands.CommandsHandler;
 import com.example.telegram.bot.message.TelegramBotMessageSender;
 import com.example.telegram.bot.multimedia.MultimediaHandler;
 import com.example.telegram.bot.queries.QueriesHandler;
-import com.example.telegram.bot.service.TelegramChatService;
+import com.example.telegram.bot.service.*;
 import com.example.telegram.bot.utils.update.UpdateUtilsService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.User;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
@@ -28,19 +29,41 @@ import java.util.Objects;
 public class TelegramBotReactiveHandler {
 
     private Authentication authentication;
+    private final AuthService authService;
+    private final UserService userService;
+    private final TelegramUserService telegramUserService;
     private final TelegramChatService telegramChatService;
     private final CommandsHandler commandsHandler;
     private final QueriesHandler queriesHandler;
     private final MultimediaHandler multimediaHandler;
     private final TelegramBotMessageSender sender;
+    private final ModelMapperService mapperService;
 
     public Mono<Boolean> handleUpdate(Update update) {
 
         log.info("Метод handleUpdate");
 
+        User telegramApiUser = UpdateUtilsService.getTelegramUser(update);
+        Long telegramUserId = UpdateUtilsService.getTelegramUserId(update);
         long chatId = UpdateUtilsService.getChatId(update);
 
         return telegramChatService.getTelegramChatByIdWithTgUser(chatId)
+                .switchIfEmpty(
+                        authService.registeredAsDefaultUserIfNotExists(update)
+                                .flatMap(tgUser -> {
+
+                                    TelegramChat chatForSave = TelegramChat.builder()
+                                            .telegramChatId(chatId)
+                                            .uiElement("")
+                                            .uiElementValue("")
+                                            .chatState("")
+                                            .telegramUser(tgUser)
+                                            .build();
+
+                                    return telegramChatService.save(chatForSave);
+
+                                })
+                )
                 .flatMap(lastTelegramChat -> {
                     if (update.hasMessage()) {
                         return handleMessage(update, lastTelegramChat);

@@ -316,6 +316,84 @@ public class TelegramBotTests extends TelegramTestsBaseClass {
 
     }
     @Test
+    public void testStartCommandFromNotRegisteredUser() throws JsonProcessingException {
+
+        log.debug("Тесты команды старт для незарегистрированного юзера");
+
+        //Given
+        String expectedMsg = MessageProvider.START_MSG;
+        Update update = createTelegramUpdate(Commands.START.getCommand());
+        String requestBody = objectMapper.writeValueAsString(update);
+
+        ApiResponse<?> telegramChatResponse = ApiResponse.builder()
+                .message("Telegram chat with telegram user id=" + TELEGRAM_API_USER_FOR_TESTS.getId() + ", not found")
+                .build();
+
+        //When
+        mockServerClient
+                .when(request()
+                        .withMethod("GET")
+                        .withPath("/api/v1/chat/telegram_user_id/" + TELEGRAM_USER_FOR_TESTS.getTelegramUserId())
+                )
+                .respond(response()
+                        .withStatusCode(200)
+                        .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
+                        .withBody(objectMapper.writeValueAsString(telegramChatResponse))
+                );
+
+        telegramChatResponse.setMessage("Telegram chat not found");
+
+        mockServerClient
+                .when(request()
+                        .withMethod("GET")
+                        .withPath("/api/v1/chat/telegram_user/" + TELEGRAM_API_CHAT_FOR_TESTS.getId())
+                )
+                .respond(response()
+                        .withStatusCode(200)
+                        .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
+                        .withBody(objectMapper.writeValueAsString(telegramChatResponse))
+                );
+
+        ApiResponse<?> userApiResponse = ApiResponse.builder()
+                .message("User with telegram user id=" + TELEGRAM_API_USER_FOR_TESTS.getId() + ", not found")
+                .build();
+
+        mockServerClient
+                .when(request()
+                        .withMethod("GET")
+                        .withPath("/api/v1/user/telegram_user_id/" + TELEGRAM_API_USER_FOR_TESTS.getId())
+                )
+                .respond(response()
+                        .withStatusCode(200)
+                        .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
+                        .withBody(objectMapper.writeValueAsString(userApiResponse))
+                );
+
+        mockServerClient
+                .when(request()
+                        .withMethod("GET")
+                        .withPath("/api/v1/user/username/" + getUserForTests().getUsername())
+                )
+                .respond(response()
+                        .withStatusCode(200)
+                        .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
+                        .withBody(objectMapper.writeValueAsString(userApiResponse))
+                );
+
+        WebTestClient.ResponseSpec exchangeStartCommand = client.post()
+                .uri("/api/bot/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(requestBody)
+                .exchange();
+
+        exchangeStartCommand.expectStatus().is2xxSuccessful();
+
+        SendMessage actual = captorSendMessage();
+
+        log.debug("Sant message {}", actual);
+
+    }
+    @Test
     @Order(3)
     public void testAuthCommand() throws JsonProcessingException {
 

@@ -73,6 +73,13 @@ public class TelegramChatService {
                         log.debug("Телеграм чат с id " + id + ", не найден");
                         throw new EntityNotFoundException("Телеграм чат с id " + id + ", не найден",  new TelegramChat());
                     }
+                })
+                .doOnError(err -> log.error("Ошибка получения telegram chat {}", err))
+                .onErrorResume(err -> {
+                    if (err instanceof EntityNotFoundException) {
+                        return Mono.empty();
+                    }
+                    return Mono.error(err);
                 });
 
     }

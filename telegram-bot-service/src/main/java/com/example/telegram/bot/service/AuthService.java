@@ -23,9 +23,8 @@ import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.User;
 import reactor.core.publisher.Mono;
-
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -109,21 +108,65 @@ public class AuthService {
     }
 
     /**
-     * Авторизация юзера в телеграм боте через команду "/authorize"
+     * Если User с telegram_user_id есть в БД
+     * Метод вернёт Mono<TelegramUser> с соответствующим User
+     *
+     * Если в БД его нет, тогда метод вернёт Mono<TelegramUser> с информацией заполненной в профиле Telegram
+     * зарегистрированного под дефолтным User
+     */
+    public Mono<TelegramUser> registeredAsDefaultUserIfNotExists(Update update) {
+
+        User telegramApiUser = UpdateUtilsService.getTelegramUser(update);
+        Long telegramUserId = UpdateUtilsService.getTelegramUserId(update);
+
+        return userService.getUserByTelegramUserIdWithTelegramUser(telegramUserId)
+                .switchIfEmpty(
+                        userService.getDefaultUser()
+                                .flatMap(defaultUser -> {
+
+                                    TelegramUser telegramUser =
+                                            mapperService.apiTelegramUserToEntity(telegramApiUser);
+
+                                    telegramUser.setUser(defaultUser);
+
+                                    return telegramUserService.save(telegramUser)
+                                            .flatMap(tgUser -> Mono.just(tgUser.getUser()));
+                                })
+                )
+                .onErrorReturn(new com.example.data.models.entity.User())
+                .flatMap(user -> Mono.just(user.getTelegramUsers().get(0)));
+    }
+
+    /**
+     * Проверки наличия записи User и TelegramUser в БД
+     * Проверка User в БД по email
      */
     public Mono<Boolean> isRegistered(String email, Update update) {
+
+        Long telegramUserId = UpdateUtilsService.getTelegramUserId(update);
+
         return userService.getUserByEmail(email)
-                .flatMap(user -> {
+                .flatMap(user -> Mono.just(true))
+                .switchIfEmpty(
+                        userService.getUserByTelegramUserId(telegramUserId)
+                                .flatMap(user -> Mono.just(true))
+                                .switchIfEmpty(
+                                        userService.checkUserInMysticSchoolDB(email)
+                                                .flatMap(checkUserResponse -> {
+                                                    if (checkUserResponse.isFound() && checkUserResponse.isActive()) {
+                                                        return Mono.just(true);
+                                                    }
+                                                    return Mono.just(false);
+                                                })
+                                )
 
-                    if (Objects.nonNull(user)) {
-                        return Mono.just(true);
-                    } else {
-                        return userService.checkUserInMysticSchoolDB(email)
-                                .flatMap(resp -> Mono.just(resp.isActive()));
-                    }
-
-                })
-                .switchIfEmpty(Mono.just(false));
+                )
+                .doOnError(err ->
+                        log.error(
+                                "Ошибка проверки регистрации User по email={} и telegramUserId={}",
+                                email, telegramUserId)
+                )
+                .onErrorResume(err -> Mono.just(false));
     }
 
     /**

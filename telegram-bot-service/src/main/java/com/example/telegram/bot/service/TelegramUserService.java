@@ -1,19 +1,27 @@
 package com.example.telegram.bot.service;
 
 import com.example.data.models.entity.TelegramUser;
+import com.example.data.models.entity.User;
+import com.example.data.models.entity.dto.UserDTO;
 import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
+import com.example.data.models.enums.ResponseIncludeDataKeys;
+import com.example.data.models.exception.ApiException;
 import com.example.data.models.exception.EntityNotFoundException;
 import com.example.telegram.api.clients.DataProviderClient;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import lombok.*;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.Objects;
 
 @Service
 @Data
 @RequiredArgsConstructor
 @ToString
+@Slf4j
 public class TelegramUserService {
 
     @ToString.Exclude
@@ -21,16 +29,31 @@ public class TelegramUserService {
     private final TelegramChatService telegramChatService;
     private final TelegramSessionService telegramSessionService;
     private final ModelMapperService mapperService;
+    private final ObjectMapper objectMapper;
 
     public Mono<TelegramUser> save(TelegramUser telegramUser) {
 
-        TelegramUserDTO dto = mapperService.toDTO(telegramUser, TelegramUserDTO.class);
+        return dataProviderClient.createTelegramUser(telegramUser)
+                .flatMap(resp -> {
+                            if (Objects.nonNull(resp.getData())) {
 
-        return dataProviderClient.createTelegramUser(dto)
-                .flatMap(resp -> Objects.nonNull(resp.getData()) ?
-                        Mono.just(mapperService.toEntity(resp.getData(), TelegramUser.class)) :
-                        Mono.empty()
-                );
+                                TelegramUser savedTelegramUser = mapperService.toEntity(resp.getData(), TelegramUser.class);
+
+                                User user = mapperService.convertIncludeObjectToEntity(
+                                        resp.getIncludedObject(ResponseIncludeDataKeys.USER.getKeyValue()),
+                                        User.class
+                                );
+                                user.setTelegramUsers(List.of(savedTelegramUser));
+
+                                savedTelegramUser.setUser(user);
+
+                                return Mono.just(savedTelegramUser);
+                            }
+                            return Mono.empty();
+                        }
+                )
+                .doOnError(err -> log.error("Ошибка записи telegram user {}", telegramUser, err))
+                .onErrorReturn(new TelegramUser());
     }
     public Mono<TelegramUser> update(TelegramUserDTO dto) {
         return dataProviderClient.updateTelegramUser(dto)

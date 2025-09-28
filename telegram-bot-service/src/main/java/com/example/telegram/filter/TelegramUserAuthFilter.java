@@ -3,6 +3,7 @@ package com.example.telegram.filter;
 
 import com.example.data.models.consts.ResponseMessageProvider;
 import com.example.data.models.consts.WarnMessageProvider;
+import com.example.data.models.entity.TelegramChat;
 import com.example.data.models.service.ApplicationFiltersService;
 import com.example.data.models.utils.ApiResponseUtilsService;
 import com.example.telegram.bot.commands.Commands;
@@ -62,104 +63,7 @@ public class TelegramUserAuthFilter implements WebFilter {
 
                     if (path.equals(webHookPath)) {
 
-                        Update update;
-
-                        try {
-                            JsonNode jsonNode = objectMapper.readTree(body);
-                            update = objectMapper.treeToValue(jsonNode, Update.class);
-                        } catch (JsonProcessingException e) {
-
-                            log.error("Тело не содержит Update");
-
-                            return appFilterService.writeJsonErrorResponse(exchange.getResponse(),
-                                    HttpStatus.BAD_REQUEST,
-                                    ApiResponseUtilsService.fail(
-                                            ResponseMessageProvider.REQUEST_BODY_DO_NOT_CONTAINS_TELEGRAM_UPDATE
-                                    )
-                            );
-
-                        }
-
-                        this.requestBody = body;
-                        this.update = update;
-
-                        Long chatId = UpdateUtilsService.getChatId(update);
-
-                        log.debug("Проверка запроса от Telegram API");
-                        // Пропускаем запросы с командами /auth и /register
-                        if (
-                                body.contains(Commands.AUTHORIZE.getCommand()) ||
-                                        body.contains(Commands.REGISTER.getCommand())
-                        ) {
-
-                            log.debug("Обработка в фильтре запроса \"/authorize\" или \"/register\"");
-
-                            return chain.filter(exchange.mutate()
-                                    .request(appFilterService.decorateRequestWithSessionId(exchange, body, ""))
-                                    .build());
-                        }
-
-                        return telegramChatService.getTelegramChatByIdWithTgUser(chatId)
-                                .flatMap(chat -> {
-
-                                    log.debug("Проверка запроса от Telegram API");
-                                    // Пропускаем запросы с командами /auth и /register
-                                    if (chat.getUiElementValue().contains("/authorize") ||
-                                            chat.getUiElementValue().contains("/register")
-                                    ) {
-
-                                        log.debug("Обработка в фильтре запроса \"/authorize\" или \"/register\"");
-
-                                        return chain.filter(exchange.mutate()
-                                                .request(appFilterService.decorateRequestWithSessionId(exchange, body, ""))
-                                                .build());
-                                    }
-
-                                    return authService.authenticate(update)
-                                            .then(chain.filter(exchange.mutate()
-                                                            .request(
-                                                                    appFilterService.decorateRequestWithSessionId(exchange, body, "")
-                                                            )
-                                                            .build()
-                                                    )
-                                            )
-                                            // Ловим любые ошибки в цепочке
-                                            .doOnError(ex -> log.error("Ошибка в TelegramUserAuthFilter - {}", ex.getMessage(), ex))
-                                            .onErrorResume(ex -> {
-
-                                                String modifiedBody = requestBody;
-
-                                                log.debug("Класс ошибки {}", ex.getClass());
-
-                                                //Если persistent просрочена отправляем юзеру сообщения об необходимости повторной авторизации
-                                                //При прочих ошибках отправляем SorryMsg
-                                                if (ex instanceof ExpiredJwtException) {
-                                                    log.debug("Отправляю сообщение юзеру об необходимости повторной авторизации");
-                                                    sender.sendMessage(
-                                                            UpdateUtilsService.getChatId(this.update),
-                                                            WarnMessageProvider.RE_AUTHORIZATION_MSG
-                                                    );
-                                                } else {
-
-                                                    sender.sendMessage(
-                                                            UpdateUtilsService.getChatId(this.update),
-                                                            WarnMessageProvider.getSorryMsg(
-                                                                    "бот временно недоступен, попробуйте написать позже!"
-                                                            )
-                                                    );
-
-                                                    modifiedBody = requestBody.replaceFirst(
-                                                            "\"update_id\"\\s*:\\s*\\d+",
-                                                            "\"update_id\":0"
-                                                    );
-
-                                                }
-
-                                                return chain.filter(exchange.mutate()
-                                                        .request(appFilterService.decorateRequestWithSessionId(exchange, modifiedBody, ""))
-                                                        .build());
-                                            });
-                                });
+                        return telegramRequestProcessor(exchange, chain, body);
 
                     }
 
@@ -205,5 +109,123 @@ public class TelegramUserAuthFilter implements WebFilter {
                     );
                 });
 
+    }
+
+    private Mono<Void> telegramRequestProcessor(ServerWebExchange exchange, WebFilterChain chain, String body) {
+        Update update;
+
+        try {
+            JsonNode jsonNode = objectMapper.readTree(body);
+            update = objectMapper.treeToValue(jsonNode, Update.class);
+        } catch (JsonProcessingException e) {
+
+            log.error("Тело не содержит Update");
+
+            return appFilterService.writeJsonErrorResponse(exchange.getResponse(),
+                    HttpStatus.BAD_REQUEST,
+                    ApiResponseUtilsService.fail(
+                            ResponseMessageProvider.REQUEST_BODY_DO_NOT_CONTAINS_TELEGRAM_UPDATE
+                    )
+            );
+
+        }
+
+        this.requestBody = body;
+        this.update = update;
+
+        Long chatId = UpdateUtilsService.getChatId(update);
+
+        log.debug("Проверка запроса от Telegram API");
+        // Пропускаем запросы с командами /auth и /register
+        if (
+                body.contains(Commands.AUTHORIZE.getCommand()) ||
+                        body.contains(Commands.REGISTER.getCommand())
+        ) {
+
+            log.debug("Обработка в фильтре запроса \"/authorize\" или \"/register\"");
+
+            return chain.filter(exchange.mutate()
+                    .request(appFilterService.decorateRequestWithSessionId(exchange, body, ""))
+                    .build());
+        }
+
+        return telegramChatService.getTelegramChatByIdWithTgUser(chatId)
+                .switchIfEmpty(
+                        authService.registeredAsDefaultUserIfNotExists(update)
+                                .flatMap(tgUser -> {
+
+                                    TelegramChat chatForSave = TelegramChat.builder()
+                                            .telegramChatId(chatId)
+                                            .uiElement("")
+                                            .uiElementValue("")
+                                            .chatState("")
+                                            .telegramUser(tgUser)
+                                            .build();
+
+                                    return telegramChatService.save(chatForSave);
+
+                                })
+                )
+                .flatMap(chat -> {
+
+                    log.debug("Проверка запроса от Telegram API");
+
+                    // Пропускаем запросы с командами /auth и /register
+                    if (chat.getUiElementValue().contains("/authorize") ||
+                            chat.getUiElementValue().contains("/register")
+                    ) {
+
+                        log.debug("Обработка в фильтре запроса \"/authorize\" или \"/register\"");
+
+                        return chain.filter(exchange.mutate()
+                                .request(appFilterService.decorateRequestWithSessionId(exchange, body, ""))
+                                .build());
+                    }
+
+                    return authService.authenticate(update)
+                            .then(chain.filter(exchange.mutate()
+                                            .request(
+                                                    appFilterService.decorateRequestWithSessionId(exchange, body, "")
+                                            )
+                                            .build()
+                                    )
+                            )
+                            // Ловим любые ошибки в цепочке
+                            .doOnError(ex -> log.error("Ошибка в TelegramUserAuthFilter - {}", ex.getMessage(), ex))
+                            .onErrorResume(ex -> {
+
+                                String modifiedBody = requestBody;
+
+                                log.debug("Класс ошибки {}", ex.getClass());
+
+                                //Если persistent просрочена отправляем юзеру сообщения об необходимости повторной авторизации
+                                //При прочих ошибках отправляем SorryMsg
+                                if (ex instanceof ExpiredJwtException) {
+                                    log.debug("Отправляю сообщение юзеру об необходимости повторной авторизации");
+                                    sender.sendMessage(
+                                            UpdateUtilsService.getChatId(this.update),
+                                            WarnMessageProvider.RE_AUTHORIZATION_MSG
+                                    );
+                                } else {
+
+                                    sender.sendMessage(
+                                            UpdateUtilsService.getChatId(this.update),
+                                            WarnMessageProvider.getSorryMsg(
+                                                    "бот временно недоступен, попробуйте написать позже!"
+                                            )
+                                    );
+
+                                    modifiedBody = requestBody.replaceFirst(
+                                            "\"update_id\"\\s*:\\s*\\d+",
+                                            "\"update_id\":0"
+                                    );
+
+                                }
+
+                                return chain.filter(exchange.mutate()
+                                        .request(appFilterService.decorateRequestWithSessionId(exchange, modifiedBody, ""))
+                                        .build());
+                            });
+                });
     }
 }

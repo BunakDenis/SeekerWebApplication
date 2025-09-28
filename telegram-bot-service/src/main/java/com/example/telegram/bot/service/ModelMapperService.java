@@ -34,4 +34,8 @@ public class ModelMapperService {
         return null;
     }
 
+    public <T, K> K convertIncludeObjectToEntity (T includeObject, Class<K> entityClass) {
+        return mapper.map(includeObject, entityClass);
+    }
+
 }

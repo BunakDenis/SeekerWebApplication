@@ -21,6 +21,7 @@ import java.util.NoSuchElementException;
 @Slf4j
 public class RestControllerExceptionHandler {
 
+
     private static final String LOG_EXCEPTION_HANDLE_MSG = "RestControllerExceptionHandler handle exception {}";
 
 

@@ -1,9 +1,7 @@
 package com.example.telegram.api.clients;
 
 
-import com.example.data.models.entity.PersistentSession;
-import com.example.data.models.entity.TelegramSession;
-import com.example.data.models.entity.TransientSession;
+import com.example.data.models.entity.*;
 import com.example.data.models.entity.dto.VerificationCodeDTO;
 import com.example.data.models.entity.dto.telegram.*;
 import com.example.data.models.entity.response.CheckUserResponse;
@@ -12,13 +10,16 @@ import com.example.data.models.entity.request.ApiRequest;
 import com.example.data.models.entity.response.ApiResponse;
 import com.example.data.models.enums.ResponseIncludeDataKeys;
 import com.example.data.models.exception.ApiException;
-import com.example.data.models.entity.TelegramChat;
+import com.example.data.models.exception.EntityNotFoundException;
 import com.example.telegram.bot.service.ModelMapperService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.protocol.HTTP;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
@@ -171,7 +172,7 @@ public class DataProviderClient {
                 .uri(endpoint.toString())
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
-                .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+                .onStatus(status -> status.is4xxClientError(),
                         response -> response.bodyToMono(String.class) // Можно прочитать тело ошибки
                                 .flatMap(errorBody -> {
                                     log.debug("Получен ответ от Data provider service {}", errorBody);
@@ -288,11 +289,16 @@ public class DataProviderClient {
     }
 
     //TELEGRAM USER SECTION
-    public Mono<ApiResponse<TelegramUserDTO>> createTelegramUser(TelegramUserDTO dto) {
+    public Mono<ApiResponse<TelegramUserDTO>> createTelegramUser(TelegramUser telegramUser) {
+
+        TelegramUserDTO dto = mapperService.toDTO(telegramUser, TelegramUserDTO.class);
+        UserDTO userDTO = mapperService.toDTO(telegramUser.getUser(), UserDTO.class);
 
         StringBuilder endpoint = new StringBuilder(getApiTelegramUserEndpoint("add/"));
 
-        ApiRequest request = new ApiRequest(dto);
+        ApiRequest<?> request = new ApiRequest(dto);
+
+        request.addIncludeObject(ResponseIncludeDataKeys.USER.getKeyValue(), userDTO);
 
         return webClient.post()
                 .uri(endpoint.toString())
@@ -410,7 +416,7 @@ public class DataProviderClient {
                                 .flatMap(errorBody -> {
                                     log.debug("Получен ответ от Data provider service {}", errorBody);
                                     return Mono.error(new ApiException(
-                                            String.format("Error from MainUtilsService: Status %d, Body: %s",
+                                            String.format("Error from Data provider service: Status %d, Body: %s",
                                                     response.statusCode().value(), errorBody)));
                                 }))
                 .bodyToMono(new ParameterizedTypeReference<>() {
@@ -431,6 +437,14 @@ public class DataProviderClient {
                 )
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
+                .onStatus(status -> status.is4xxClientError(),
+                        response ->
+                                response.bodyToMono(String.class).flatMap(body -> {
+                                            log.error("Ответ от Data provide service \n{}", body);
+                                            return Mono.empty();
+                                        }
+                                )
+                )
                 .bodyToMono(new ParameterizedTypeReference<>() {
                 });
     }

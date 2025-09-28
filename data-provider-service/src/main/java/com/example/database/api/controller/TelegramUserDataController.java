@@ -39,6 +39,7 @@ public class TelegramUserDataController {
         telegramUser.setUser(user);
 
         ApiResponse<TelegramUserDTO> result = telegramUserService.save(telegramUser);
+        result.addIncludeObject(ResponseIncludeDataKeys.USER.getKeyValue(), user);
 
         return ResponseEntity.status(result.getStatus()).body(result);
     }
