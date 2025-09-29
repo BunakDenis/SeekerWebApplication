@@ -47,17 +47,13 @@ public class CommandsHandler {
 
             return commandHandler.apply(update, lastTelegramChat)
                     .flatMap(upd -> {
-                        log.debug("Отправляю сообщение юзеру {}", upd);
                         sender.sendMessage(upd);
                         return Mono.just(true);
                     });
 
-        } else  {
-
-            log.debug("Отправляю сообщение юзеру \"{}\"", MessageProvider.UNKNOWN_COMMAND_OR_QUERY);
-            sender.sendMessage(new SendMessage(chatId, MessageProvider.UNKNOWN_COMMAND_OR_QUERY));
-
         }
+
+        sender.sendMessage(new SendMessage(chatId, MessageProvider.UNKNOWN_COMMAND_OR_QUERY));
 
         return Mono.just(false);
     }

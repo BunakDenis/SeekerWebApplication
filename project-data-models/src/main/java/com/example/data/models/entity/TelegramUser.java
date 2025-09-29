@@ -18,9 +18,7 @@ public class TelegramUser {
     private boolean isActive;
     @ToString.Exclude
     private User user;
-    @ToString.Exclude
     private List<TelegramChat> telegramChats;
-    @ToString.Exclude
-    private TelegramSession telegramSession;
+    private List<TelegramSession> telegramSessions;
 
 }

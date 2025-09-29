@@ -2,18 +2,14 @@ package com.example.telegram;
 
 import com.example.data.models.consts.ResponseMessageProvider;
 import com.example.data.models.consts.WarnMessageProvider;
-import com.example.data.models.entity.PersistentSession;
-import com.example.data.models.entity.TransientSession;
-import com.example.data.models.entity.VerificationCode;
+import com.example.data.models.entity.*;
 import com.example.data.models.entity.dto.UserDTO;
 import com.example.data.models.entity.dto.VerificationCodeDTO;
+import com.example.data.models.entity.dto.telegram.*;
 import com.example.data.models.entity.jwt.JwtTelegramDataImpl;
 import com.example.data.models.entity.response.ApiResponse;
-import com.example.data.models.entity.dto.telegram.PersistentSessionDTO;
-import com.example.data.models.entity.dto.telegram.TelegramChatDTO;
-import com.example.data.models.entity.dto.telegram.TelegramSessionDTO;
-import com.example.data.models.entity.dto.telegram.TransientSessionDTO;
 import com.example.data.models.enums.JWTDataSubjectKeys;
+import com.example.data.models.enums.ResponseIncludeDataKeys;
 import com.example.data.models.utils.ApiResponseUtilsService;
 import com.example.telegram.bot.chat.states.DialogStates;
 import com.example.telegram.bot.chat.UiElements;
@@ -283,9 +279,33 @@ public class TelegramBotTests extends TelegramTestsBaseClass {
                 .data(persistentSessionDTO)
                 .build();
 
-        mockTelegramSessionGetRequest(TELEGRAM_API_USER_FOR_TESTS.getId(), telegramSessionResponse);
+        mockTelegramSessionByTelegramUserIdGetRequest(TELEGRAM_API_USER_FOR_TESTS.getId(), telegramSessionResponse);
 
         mockPersistentSessionAddRequest(persistentSessionResponse);
+
+        TelegramUser telegramUserForTests = TELEGRAM_USER_FOR_TESTS;
+        TelegramUserDTO telegramUserDTO = mapperService.toDTO(telegramUserForTests, TelegramUserDTO.class);
+
+        TelegramSession telegramSessionForTests = TELEGRAM_SESSION_FOR_TESTS;
+        telegramSessionForTests.setLastAuthWarnTimestamp(LocalDateTime.now(ZoneId.of(zoneId)).minusHours(2L));
+        TelegramSessionDTO telegramSessionIncludeDto = mapperService.toDTO(telegramSessionForTests, TelegramSessionDTO.class);
+
+        ApiResponse<TelegramUserDTO> telegramUserWithTelegramSessionResponse = ApiResponse.<TelegramUserDTO>builder()
+                .data(telegramUserDTO)
+                .includeObject(
+                        TELEGRAM_SESSION.getKeyValue(),
+                        telegramSessionIncludeDto
+                        )
+                .build();
+
+        mockTelegramUserWithTelegramSessionGetRequest(
+                telegramUserForTests.getTelegramUserId(),
+                telegramUserWithTelegramSessionResponse
+        );
+
+        ApiResponse<TelegramSession> telegramSessionSaveResponse = ApiResponseUtilsService.success(telegramSessionForTests);
+        telegramSessionSaveResponse.addIncludeObject(TELEGRAM_USER.getKeyValue(), telegramUserDTO);
+        mockTelegramSessionSaveRequest(telegramSessionSaveResponse);
 
         WebTestClient.ResponseSpec exchangeAuthCommand = client.post()
                 .uri("/api/bot/")
@@ -315,7 +335,7 @@ public class TelegramBotTests extends TelegramTestsBaseClass {
         assertEquals(expectedMsg, actualMessage);
 
     }
-    /*
+/*
     @Test
     public void testStartCommandFromNotRegisteredUser() throws JsonProcessingException {
 
@@ -394,8 +414,7 @@ public class TelegramBotTests extends TelegramTestsBaseClass {
         log.debug("Sant message {}", actual);
 
     }
-
-     */
+*/
     @Test
     @Order(3)
     public void testAuthCommand() throws JsonProcessingException {
@@ -1002,7 +1021,7 @@ public class TelegramBotTests extends TelegramTestsBaseClass {
                 .data(persistentSessionDTO)
                 .build();
 
-        mockTelegramSessionGetRequest(telegramSessionResponse.getData().getId(), telegramSessionResponse);
+        mockTelegramSessionByTelegramUserIdGetRequest(telegramSessionResponse.getData().getId(), telegramSessionResponse);
 
         mockPersistentSessionAddRequest(persistentSessionResponse);
     }
@@ -1042,7 +1061,8 @@ public class TelegramBotTests extends TelegramTestsBaseClass {
                         )
                 );
     }
-    private void mockTelegramSessionGetRequest(Long telegramUserId, ApiResponse<?> telegramSessionResponse) throws JsonProcessingException {
+
+    private void mockTelegramSessionByTelegramUserIdGetRequest(Long telegramUserId, ApiResponse<?> telegramSessionResponse) throws JsonProcessingException {
         mockServerClient
                 .when(request()
                         .withMethod("GET")
@@ -1054,6 +1074,36 @@ public class TelegramBotTests extends TelegramTestsBaseClass {
                         .withBody(objectMapper.writeValueAsString(telegramSessionResponse))
                 );
     }
+
+    private void mockTelegramSessionSaveRequest(ApiResponse<?> response) throws JsonProcessingException {
+        mockServerClient.when(
+                        request()
+                                .withMethod("POST")
+                                .withPath("/api/v1/session/add/")
+                )
+                .respond(
+                        response()
+                                .withStatusCode(200)
+                                .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
+                                .withBody(objectMapper.writeValueAsString(response))
+                );
+    }
+
+    private void mockTelegramUserWithTelegramSessionGetRequest(Long telegramUserId, ApiResponse<?> telegramUserResponse) throws JsonProcessingException {
+        mockServerClient
+                .when(
+                        request()
+                                .withMethod("GET")
+                                .withPath("/api/v1/telegram_user/telegram_session/" + telegramUserId)
+                )
+                .respond(
+                        response()
+                                .withStatusCode(200)
+                                .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
+                                .withBody(objectMapper.writeValueAsString(telegramUserResponse))
+                );
+    }
+
     private SendMessage captorSendMessage() {
         ArgumentCaptor<SendMessage> captor = ArgumentCaptor.forClass(SendMessage.class);
 
@@ -1061,6 +1111,7 @@ public class TelegramBotTests extends TelegramTestsBaseClass {
 
         return captor.getValue();
     }
+
     private void printToConsoleRegisteredMockRequests() {
         log.debug("Зарегистрированые GET запросы mockServerClient");
         Expectation[] getExpectations = mockServerClient.retrieveActiveExpectations(request().withMethod("GET"));

@@ -3,7 +3,7 @@ package com.example.telegram.bot.message;
 import com.example.telegram.bot.TelegramBot;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.context.ApplicationContext;
@@ -17,7 +17,7 @@ import java.util.List;
 @Component
 @Data
 @RequiredArgsConstructor
-@Log4j2
+@Slf4j
 public class TelegramBotMessageSender {
 
     @Value("${telegram.bot.max.length}")
@@ -32,6 +32,7 @@ public class TelegramBotMessageSender {
      * @param text   Текст для отправки
      */
     public void sendMessage(Long chatId, String text) {
+        log.debug("Отправляю сообщение в чат с id={}, сообщение = {}", chatId, text);
         List<String> messageParts = splitMessage(text);
         for (String part : messageParts) {
             sendSingleMessage(chatId, part);
@@ -44,6 +45,7 @@ public class TelegramBotMessageSender {
      * @param msg Сообщение для отправки
      */
     public void sendMessage(SendMessage msg) {
+        log.debug("Отправляю сообщение {}", msg);
         if (isTextValidForSending(msg.getText())) {
             executeSafely(msg);
         } else {

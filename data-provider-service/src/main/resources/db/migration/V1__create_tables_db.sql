@@ -72,6 +72,7 @@ CREATE TABLE IF NOT EXISTS transient_sessions (
 CREATE TABLE IF NOT EXISTS telegram_sessions (
     id BIGSERIAL PRIMARY KEY,
     session_data VARCHAR(255),
+    last_auth_warn_timestamp TIMESTAMP WITH TIME ZONE,
     telegram_user_id BIGINT REFERENCES telegram_users(id) NOT NULL,
     persistent_session_id BIGINT,
     transient_session_id BIGINT

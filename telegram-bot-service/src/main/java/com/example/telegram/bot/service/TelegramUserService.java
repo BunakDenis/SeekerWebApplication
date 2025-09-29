@@ -1,11 +1,11 @@
 package com.example.telegram.bot.service;
 
+import com.example.data.models.entity.TelegramSession;
 import com.example.data.models.entity.TelegramUser;
 import com.example.data.models.entity.User;
-import com.example.data.models.entity.dto.UserDTO;
+import com.example.data.models.entity.dto.telegram.TelegramSessionDTO;
 import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
 import com.example.data.models.enums.ResponseIncludeDataKeys;
-import com.example.data.models.exception.ApiException;
 import com.example.data.models.exception.EntityNotFoundException;
 import com.example.telegram.api.clients.DataProviderClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,16 +18,12 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
-@Data
 @RequiredArgsConstructor
-@ToString
 @Slf4j
 public class TelegramUserService {
 
     @ToString.Exclude
     private final DataProviderClient dataProviderClient;
-    private final TelegramChatService telegramChatService;
-    private final TelegramSessionService telegramSessionService;
     private final ModelMapperService mapperService;
     private final ObjectMapper objectMapper;
 
@@ -62,7 +58,7 @@ public class TelegramUserService {
                         Mono.empty()
                 );
     }
-    public Mono<TelegramUser> getById(long id) {
+    public Mono<TelegramUser> getByTelegramUserId(long id) {
         return dataProviderClient.getTelegramUserByTelegramUserId(id)
                 .flatMap(resp -> {
 
@@ -74,6 +70,37 @@ public class TelegramUserService {
                     }
 
                     TelegramUser result = mapperService.toEntity(resp.getData(), TelegramUser.class);
+
+                    return Mono.just(result);
+                });
+    }
+    public Mono<TelegramUser> getByTelegramUserIdWithTelegramSession(long id) {
+        return dataProviderClient.getTelegramUserByTelegramUserIdWithTelegramSession(id)
+                .flatMap(resp -> {
+
+                    if (Objects.isNull(resp.getData())) {
+                        return Mono.error(
+                                new EntityNotFoundException("Telegram user with id=" + id + ", is not found",
+                                        new TelegramUser())
+                        );
+                    }
+
+                    TelegramUser result = mapperService.toEntity(resp.getData(), TelegramUser.class);
+                    TelegramSessionDTO telegramSessionDTO = objectMapper.convertValue(
+                            resp.getIncludedObject(ResponseIncludeDataKeys.TELEGRAM_SESSION.getKeyValue()),
+                            TelegramSessionDTO.class
+                    );
+
+                    log.debug("telegramSessionDTO = {}", telegramSessionDTO);
+
+                    TelegramSession telegramSession = mapperService.toEntity(
+                            telegramSessionDTO,
+                            TelegramSession.class
+                    );
+
+                    result.setTelegramSessions(List.of(telegramSession));
+
+                    log.debug("Telegram user = {}", result);
 
                     return Mono.just(result);
                 });

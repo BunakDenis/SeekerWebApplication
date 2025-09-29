@@ -56,14 +56,25 @@ public class TelegramUserDataController {
     }
 
     @GetMapping("/telegram_user/{id}")
-    public ResponseEntity<ApiResponse<TelegramUserDTO>> getTelegramUserById(
+    public ResponseEntity<ApiResponse<TelegramUserDTO>> getByTelegramUserId(
             @PathVariable("id") Long id
     ) {
         log.debug("Запрос на получение TelegramUser по id {}", id);
 
         ApiResponse<TelegramUserDTO> response = telegramUserService.getByTelegramUserId(id);
 
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.status(response.getStatus()).body(response);
+
+    }
+    @GetMapping("/telegram_user/telegram_session/{id}")
+    public ResponseEntity<ApiResponse<TelegramUserDTO>> getByTelegramUserIdWithTelegramSession(
+            @PathVariable("id") Long id
+    ) {
+        log.debug("Запрос на получение TelegramUser по id {} с Telegram Session", id);
+
+        ApiResponse<TelegramUserDTO> response = telegramUserService.getByTelegramUserIdWithTelegramSession(id);
+
+        return ResponseEntity.status(response.getStatus()).body(response);
 
     }
 

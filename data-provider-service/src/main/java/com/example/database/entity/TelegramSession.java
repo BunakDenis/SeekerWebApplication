@@ -22,6 +22,9 @@ public class TelegramSession {
     @Column(name = "session_data")
     private String sessionData;
 
+    @Column(name = "last_auth_warn_timestamp")
+    private LocalDateTime lastAuthWarnTimestamp;
+
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "telegram_user_id", referencedColumnName = "id", nullable = false)
     @ToString.Exclude

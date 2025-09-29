@@ -1,6 +1,7 @@
 package com.example.telegram.bot.service;
 
 import com.example.data.models.consts.WarnMessageProvider;
+import com.example.data.models.entity.TelegramSession;
 import com.example.data.models.entity.TelegramUser;
 import com.example.telegram.bot.message.TelegramBotMessageSender;
 import com.example.telegram.bot.utils.update.UpdateUtilsService;
@@ -15,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.core.userdetails.UserDetails;
 */
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
@@ -26,12 +28,18 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Objects;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class AuthService {
 
 
+    @Value("${default.utc.zone.id}")
+    private String zoneId;
     private final UserService userService;
     private final TelegramUserService telegramUserService;
     private final TelegramSessionService telegramSessionService;
@@ -53,7 +61,7 @@ public class AuthService {
 
         return userService.getUserByTelegramUserId(telegramUserId)
                 .flatMap(user -> {
-                    log.debug("User {}", user);
+                    log.debug("User = {}", user);
                     return userService.findByUsername(user.getUsername());
                 })
                 .switchIfEmpty(
@@ -76,15 +84,50 @@ public class AuthService {
                                 Mono.just(userDetails))
                 )
                 .doOnError(err -> log.error("Ошибка проверки telegram session - {}", err.getMessage()))
-                .onErrorResume(err -> {
+                .onErrorResume(err -> telegramUserService.getByTelegramUserIdWithTelegramSession(telegramUserId)
+                        .flatMap(tgUser -> {
 
-                    sender.sendMessage(chatId, WarnMessageProvider.RE_AUTHORIZATION_MSG);
+                            if (Objects.nonNull(tgUser.getTelegramSessions().get(0))) {
 
-                    return Mono.zip(
-                            Mono.just(false),
-                            Mono.just(userService.getDefaultUserDetails())
-                    );
-                })
+                                TelegramSession telegramSession = tgUser.getTelegramSessions().get(0);
+                                telegramSession.setTelegramUser(tgUser);
+
+                                log.debug("Telegram session = {}", telegramSession);
+
+                                if (Objects.nonNull(telegramSession.getLastAuthWarnTimestamp())) {
+
+                                    LocalDateTime lastAuthWarnDateTime =
+                                            telegramSession.getLastAuthWarnTimestamp().plusHours(1L);
+                                    LocalDateTime nowDateTime = LocalDateTime.now(ZoneId.of(zoneId));
+
+                                    log.debug(
+                                            "lastAuthWarnDateTime = {}, nowDateTime = {}",
+                                            lastAuthWarnDateTime, nowDateTime
+                                    );
+
+                                    if (nowDateTime.isAfter(lastAuthWarnDateTime)) {
+                                        sender.sendMessage(chatId, WarnMessageProvider.RE_AUTHORIZATION_MSG);
+
+                                        telegramSession.setLastAuthWarnTimestamp(nowDateTime);
+
+                                        return telegramSessionService.update(telegramSession);
+                                    }
+                                }
+
+                                telegramSession.setLastAuthWarnTimestamp(LocalDateTime.now(ZoneId.of(zoneId)));
+
+                                return telegramSessionService.update(telegramSession);
+                            }
+
+                            return Mono.just(new TelegramSession());
+
+                        })
+                        .then(Mono.zip(
+                                        Mono.just(false),
+                                        Mono.just(userService.getDefaultUserDetails())
+                                )
+                        )
+                )
                 .flatMap(tuple -> {
 
                     UserDetails userDetails = tuple.getT2();

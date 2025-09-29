@@ -73,7 +73,7 @@ public class TelegramSessionService {
     public Mono<TelegramSession> update(TelegramSession telegramSession) {
         return save(telegramSession);
     }
-    public Mono<TelegramSession> getFull(Long telegramUserId) {
+    public Mono<TelegramSession> getFullByTelegramUserId(Long telegramUserId) {
 
         return dataProviderClient.getTelegramSessionByTelegramUserId(telegramUserId)
                 .flatMap(resp -> {
@@ -122,7 +122,7 @@ public class TelegramSessionService {
                 });
     }
     public Mono<Boolean> checkSessionsExpired(Long tgUserId, UserDetails userDetails) {
-        return getFull(tgUserId)
+        return getFullByTelegramUserId(tgUserId)
                 .flatMap(session -> {
 
                     checkPersistentSession(userDetails, session);

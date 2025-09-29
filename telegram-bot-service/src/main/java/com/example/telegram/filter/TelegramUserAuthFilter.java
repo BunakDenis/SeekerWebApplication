@@ -63,7 +63,7 @@ public class TelegramUserAuthFilter implements WebFilter {
 
                     if (path.equals(webHookPath)) {
 
-                        return telegramRequestProcessor(exchange, chain, body);
+                        return telegramAPIRequestProcessor(exchange, chain, body);
 
                     }
 
@@ -111,7 +111,7 @@ public class TelegramUserAuthFilter implements WebFilter {
 
     }
 
-    private Mono<Void> telegramRequestProcessor(ServerWebExchange exchange, WebFilterChain chain, String body) {
+    private Mono<Void> telegramAPIRequestProcessor(ServerWebExchange exchange, WebFilterChain chain, String body) {
         Update update;
 
         try {
@@ -167,8 +167,6 @@ public class TelegramUserAuthFilter implements WebFilter {
                                 })
                 )
                 .flatMap(chat -> {
-
-                    log.debug("Проверка запроса от Telegram API");
 
                     // Пропускаем запросы с командами /auth и /register
                     if (chat.getUiElementValue().contains("/authorize") ||

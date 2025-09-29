@@ -342,6 +342,24 @@ public class DataProviderClient {
                 .bodyToMono(new ParameterizedTypeReference<>() {
                 });
     }
+    public Mono<ApiResponse<TelegramUserDTO>> getTelegramUserByTelegramUserIdWithTelegramSession(Long id) {
+
+        StringBuilder endpoint = new StringBuilder(getApiTelegramUserEndpoint("telegram_session/"));
+        endpoint.append(id);
+
+        return webClient.get()
+                .uri(endpoint.toString())
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+                        response -> response.bodyToMono(String.class) // Можно прочитать тело ошибки
+                                .flatMap(errorBody -> {
+                                    log.debug("Получен ответ от Data provider service {}", errorBody);
+                                    return Mono.empty();
+                                }))
+                .bodyToMono(new ParameterizedTypeReference<>() {
+                });
+    }
     public Mono<ApiResponse<Boolean>> deleteTelegramUser(Long id) {
 
         return webClient.post()

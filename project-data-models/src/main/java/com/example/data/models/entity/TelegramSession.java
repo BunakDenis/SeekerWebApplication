@@ -1,6 +1,5 @@
 package com.example.data.models.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
@@ -15,13 +14,12 @@ import java.util.List;
 @ToString
 public class TelegramSession {
 
-    /*
-        TODO
-            1. Добавить поле "isActive"
-     */
+
     private Long id;
 
     private String sessionData;
+
+    private LocalDateTime lastAuthWarnTimestamp;
 
     @ToString.Exclude
     @JsonIgnore
