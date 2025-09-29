@@ -5,47 +5,26 @@ networks:
 
 services:
 
-  #data-provider-service:
-    #image: postgres:latest
-    #container_name: postgres-db
-    #volumes:
-      #- db_data:/var/lib/postgresql/data  # Монтируем том для хранения данных
-    #env_file:
-      #- ./.env
-    #environment:
-      #SPRING_PROFILES_ACTIVE: dev
-      #DB_NAME: ${DB_NAME}
-      #DB_USER_NAME: ${DB_USER_NAME}
-      #DB_USER_PASSWORD: ${DB_USER_PASSWORD}
-      #DATA_SERVICE_PORT: ${DATA_SERVICE_PORT}
-    #networks:
-      #- app-network
-    #ports:
-      #- ${DATA_SERVICE_PORT}:5432  # Перенаправляем порт 5432 (внутри контейнера) на 8080 (хост)
-    #healthcheck:
-      #test: [ "CMD", "curl", "-f", "$${API_USEFUL_TOOLS_URL}:$${DATA_SERVICE_PORT}/actuator/health" ]
-      #interval: 30s
-      #timeout: 10s
-      #retries: 3
-
-  telegram-bot-service:
-    image: ${TELEGRAM_BOT_SERVICE_IMAGE}
-    #volumes:
-      #- ./telegram-bot-service/src:/app/src
-      #- ./utils-service/src:/app/utils-service
+  postgres-db:
+    image: postgres:latest
     env_file:
       - ./.env
     environment:
       SPRING_PROFILES_ACTIVE: dev
-      USER_PASSWORD: ${USER_PASSWORD}
-      TELEGRAM_BOT_NAME: ${TELEGRAM_BOT_NAME}
-      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
-      API_USEFUL_TOOLS_URL: ${API_USEFUL_TOOLS_URL}
-      API_USEFUL_TOOLS_FILE_SERVICE_ENDPOINT: ${API_USEFUL_TOOLS_FILE_SERVICE_ENDPOINT}
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER_NAME}
+      POSTGRES_PASSWORD: ${DB_USER_PASSWORD}
+      POSTGRES_DB_HOST: ${POSTGRES_DB_HOST}
+      POSTGRES_DB_PORT: ${POSTGRES_DB_PORT}
     networks:
       - app-network
     ports:
-      - ${TELEGRAM_BOT_PORT}:8080
+      - ${POSTGRES_DB_PORT}:5432
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER_NAME} -d ${DB_NAME}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   useful-tools:
     image: bunakdenis/useful-tools:latest
@@ -54,21 +33,72 @@ services:
         limits:
           cpus: "4.0"
           memory: 12g
-    #volumes:
-      #- ./useful-tools/src:/app/src
-      #- ./utils-service/src:/app/utils-service
-      #- ./models:/app/models
     env_file:
       - ./.env
     environment:
       SPRING_PROFILES_ACTIVE: dev
       USER_PASSWORD: ${USER_PASSWORD}
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      MAIL_SEND_FROM: ${MAIL_SEND_FROM}
     networks:
       - app-network
+    depends_on:
+      postgres-db:
+        condition: service_healthy
     healthcheck:
-      test: [ "CMD", "curl", "-f", "$${API_USEFUL_TOOLS_URL}:$${API_USEFUL_TOOLS_PORT}/actuator/health" ]
+      test: [ "CMD", "curl", "-f", "$${USEFUL_TOOLS_API_URL}:$${USEFUL_TOOLS_API_PORT}/actuator/health" ]
       interval: 30s
       timeout: 10s
       retries: 3
     ports:
-      - ${API_USEFUL_TOOLS_PORT}:8080
+      - ${USEFUL_TOOLS_API_PORT}:8082
+
+  data-provider-service:
+    image: ${DATA_PROVIDER_SERVICE_IMAGE}
+    env_file:
+      - ./.env
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      DB_NAME: ${DB_NAME}
+      DB_USER_NAME: ${DB_USER_NAME}
+      DB_USER_PASSWORD: ${DB_USER_PASSWORD}
+      POSTGRES_USER: ${DB_USER_NAME}
+      POSTGRES_PASSWORD: ${DB_USER_PASSWORD}
+      POSTGRES_DB_HOST: ${POSTGRES_DB_DOCKER_HOST}
+      POSTGRES_DB_PORT: 5432
+      DATA_PROVIDER_SERVICE_PORT: ${DATA_PROVIDER_SERVICE_PORT}
+    networks:
+      - app-network
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+      useful-tools:
+        condition: service_healthy
+    ports:
+      - ${DATA_PROVIDER_SERVICE_PORT}:8086
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "$${DATA_PROVIDER_SERVICE_API_URL}:$${DATA_PROVIDER_SERVICE_PORT}/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  telegram-bot-service:
+    image: ${TELEGRAM_BOT_SERVICE_IMAGE}
+    env_file:
+      - ./.env
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      USER_PASSWORD: ${USER_PASSWORD}
+      TELEGRAM_BOT_NAME: ${TELEGRAM_BOT_NAME}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      USEFUL_TOOLS_API_URL: ${USEFUL_TOOLS_API_URL}
+      USEFUL_TOOLS_API_FILE_SERVICE_ENDPOINT: ${USEFUL_TOOLS_API_FILE_SERVICE_ENDPOINT}
+      DATA_PROVIDER_SERVICE_API_URL: ${DATA_PROVIDER_SERVICE_API_DOCKER_URL}
+    networks:
+      - app-network
+    depends_on:
+      data-provider-service:
+        condition: service_healthy
+    ports:
+      - ${TELEGRAM_BOT_PORT}:8085

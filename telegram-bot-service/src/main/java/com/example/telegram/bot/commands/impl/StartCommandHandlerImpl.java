@@ -9,6 +9,7 @@ import com.example.telegram.bot.utils.update.UpdateUtilsService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -22,7 +23,7 @@ import java.util.Collections;
 
 @Component
 @Data
-@Log4j2
+@Slf4j
 @RequiredArgsConstructor
 public class StartCommandHandlerImpl implements CommandHandler {
 

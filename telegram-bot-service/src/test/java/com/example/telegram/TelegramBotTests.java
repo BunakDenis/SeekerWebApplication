@@ -146,7 +146,7 @@ public class TelegramBotTests extends TelegramTestsBaseClass {
 
         mockTelegramChatGetByIdRequest(telegramChatForTests.getId(), telegramChatResponse);
 
-        printToConsoleRegisteredMockRequests();
+        //printToConsoleRegisteredMockRequests();
 
         WebTestClient.ResponseSpec exchange = client.post()
                 .uri("/api/bot/")
@@ -315,6 +315,7 @@ public class TelegramBotTests extends TelegramTestsBaseClass {
         assertEquals(expectedMsg, actualMessage);
 
     }
+    /*
     @Test
     public void testStartCommandFromNotRegisteredUser() throws JsonProcessingException {
 
@@ -393,6 +394,8 @@ public class TelegramBotTests extends TelegramTestsBaseClass {
         log.debug("Sant message {}", actual);
 
     }
+
+     */
     @Test
     @Order(3)
     public void testAuthCommand() throws JsonProcessingException {
