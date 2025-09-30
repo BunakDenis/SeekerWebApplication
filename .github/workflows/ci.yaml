@@ -45,21 +45,15 @@ jobs:
       - name: Export all required env vars
         run: |
           echo "TRUTH_SEEKER_OFFICE_IP_ADDRESS=${{ secrets.TRUTH_SEEKER_OFFICE_IP_ADDRESS }}" >> $GITHUB_ENV
+          echo "USER_PASSWORD=${{ secrets.USER_PASSWORD }}" >> $GITHUB_ENV
+          echo "MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}" >> $GITHUB_ENV
+          echo "MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}" >> $GITHUB_ENV
+          echo "MAIL_SEND_FROM=${{ secrets.MAIL_SEND_FROM }}" >> $GITHUB_ENV
+          echo "REPOSITORY_NAME=${{ secrets.REPOSITORY_NAME }}" >> $GITHUB_ENV
           echo "TELEGRAM_BOT_SERVICE_IMAGE=${{ vars.TELEGRAM_BOT_SERVICE_IMAGE }}" >> $GITHUB_ENV
           echo "SPRING_PROFILES_ACTIVE=${{ vars.SPRING_PROFILES_ACTIVE }}" >> $GITHUB_ENV
           echo "DOCKER_REGISTRY_PASSWORD=${{ secrets.DOCKER_REGISTRY_PASSWORD }}" >> $GITHUB_ENV
           echo "DOCKER_REGISTRY_USERNAME=${{ secrets.DOCKER_REGISTRY_USERNAME }}" >> $GITHUB_ENV
-          echo "DB_NAME=${{ secrets.DB_NAME }}" >> $GITHUB_ENV
-          echo "DB_USER_NAME=${{ secrets.DB_USER_NAME }}" >> $GITHUB_ENV
-          echo "DB_USER_PASSWORD=${{ secrets.DB_USER_PASSWORD }}" >> $GITHUB_ENV
-          echo "PROXY_TOR_HOST=${{ secrets.PROXY_TOR_HOST }}" >> $GITHUB_ENV
-          echo "PROXY_TOR_PORT=${{ secrets.PROXY_TOR_PORT }}" >> $GITHUB_ENV
-          echo "PROXY_TOR_ENABLED=${{ secrets.PROXY_TOR_ENABLED }}" >> $GITHUB_ENV
-          echo "MYSTIC_SCHOOL_API_URL=${{ secrets.MYSTIC_SCHOOL_API_URL }}" >> $GITHUB_ENV
-          echo "MYSTIC_SCHOOL_API_VERSION=${{ secrets.MYSTIC_SCHOOL_API_VERSION }}" >> $GITHUB_ENV
-          echo "MYSTIC_SCHOOL_API_KEY=${{ secrets.MYSTIC_SCHOOL_API_KEY }}" >> $GITHUB_ENV
-          echo "MYSTIC_SCHOOL_CHECK_USER_ENDPOINT=${{ secrets.MYSTIC_SCHOOL_CHECK_USER_ENDPOINT }}" >> $GITHUB_ENV
-          echo "MYSTIC_SCHOOL_ARTICLE_ENDPOINT=${{ secrets.MYSTIC_SCHOOL_ARTICLE_ENDPOINT }}" >> $GITHUB_ENV
           echo "INTERNAL_NETWORK_API_KEY=${{ secrets.INTERNAL_NETWORK_API_KEY }}" >> $GITHUB_ENV
           echo "API_KEY_HEADER_NAME=${{ secrets.API_KEY_HEADER_NAME }}" >> $GITHUB_ENV
           echo "TELEGRAM_BOT_SERVICE_API_KEY=${{ secrets.TELEGRAM_BOT_SERVICE_API_KEY }}" >> $GITHUB_ENV
@@ -69,19 +63,20 @@ jobs:
           echo "PERSISTENT_AUTHORIZATION_EXPIRATION_TIME=${{ secrets.PERSISTENT_AUTHORIZATION_EXPIRATION_TIME }}" >> $GITHUB_ENV
           echo "TRANSIENT_AUTHORIZATION_HEADER_NAME=${{ secrets.TRANSIENT_AUTHORIZATION_HEADER_NAME }}" >> $GITHUB_ENV
           echo "TRANSIENT_AUTHORIZATION_EXPIRATION_TIME=${{ secrets.TRANSIENT_AUTHORIZATION_EXPIRATION_TIME }}" >> $GITHUB_ENV
-          echo "TELEGRAM_BOT_PORT=${{ secrets.TELEGRAM_BOT_PORT }}" >> $GITHUB_ENV
-          echo "TELEGRAM_BOT_NAME=${{ secrets.TELEGRAM_BOT_NAME }}" >> $GITHUB_ENV
-          echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}" >> $GITHUB_ENV
-          echo "TELEGRAM_BOT_WEB_HOOK_PATH=${{ secrets.TELEGRAM_BOT_WEB_HOOK_PATH }}" >> $GITHUB_ENV
-          echo "TELEGRAM_BOT_WEB_HOOK_URL=${{ secrets.TELEGRAM_BOT_WEB_HOOK_URL }}" >> $GITHUB_ENV
-          echo "TELEGRAM_BOT_SERVICE_IMAGE=${{ secrets.TELEGRAM_BOT_SERVICE_IMAGE }}" >> $GITHUB_ENV
-          echo "TELEGRAM_BOT_API_PATH=${{ secrets.TELEGRAM_BOT_API_PATH }}" >> $GITHUB_ENV
+          echo "DB_NAME=${{ secrets.DB_NAME }}" >> $GITHUB_ENV
+          echo "DB_USER_NAME=${{ secrets.DB_USER_NAME }}" >> $GITHUB_ENV
+          echo "DB_USER_PASSWORD=${{ secrets.DB_USER_PASSWORD }}" >> $GITHUB_ENV
           echo "DATA_PROVIDER_SERVICE_API_URL=${{ secrets.DATA_PROVIDER_SERVICE_API_URL }}" >> $GITHUB_ENV
           echo "DATA_PROVIDER_SERVICE_PORT=${{ secrets.DATA_PROVIDER_SERVICE_PORT }}" >> $GITHUB_ENV
-          echo "POSTGRES_DB_PORT=${{ secrets.POSTGRES_DB_PORT }}" >> $GITHUB_ENV
+          echo "DATA_PROVIDER_SERVICE_IMAGE=${{ secrets.DATA_PROVIDER_SERVICE_IMAGE }}" >> $GITHUB_ENV
+          echo "DATA_PROVIDER_SERVICE_API_DOCKER_URL=${{ secrets.DATA_PROVIDER_SERVICE_API_DOCKER_URL }}" >> $GITHUB_ENV
           echo "DB_API_DOCKER_URL=${{ secrets.DB_API_DOCKER_URL }}" >> $GITHUB_ENV
           echo "DB_API_VERSION=${{ secrets.DB_API_VERSION }}" >> $GITHUB_ENV
           echo "DB_TELEGRAM_DATA_API_ENDPOINT=${{ secrets.DB_TELEGRAM_DATA_API_ENDPOINT }}" >> $GITHUB_ENV
+          echo "POSTGRES_DB_DOCKER_HOST=${{ secrets.POSTGRES_DB_DOCKER_HOST }}" >> $GITHUB_ENV
+          echo "POSTGRES_DB_HOST=${{ secrets.POSTGRES_DB_HOST }}" >> $GITHUB_ENV
+          echo "POSTGRES_DB_DOCKER_PORT=${{ secrets.POSTGRES_DB_DOCKER_PORT }}" >> $GITHUB_ENV
+          echo "POSTGRES_DB_PORT=${{ secrets.POSTGRES_DB_PORT }}" >> $GITHUB_ENV
           echo "PROXY_TOR_HOST=${{ secrets.PROXY_TOR_HOST }}" >> $GITHUB_ENV
           echo "PROXY_TOR_PORT=${{ secrets.PROXY_TOR_PORT }}" >> $GITHUB_ENV
           echo "PROXY_TOR_ENABLED=${{ secrets.PROXY_TOR_ENABLED }}" >> $GITHUB_ENV
@@ -90,14 +85,16 @@ jobs:
           echo "MYSTIC_SCHOOL_API_KEY=${{ secrets.MYSTIC_SCHOOL_API_KEY }}" >> $GITHUB_ENV
           echo "MYSTIC_SCHOOL_CHECK_USER_ENDPOINT=${{ secrets.MYSTIC_SCHOOL_CHECK_USER_ENDPOINT }}" >> $GITHUB_ENV
           echo "MYSTIC_SCHOOL_ARTICLE_ENDPOINT=${{ secrets.MYSTIC_SCHOOL_ARTICLE_ENDPOINT }}" >> $GITHUB_ENV
+          echo "TELEGRAM_BOT_PORT=${{ secrets.TELEGRAM_BOT_PORT }}" >> $GITHUB_ENV
+          echo "TELEGRAM_BOT_NAME=${{ secrets.TELEGRAM_BOT_NAME }}" >> $GITHUB_ENV
+          echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}" >> $GITHUB_ENV
+          echo "TELEGRAM_BOT_WEB_HOOK_PATH=${{ secrets.TELEGRAM_BOT_WEB_HOOK_PATH }}" >> $GITHUB_ENV
+          echo "TELEGRAM_BOT_WEB_HOOK_URL=${{ secrets.TELEGRAM_BOT_WEB_HOOK_URL }}" >> $GITHUB_ENV
+          echo "TELEGRAM_BOT_SERVICE_IMAGE=${{ secrets.TELEGRAM_BOT_SERVICE_IMAGE }}" >> $GITHUB_ENV
+          echo "TELEGRAM_BOT_API_PATH=${{ secrets.TELEGRAM_BOT_API_PATH }}" >> $GITHUB_ENV
           echo "USEFUL_TOOLS_API_FILE_SERVICE_ENDPOINT=${{ secrets.USEFUL_TOOLS_API_FILE_SERVICE_ENDPOINT }}" >> $GITHUB_ENV
           echo "USEFUL_TOOLS_API_PORT=${{ secrets.USEFUL_TOOLS_API_PORT }}" >> $GITHUB_ENV
           echo "USEFUL_TOOLS_API_URL=${{ secrets.USEFUL_TOOLS_API_URL }}" >> $GITHUB_ENV
-          echo "USER_PASSWORD=${{ secrets.USER_PASSWORD }}" >> $GITHUB_ENV
-          echo "MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}" >> $GITHUB_ENV
-          echo "MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}" >> $GITHUB_ENV
-          echo "MAIL_SEND_FROM=${{ secrets.MAIL_SEND_FROM }}" >> $GITHUB_ENV
-          echo "REPOSITORY_NAME=${{ secrets.REPOSITORY_NAME }}" >> $GITHUB_ENV
           echo "DEFAULT_UTC_ZONE_ID=${{ vars.DEFAULT_UTC_ZONE_ID }}" >> $GITHUB_ENV
 
       #- name: Debug - List environment variables

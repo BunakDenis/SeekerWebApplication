@@ -45,7 +45,7 @@ public class TelegramBotMessageSender {
      * @param msg Сообщение для отправки
      */
     public void sendMessage(SendMessage msg) {
-        log.debug("Отправляю сообщение {}", msg);
+        log.debug("Отправляю сообщение в чат с id={}, сообщение = {}", msg.getChatId(), msg.getText());
         if (isTextValidForSending(msg.getText())) {
             executeSafely(msg);
         } else {
