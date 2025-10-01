@@ -18,9 +18,11 @@ public interface TelegramSessionRepo extends JpaRepository<TelegramSession, Long
            """)
     Optional<TelegramSession> findWithTelegramUserById(@Param("id") Long id);
 
-    @Query("SELECT s FROM TelegramSession s " +
-            "JOIN FETCH s.telegramUser tu " +
-            "WHERE tu.telegramUserId = :telegramUserId")
+    @Query("""
+            SELECT s FROM TelegramSession s
+            JOIN FETCH s.telegramUser tu
+            WHERE tu.telegramUserId = :telegramUserId
+            """)
     Optional<TelegramSession> getTelegramSessionByTelegramUserId(@Param("telegramUserId") Long telegramUserId);
 
 }

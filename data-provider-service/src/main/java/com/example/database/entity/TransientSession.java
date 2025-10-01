@@ -21,9 +21,6 @@ public class TransientSession {
         @Column(name = "transient_session_data")
         private String data;
 
-        @Column(name = "lastWarnTimestamp")
-        private LocalDateTime lastWarnTimestamp;
-
         @Column(name = "is_active", nullable = false)
         private boolean isActive;
 
