@@ -75,10 +75,6 @@ public class TelegramBotReactiveHandler {
                 })
                 .doOnNext(sent -> log.debug("Сообщение {} отправлено юзеру!",
                         sent ? "" : "не "))
-                .doOnTerminate(() -> {
-                    log.debug("Конец метода onWebhookUpdateReceived");
-                    log.debug("--------------------------------------");
-                })
                 // Ловим любые ошибки в цепочке
                 .doOnError(ex -> log.error("Ошибка обработки update:", ex))
                 .onErrorResume(ex -> {
@@ -89,7 +85,8 @@ public class TelegramBotReactiveHandler {
                     SendMessage sorry = new SendMessage(String.valueOf(chatId), text);
                     sender.sendMessage(sorry);
                     return Mono.just(false);
-                });
+                })
+                .doFinally(signalType -> log.debug("Конец метода handleUpdate: {}", signalType));
     }
 
     private Mono<Boolean> handleMessage(Update update, TelegramChat lastChat) {

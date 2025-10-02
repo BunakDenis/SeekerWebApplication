@@ -52,6 +52,7 @@ public class TelegramBotConstantsForTests {
 
     public static final TelegramSession TELEGRAM_SESSION_FOR_TESTS = TelegramSession.builder()
             .id(23456L)
+            .lastAuthWarnTimestamp(LocalDateTime.now().minusDays(1L))
             .telegramUser(TELEGRAM_USER_FOR_TESTS)
             .build();
 

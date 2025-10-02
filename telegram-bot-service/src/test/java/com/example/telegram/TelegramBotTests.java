@@ -9,6 +9,7 @@ import com.example.data.models.entity.dto.telegram.*;
 import com.example.data.models.entity.jwt.JwtTelegramDataImpl;
 import com.example.data.models.entity.response.ApiResponse;
 import com.example.data.models.enums.JWTDataSubjectKeys;
+import com.example.data.models.enums.UserRoles;
 import com.example.data.models.utils.ApiResponseUtilsService;
 import com.example.telegram.bot.chat.states.DialogStates;
 import com.example.telegram.bot.chat.UiElements;
@@ -164,7 +165,7 @@ public class TelegramBotTests extends TelegramTestsBaseClass {
         log.debug("testStartCommand");
 
         //Given
-        List<KeyboardRow> expectedKeyboard = ReplyKeyboardMarkupFactory.getMainMenuKeyboard();
+        List<KeyboardRow> expectedKeyboard = ReplyKeyboardMarkupFactory.getMainMenuKeyboard(UserRoles.ADMIN);
         KeyboardRow favBtnRow = ReplyKeyboardMarkupFactory.getFavBtnRow();
         expectedKeyboard.add(0, favBtnRow);
 
@@ -1014,7 +1015,6 @@ public class TelegramBotTests extends TelegramTestsBaseClass {
         PersistentSessionDTO persistentSessionDTO = mapperService.toDTO(persistentSession, PersistentSessionDTO.class);
         TransientSessionDTO transientSessionDTO = mapperService.toDTO(transientSession, TransientSessionDTO.class);
 
-
         ApiResponse<TelegramSessionDTO> telegramSessionResponse = ApiResponse.<TelegramSessionDTO>builder()
                 .data(telegramSessionDTO)
                 .includeObject(TELEGRAM_USER.getKeyValue(), TELEGRAM_USER_FOR_TESTS)
@@ -1066,12 +1066,11 @@ public class TelegramBotTests extends TelegramTestsBaseClass {
                         )
                 );
     }
-
     private void mockTelegramSessionByTelegramUserIdGetRequest(Long telegramUserId, ApiResponse<?> telegramSessionResponse) throws JsonProcessingException {
         mockServerClient
                 .when(request()
                         .withMethod("GET")
-                        .withPath("/api/v1/session/telegram_user_id/" + telegramUserId)
+                        .withPath("/api/v1/session/telegram_user_id/")
                 )
                 .respond(response()
                         .withStatusCode(200)
@@ -1079,7 +1078,6 @@ public class TelegramBotTests extends TelegramTestsBaseClass {
                         .withBody(objectMapper.writeValueAsString(telegramSessionResponse))
                 );
     }
-
     private void mockTelegramSessionSaveRequest(ApiResponse<?> response) throws JsonProcessingException {
         mockServerClient.when(
                         request()
@@ -1093,7 +1091,6 @@ public class TelegramBotTests extends TelegramTestsBaseClass {
                                 .withBody(objectMapper.writeValueAsString(response))
                 );
     }
-
     private void mockTelegramUserWithTelegramSessionGetRequest(Long telegramUserId, ApiResponse<?> telegramUserResponse) throws JsonProcessingException {
         mockServerClient
                 .when(

@@ -3,22 +3,16 @@ package com.example.telegram.bot.service;
 import com.example.data.models.consts.WarnMessageProvider;
 import com.example.data.models.entity.TelegramSession;
 import com.example.data.models.entity.TelegramUser;
+import com.example.data.models.enums.UserRoles;
 import com.example.telegram.bot.message.TelegramBotMessageSender;
 import com.example.telegram.bot.utils.update.UpdateUtilsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-/*
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.ReactiveSecurityContextHolder;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextImpl;
-import org.springframework.security.core.userdetails.UserDetails;
-*/
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextImpl;
@@ -230,5 +224,12 @@ public class AuthService {
                 null,
                 userDetails.getAuthorities()
         );
+    }
+
+    public UserRoles getUserRoleFromAuthorities(GrantedAuthority authority) {
+        String authorityRole = authority.getAuthority();
+        log.debug(authorityRole);
+        log.debug(UserRoles.TOURIST.getRole());
+        return UserRoles.valueOf(UserRoles.class, authorityRole);
     }
 }

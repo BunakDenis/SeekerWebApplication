@@ -1,5 +1,6 @@
 package com.example.telegram.bot.keyboard;
 
+import com.example.data.models.enums.UserRoles;
 import com.example.telegram.bot.chat.states.DialogStates;
 import com.example.telegram.bot.queries.Queries;
 import org.springframework.stereotype.Component;
@@ -29,18 +30,16 @@ public class ReplyKeyboardMarkupFactory {
      * Создает клавиатуру главного меню (первый уровень).
      * @return List of KeyboardRow для главного меню.
      */
-    public static List<KeyboardRow> getMainMenuKeyboard() {
-        KeyboardButton generalBtn = new KeyboardButton(Queries.GENERAL_RESULTS.getQuery());
-        KeyboardButton godBtn = new KeyboardButton(Queries.GOD.getQuery());
-        KeyboardButton workBtn = new KeyboardButton(Queries.WORK.getQuery());
-        KeyboardButton seekerBtn = new KeyboardButton(Queries.SEEKER.getQuery());
-        KeyboardButton settingsBtn = new KeyboardButton(Queries.SETTINGS.getQuery());
+    public static List<KeyboardRow> getMainMenuKeyboard(UserRoles userRole) {
 
-        KeyboardRow row1 = new KeyboardRow(List.of(generalBtn, godBtn));
-        KeyboardRow row2 = new KeyboardRow(List.of(workBtn, seekerBtn));
-        KeyboardRow row3 = new KeyboardRow(List.of(settingsBtn));
+        List<Queries> queries = List.of(
+                Queries.GENERAL_RESULTS, Queries.GOD, Queries.WORK,
+                Queries.KNOWLEDGE, Queries.SETTINGS
+        );
 
-        return new ArrayList<>(List.of(row1, row2, row3));
+        List<KeyboardRow> result = createKeyboardList(queries, userRole);
+
+        return new ArrayList<>(result);
     }
 
     /**
@@ -58,7 +57,7 @@ public class ReplyKeyboardMarkupFactory {
         KeyboardRow row2 = new KeyboardRow(List.of(visionBtn, messageBtn));
         KeyboardRow row3 = new KeyboardRow(List.of(vowBtn));
 
-        return List.of(row1, row2, row3);
+        return new ArrayList<>(List.of(row1, row2, row3));
     }
 
     /**
@@ -71,7 +70,69 @@ public class ReplyKeyboardMarkupFactory {
 
         KeyboardRow row1 = new KeyboardRow(List.of(spiritualBtn, mysticBtn));
 
-        return List.of(row1);
+        return new ArrayList<>(List.of(row1));
+    }
+
+    /**
+     * Создает клавиатуру для подменю "Духовная Работа".
+     * @return List of KeyboardRow для меню "Духовная Работа".
+     */
+    public static List<KeyboardRow> getSpiritualWorkKeyboard() {
+
+        KeyboardButton purposeBtn = new KeyboardButton(Queries.PURPOSE.getQuery());
+        KeyboardButton supplicationBtn = new KeyboardButton(Queries.SUPPLICATION.getQuery());
+        KeyboardButton practicesBtn = new KeyboardButton(Queries.PRACTICES.getQuery());
+        KeyboardButton ideasBtn = new KeyboardButton(Queries.IDEAS.getQuery());
+        KeyboardButton feelingsBtn = new KeyboardButton(Queries.FEELINGS.getQuery());
+        KeyboardButton emotionsBtn = new KeyboardButton(Queries.EMOTIONS.getQuery());
+        KeyboardButton innerStateDiaryBtn = new KeyboardButton(Queries.INNER_STATE_DIARY.getQuery());
+        KeyboardButton contemplationBtn = new KeyboardButton(Queries.CONTEMPLATION.getQuery());
+        KeyboardButton remembrancesBtn = new KeyboardButton(Queries.REMEMBRANCES.getQuery());
+        KeyboardButton seclusionBtn = new KeyboardButton(Queries.SECLUSION.getQuery());
+
+        KeyboardRow row1 = new KeyboardRow(List.of(purposeBtn, supplicationBtn));
+        KeyboardRow row2 = new KeyboardRow(List.of(practicesBtn, ideasBtn));
+        KeyboardRow row3 = new KeyboardRow(List.of(feelingsBtn, emotionsBtn));
+        KeyboardRow row4 = new KeyboardRow(List.of(innerStateDiaryBtn, contemplationBtn));
+        KeyboardRow row5 = new KeyboardRow(List.of(remembrancesBtn, seclusionBtn));
+
+        return new ArrayList<>(List.of(row1, row2, row3, row4, row5));
+    }
+
+    /**
+     * Создает клавиатуру для подменю "Эмоции".
+     * @return List of KeyboardRow для меню "Эмоции".
+     */
+    public static List<KeyboardRow> getEmotionsKeyboard() {
+
+        KeyboardButton joyBtn = new KeyboardButton(Queries.JOY.getQuery());
+        KeyboardButton fearBtn = new KeyboardButton(Queries.FEAR.getQuery());
+        KeyboardButton angerBtn = new KeyboardButton(Queries.ANGER.getQuery());
+        KeyboardButton sadnessBtn = new KeyboardButton(Queries.SADNESS.getQuery());
+
+        KeyboardRow row1 = new KeyboardRow(List.of(joyBtn, fearBtn));
+        KeyboardRow row2 = new KeyboardRow(List.of(angerBtn, sadnessBtn));
+
+        return new ArrayList<>(List.of(row1, row2));
+    }
+
+    /**
+     * Создает клавиатуру для подменю "Мистическая Работа".
+     * @return List of KeyboardRow для меню "Мистическая Работа".
+     */
+    public static List<KeyboardRow> getMysticWorkKeyboard() {
+
+        KeyboardButton dhikrBtn = new KeyboardButton(Queries.DHIKR.getQuery());
+        KeyboardButton prayerBtn = new KeyboardButton(Queries.PRAYER.getQuery());
+        KeyboardButton pilgrimageBtn = new KeyboardButton(Queries.PILGRIMAGE.getQuery());
+        KeyboardButton healingBtn = new KeyboardButton(Queries.HEALING.getQuery());
+        KeyboardButton dreamsBtn = new KeyboardButton(Queries.DREAMS.getQuery());
+
+        KeyboardRow row1 = new KeyboardRow(List.of(dhikrBtn, prayerBtn));
+        KeyboardRow row2 = new KeyboardRow(List.of(pilgrimageBtn, healingBtn));
+        KeyboardRow row3 = new KeyboardRow(List.of(dreamsBtn));
+
+        return new ArrayList<>(List.of(row1, row2, row3));
     }
 
     /**
@@ -134,6 +195,32 @@ public class ReplyKeyboardMarkupFactory {
         result.setSelective(true);
 
         return result;
+    }
+    private static List<KeyboardRow> createKeyboardList(List<Queries> queries, UserRoles userRole) {
+
+        List<KeyboardButton> availableButtons = new ArrayList<>();
+
+        // Проходим по всем возможным кнопкам
+        for (Queries query : Queries.values()) {
+            // Добавляем кнопку, только если у пользователя достаточно прав
+            if (userRole.hasAccess(query.getRequiredRole())) {
+                availableButtons.add(new KeyboardButton(query.getQuery()));
+            }
+        }
+
+        // Динамически формируем ряды (например, по 2 кнопки в ряду)
+        List<KeyboardRow> rows = new ArrayList<>();
+        for (int i = 0; i < availableButtons.size(); i += 2) {
+            KeyboardRow row = new KeyboardRow();
+            row.add(availableButtons.get(i));
+            if (i + 1 < availableButtons.size()) {
+                row.add(availableButtons.get(i + 1));
+            }
+            rows.add(row);
+        }
+
+        return Collections.unmodifiableList(rows);
+
     }
 
 }
