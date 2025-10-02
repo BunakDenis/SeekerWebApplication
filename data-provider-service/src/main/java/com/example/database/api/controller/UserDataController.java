@@ -49,7 +49,7 @@ public class UserDataController {
 
         ApiResponse<UserDTO> result = ApiResponse.<UserDTO>builder().build();
 
-        if (Objects.nonNull(user)) result = userService.create(user);
+        if (Objects.nonNull(user)) result = userService.save(user);
 
         return ResponseEntity.status(result.getStatus()).body(result);
     }

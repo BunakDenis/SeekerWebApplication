@@ -156,7 +156,7 @@ public class UserDataControllerTests extends DataProviderTestsBaseClass {
                     String expectedMessage = response.getMessage();
 
                     EntityNullException entityNullException = assertThrows(EntityNullException.class, () -> {
-                        userService.create(null);
+                        userService.save(null);
                     });
 
                     String actualMessage = entityNullException.getMessage();
@@ -191,7 +191,7 @@ public class UserDataControllerTests extends DataProviderTestsBaseClass {
                     ApiResponse<Object> response = resp.getResponseBody();
 
                     EntityEmptyFieldException entityEmptyFieldException = assertThrows(EntityEmptyFieldException.class, () -> {
-                        userService.create(expectedUser);
+                        userService.save(expectedUser);
                     });
 
                     String expectedResponseText = entityEmptyFieldException.getMessage();
@@ -226,7 +226,7 @@ public class UserDataControllerTests extends DataProviderTestsBaseClass {
                     ApiResponse<Object> response = resp.getResponseBody();
 
                     EntityNullFieldException entityNullFieldException = assertThrows(EntityNullFieldException.class, () -> {
-                        userService.create(expectedUser);
+                        userService.save(expectedUser);
                     });
 
                     String expectedResponseText = entityNullFieldException.getMessage();
@@ -261,7 +261,7 @@ public class UserDataControllerTests extends DataProviderTestsBaseClass {
                     ApiResponse<Object> response = resp.getResponseBody();
 
                     EntityEmptyFieldException entityEmptyFieldException = assertThrows(EntityEmptyFieldException.class, () -> {
-                        userService.create(expectedUser);
+                        userService.save(expectedUser);
                     });
 
                     String expectedResponseText = entityEmptyFieldException.getMessage();
@@ -296,7 +296,7 @@ public class UserDataControllerTests extends DataProviderTestsBaseClass {
                     ApiResponse<Object> response = resp.getResponseBody();
 
                     EntityNullFieldException entityNullFieldException = assertThrows(EntityNullFieldException.class, () -> {
-                        userService.create(expectedUser);
+                        userService.save(expectedUser);
                     });
 
                     String expectedResponseText = entityNullFieldException.getMessage();
@@ -331,7 +331,7 @@ public class UserDataControllerTests extends DataProviderTestsBaseClass {
                     ApiResponse<Object> response = resp.getResponseBody();
 
                     EntityEmptyFieldException entityEmptyFieldException = assertThrows(EntityEmptyFieldException.class, () -> {
-                        userService.create(expectedUser);
+                        userService.save(expectedUser);
                     });
 
                     String expectedResponseText = entityEmptyFieldException.getMessage();
@@ -366,7 +366,7 @@ public class UserDataControllerTests extends DataProviderTestsBaseClass {
                     ApiResponse<Object> response = resp.getResponseBody();
 
                     EntityNullFieldException entityNullFieldException = assertThrows(EntityNullFieldException.class, () -> {
-                        userService.create(expectedUser);
+                        userService.save(expectedUser);
                     });
 
                     String expectedResponseText = entityNullFieldException.getMessage();

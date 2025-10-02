@@ -8,7 +8,7 @@ import com.example.data.models.exception.NotValidVerificationCodeException;
 import com.example.telegram.bot.chat.UiElements;
 import com.example.telegram.bot.chat.states.DialogStates;
 import com.example.telegram.bot.commands.CommandHandler;
-import com.example.telegram.bot.keyboard.ReplyKeyboardMarkupProvider;
+import com.example.telegram.bot.keyboard.ReplyKeyboardMarkupFactory;
 import com.example.telegram.bot.message.MessageProvider;
 import com.example.telegram.bot.commands.Commands;
 import com.example.telegram.bot.service.*;
@@ -326,7 +326,9 @@ public class AuthCommandHandlerImpl implements CommandHandler {
                 .doOnError(error -> log.error("Ошибка проверки верификационного кода - {}", error.getMessage()))
                 .onErrorResume(error -> {
 
-                    ReplyKeyboardMarkup notValidEmailKeyboard = ReplyKeyboardMarkupProvider.getNotValidEmailKeyboard();
+                    ReplyKeyboardMarkup notValidEmailKeyboard = ReplyKeyboardMarkupFactory.getEmptyReplyKeyboard();
+                    notValidEmailKeyboard.setKeyboard(List.of(ReplyKeyboardMarkupFactory.getNotValidEmailKeyboard()));
+
                     SendMessage result = new SendMessage();
                     result.setChatId(UpdateUtilsService.getStringChatId(update));
 

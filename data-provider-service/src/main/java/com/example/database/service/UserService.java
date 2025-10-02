@@ -3,6 +3,7 @@ package com.example.database.service;
 import com.example.data.models.consts.ExceptionMessageProvider;
 import com.example.data.models.entity.dto.UserDTO;
 import com.example.data.models.entity.dto.UserDetailsDTO;
+import com.example.data.models.entity.dto.VerificationCodeDTO;
 import com.example.data.models.entity.response.ApiResponse;
 import com.example.data.models.enums.ResponseIncludeDataKeys;
 import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
@@ -11,6 +12,7 @@ import com.example.data.models.exception.*;
 import com.example.data.models.utils.ApiResponseUtilsService;
 import com.example.database.entity.TelegramUser;
 import com.example.database.entity.User;
+import com.example.database.entity.VerificationCode;
 import com.example.database.repo.jpa.telegram.UserRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +22,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -36,24 +39,26 @@ public class UserService implements UserDetailsService {
     private final ModelMapperService mapper;
 
 
-    public ApiResponse<UserDTO> create(User user) {
+    public ApiResponse<UserDTO> save(User user) {
 
         User save;
 
         checkUser(user);
 
         try {
+
             save = repo.save(user);
+
+            return success(mapper.toDTO(save, UserDTO.class));
+
         } catch (Exception e) {
-            log.error("Ошибка сохранения юзера User - {}", e.getMessage(), e.getClass());
+            log.error("Ошибка сохранения юзера User - {}", e.getMessage(), e);
             throw new EntityNotSavedException("Ошибка сохранения юзера " + user);
         }
 
-        return ApiResponseUtilsService.success(mapper.toDTO(save, UserDTO.class));
-
     }
     public ApiResponse<UserDTO> update(User user) {
-        return create(user);
+        return save(user);
     }
     public ApiResponse<UserDTO> getUserById(Long id) {
         Optional<User> userOptional = repo.findById(id);

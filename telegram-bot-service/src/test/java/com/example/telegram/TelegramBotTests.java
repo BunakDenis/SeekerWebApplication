@@ -9,11 +9,11 @@ import com.example.data.models.entity.dto.telegram.*;
 import com.example.data.models.entity.jwt.JwtTelegramDataImpl;
 import com.example.data.models.entity.response.ApiResponse;
 import com.example.data.models.enums.JWTDataSubjectKeys;
-import com.example.data.models.enums.ResponseIncludeDataKeys;
 import com.example.data.models.utils.ApiResponseUtilsService;
 import com.example.telegram.bot.chat.states.DialogStates;
 import com.example.telegram.bot.chat.UiElements;
 import com.example.telegram.bot.commands.Commands;
+import com.example.telegram.bot.keyboard.ReplyKeyboardMarkupFactory;
 import com.example.telegram.bot.message.MessageProvider;
 import com.example.telegram.bot.utils.update.UpdateUtilsService;
 import com.example.utils.datetime.DateTimeService;
@@ -164,6 +164,10 @@ public class TelegramBotTests extends TelegramTestsBaseClass {
         log.debug("testStartCommand");
 
         //Given
+        List<KeyboardRow> expectedKeyboard = ReplyKeyboardMarkupFactory.getMainMenuKeyboard();
+        KeyboardRow favBtnRow = ReplyKeyboardMarkupFactory.getFavBtnRow();
+        expectedKeyboard.add(0, favBtnRow);
+
         Update update = createTelegramUpdate(Commands.START.getCommand());
         Message message = update.getMessage();
 
@@ -192,13 +196,14 @@ public class TelegramBotTests extends TelegramTestsBaseClass {
 
         assertTrue(actual.getReplyMarkup() instanceof ReplyKeyboardMarkup);
 
-        ReplyKeyboardMarkup markup = (ReplyKeyboardMarkup) actual.getReplyMarkup();
-
-        List<KeyboardRow> keyboard = markup.getKeyboard();
-
-        assertEquals("Декодировать аудио", keyboard.get(0).get(0).getText());
+        ReplyKeyboardMarkup actualMarkup = (ReplyKeyboardMarkup) actual.getReplyMarkup();
+        List<KeyboardRow> actualMenuKeyBoards = actualMarkup.getKeyboard();
 
         //Then
+        for (int i = 0; i < actualMenuKeyBoards.size(); i++) {
+            assertEquals(expectedKeyboard.get(i), actualMenuKeyBoards.get(i));
+        }
+
         assertEquals(Long.toString(message.getChatId()), actual.getChatId());
         assertEquals(expectedMsgText, actual.getText());
 

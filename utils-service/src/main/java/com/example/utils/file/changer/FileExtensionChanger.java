@@ -1,10 +1,10 @@
 package com.example.utils.file.changer;
 
-import lombok.Data;
-import lombok.extern.log4j.Log4j2;
 
-@Data
-@Log4j2
+import lombok.extern.slf4j.Slf4j;
+
+
+@Slf4j
 public class FileExtensionChanger {
 
     public static String change(String fileName, String newExtension) {
