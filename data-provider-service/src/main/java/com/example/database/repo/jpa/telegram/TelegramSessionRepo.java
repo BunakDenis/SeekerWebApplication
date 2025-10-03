@@ -18,6 +18,12 @@ public interface TelegramSessionRepo extends JpaRepository<TelegramSession, Long
            """)
     Optional<TelegramSession> findWithTelegramUserById(@Param("id") Long id);
 
+    /*
+        TODO
+            1. Добавить сортировку по убыванию
+            2. Добавить List как результат
+            3. В сервисе сделать перебор сессий
+     */
     @Query("""
             SELECT s FROM TelegramSession s
             JOIN FETCH s.telegramUser tu

@@ -165,9 +165,12 @@ public class TelegramBotTests extends TelegramTestsBaseClass {
         log.debug("testStartCommand");
 
         //Given
-        List<KeyboardRow> expectedKeyboard = ReplyKeyboardMarkupFactory.getMainMenuKeyboard(UserRoles.ADMIN);
-        KeyboardRow favBtnRow = ReplyKeyboardMarkupFactory.getFavBtnRow();
-        expectedKeyboard.add(0, favBtnRow);
+        UserRoles userRole = UserRoles.valueOf(getUserForTests().getRole().toUpperCase());
+        List<KeyboardRow> expectedKeyboard =
+                ReplyKeyboardMarkupFactory.getMainMenuKeyboard(userRole);
+        KeyboardRow navigationControlKeyBoard = ReplyKeyboardMarkupFactory.getNavigationControlKeyBoard();
+
+        expectedKeyboard.add(0, navigationControlKeyBoard);
 
         Update update = createTelegramUpdate(Commands.START.getCommand());
         Message message = update.getMessage();

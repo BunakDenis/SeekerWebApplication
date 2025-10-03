@@ -60,16 +60,17 @@ public class StartCommandHandlerImpl implements CommandHandler {
 
                     log.debug("Текущий user = {}", currentUser);
 
-                        List<KeyboardRow> mainMenuKeyboard =
-                                ReplyKeyboardMarkupFactory.getMainMenuKeyboard(
-                                        UserRoles.valueOf(currentUser.getRole().toUpperCase())
-                                );
-                        KeyboardRow favBtnRow = ReplyKeyboardMarkupFactory.getFavBtnRow();
-                        mainMenuKeyboard.add(0, favBtnRow);
+                    UserRoles userRole = UserRoles.valueOf(currentUser.getRole().toUpperCase());
 
-                        ReplyKeyboardMarkup replyKeyboard = ReplyKeyboardMarkupFactory.getReplyKeyboard(mainMenuKeyboard);
+                    List<KeyboardRow> mainMenuKeyboard =
+                            ReplyKeyboardMarkupFactory.getMainMenuKeyboard(userRole);
+                    KeyboardRow navigationControlKeyBoard = ReplyKeyboardMarkupFactory.getNavigationControlKeyBoard();
 
-                        answer.setReplyMarkup(replyKeyboard);
+                    mainMenuKeyboard.add(0, navigationControlKeyBoard);
+
+                    ReplyKeyboardMarkup replyKeyboard = ReplyKeyboardMarkupFactory.getReplyKeyboard(mainMenuKeyboard);
+
+                    answer.setReplyMarkup(replyKeyboard);
 
                     return Mono.just(answer);
                 })

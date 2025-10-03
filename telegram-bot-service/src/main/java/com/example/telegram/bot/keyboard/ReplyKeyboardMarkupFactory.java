@@ -3,6 +3,7 @@ package com.example.telegram.bot.keyboard;
 import com.example.data.models.enums.UserRoles;
 import com.example.telegram.bot.chat.states.DialogStates;
 import com.example.telegram.bot.queries.Queries;
+import com.example.utils.collections.CollectionsUtils;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
@@ -15,6 +16,14 @@ import java.util.List;
 @Component
 public class ReplyKeyboardMarkupFactory {
 
+    /**
+     * Создает навигационную клавиатуру телеграм бота.
+     * <p>Навигационна клавиатура состоит из кнопок:
+     * <p>1. Назад (вернуться в предыдущее меню)
+     * <p>2. Главное меню
+     * <p>3. Избранное (Записи помеченные "флагом" избранное текущей выбранной категории)
+     * @return List of KeyboardRow для главного меню.
+     */
     public static KeyboardRow getNavigationControlKeyBoard() {
 
         KeyboardButton returnBtn = new KeyboardButton(Queries.PREV_MENU.getQuery());
@@ -22,6 +31,23 @@ public class ReplyKeyboardMarkupFactory {
         KeyboardButton favBtn = getFavBtn();
 
         KeyboardRow result = new KeyboardRow(List.of(returnBtn, mainMenuBtn, favBtn));
+
+        return result;
+    }
+
+    /**
+     * Создает навигационную клавиатуру телеграм бота без кнопки "Избранное".
+     * <p>Навигационна клавиатура состоит из кнопок:
+     * <p>1. Назад (вернуться в предыдущее меню)
+     * <p>2. Главное меню
+     * @return List of KeyboardRow для главного меню.
+     */
+    public static KeyboardRow getNavigationControlKeyBoardWithoutFavBtn() {
+
+        KeyboardButton returnBtn = new KeyboardButton(Queries.PREV_MENU.getQuery());
+        KeyboardButton mainMenuBtn = new KeyboardButton(Queries.MAIN_MENU.getQuery());
+
+        KeyboardRow result = new KeyboardRow(List.of(returnBtn, mainMenuBtn));
 
         return result;
     }
@@ -39,116 +65,127 @@ public class ReplyKeyboardMarkupFactory {
 
         List<KeyboardRow> result = createKeyboardList(queries, userRole);
 
-        return new ArrayList<>(result);
+        return CollectionsUtils.cloneListWithStream(result);
     }
 
     /**
      * Создает клавиатуру для подменю "Господь".
      * @return List of KeyboardRow для меню "Господь".
      */
-    public static List<KeyboardRow> getGodMenuKeyboard() {
-        KeyboardButton willBtn = new KeyboardButton(Queries.WILL.getQuery());
-        KeyboardButton questioningBtn = new KeyboardButton(Queries.QUESTIONING.getQuery());
-        KeyboardButton visionBtn = new KeyboardButton(Queries.VISION.getQuery());
-        KeyboardButton messageBtn = new KeyboardButton(Queries.GOD_MESSAGES.getQuery());
-        KeyboardButton vowBtn = new KeyboardButton(Queries.VOWS.getQuery());
+    public static List<KeyboardRow> getGodMenuKeyboard(UserRoles userRole) {
 
-        KeyboardRow row1 = new KeyboardRow(List.of(willBtn, questioningBtn));
-        KeyboardRow row2 = new KeyboardRow(List.of(visionBtn, messageBtn));
-        KeyboardRow row3 = new KeyboardRow(List.of(vowBtn));
+        ArrayList<KeyboardRow> result = new ArrayList<>();
 
-        return new ArrayList<>(List.of(row1, row2, row3));
+        List<Queries> queries = List.of(Queries.WILL , Queries.QUESTIONING, Queries.VISION,
+                Queries.GOD_MESSAGES, Queries.VOWS);
+
+        List<KeyboardRow> mainMenuKeyboard = getMainMenuKeyboard(userRole);
+        List<KeyboardRow> contentKeyboard = createKeyboardList(queries, userRole);
+
+        result.addAll(mainMenuKeyboard);
+        result.addAll(contentKeyboard);
+
+        return CollectionsUtils.cloneListWithStream(result);
     }
 
     /**
      * Создает клавиатуру для подменю "Работа".
      * @return List of KeyboardRow для меню "Работа".
      */
-    public static List<KeyboardRow> getWorkMenuKeyboard() {
-        KeyboardButton spiritualBtn = new KeyboardButton(Queries.SPIRITUAL_WORK.getQuery());
-        KeyboardButton mysticBtn = new KeyboardButton(Queries.MYSTIC_WORK.getQuery());
+    public static List<KeyboardRow> getWorkMenuKeyboard(UserRoles userRole) {
 
-        KeyboardRow row1 = new KeyboardRow(List.of(spiritualBtn, mysticBtn));
+        List<KeyboardRow> result = createKeyboardList(
+                List.of(Queries.SPIRITUAL_WORK, Queries.MYSTIC_WORK),
+                userRole
+        );
 
-        return new ArrayList<>(List.of(row1));
+        return CollectionsUtils.cloneListWithStream(result);
     }
 
     /**
      * Создает клавиатуру для подменю "Духовная Работа".
      * @return List of KeyboardRow для меню "Духовная Работа".
      */
-    public static List<KeyboardRow> getSpiritualWorkKeyboard() {
+    public static List<KeyboardRow> getSpiritualWorkKeyboard(UserRoles userRole) {
 
-        KeyboardButton purposeBtn = new KeyboardButton(Queries.PURPOSE.getQuery());
-        KeyboardButton supplicationBtn = new KeyboardButton(Queries.SUPPLICATION.getQuery());
-        KeyboardButton practicesBtn = new KeyboardButton(Queries.PRACTICES.getQuery());
-        KeyboardButton ideasBtn = new KeyboardButton(Queries.IDEAS.getQuery());
-        KeyboardButton feelingsBtn = new KeyboardButton(Queries.FEELINGS.getQuery());
-        KeyboardButton emotionsBtn = new KeyboardButton(Queries.EMOTIONS.getQuery());
-        KeyboardButton innerStateDiaryBtn = new KeyboardButton(Queries.INNER_STATE_DIARY.getQuery());
-        KeyboardButton contemplationBtn = new KeyboardButton(Queries.CONTEMPLATION.getQuery());
-        KeyboardButton remembrancesBtn = new KeyboardButton(Queries.REMEMBRANCES.getQuery());
-        KeyboardButton seclusionBtn = new KeyboardButton(Queries.SECLUSION.getQuery());
+        List<Queries> queries = List.of(
+                Queries.PURPOSE, Queries.SUPPLICATION, Queries.PRACTICES, Queries.IDEAS,
+                Queries.FEELINGS, Queries.EMOTIONS, Queries.INNER_STATE_DIARY, Queries.CONTEMPLATION,
+                Queries.REMEMBRANCES, Queries.SECLUSION
+        );
 
-        KeyboardRow row1 = new KeyboardRow(List.of(purposeBtn, supplicationBtn));
-        KeyboardRow row2 = new KeyboardRow(List.of(practicesBtn, ideasBtn));
-        KeyboardRow row3 = new KeyboardRow(List.of(feelingsBtn, emotionsBtn));
-        KeyboardRow row4 = new KeyboardRow(List.of(innerStateDiaryBtn, contemplationBtn));
-        KeyboardRow row5 = new KeyboardRow(List.of(remembrancesBtn, seclusionBtn));
+        List<KeyboardRow> mainMenuKeyboard = getMainMenuKeyboard(userRole);
+        List<KeyboardRow> contentMenuKeyboard = createKeyboardList(queries, userRole);
 
-        return new ArrayList<>(List.of(row1, row2, row3, row4, row5));
+        ArrayList<KeyboardRow> result = new ArrayList<>();
+
+        result.addAll(mainMenuKeyboard);
+        result.addAll(contentMenuKeyboard);
+
+        return CollectionsUtils.cloneListWithStream(result);
     }
 
     /**
      * Создает клавиатуру для подменю "Эмоции".
      * @return List of KeyboardRow для меню "Эмоции".
      */
-    public static List<KeyboardRow> getEmotionsKeyboard() {
+    public static List<KeyboardRow> getEmotionsKeyboard(UserRoles userRole) {
 
-        KeyboardButton joyBtn = new KeyboardButton(Queries.JOY.getQuery());
-        KeyboardButton fearBtn = new KeyboardButton(Queries.FEAR.getQuery());
-        KeyboardButton angerBtn = new KeyboardButton(Queries.ANGER.getQuery());
-        KeyboardButton sadnessBtn = new KeyboardButton(Queries.SADNESS.getQuery());
+        List<Queries> queries = List.of(
+                Queries.JOY, Queries.FEAR, Queries.ANGER, Queries.SADNESS
+        );
 
-        KeyboardRow row1 = new KeyboardRow(List.of(joyBtn, fearBtn));
-        KeyboardRow row2 = new KeyboardRow(List.of(angerBtn, sadnessBtn));
+        List<KeyboardRow> mainMenuKeyboard = getMainMenuKeyboard(userRole);
+        List<KeyboardRow> contentMenuKeyboard = createKeyboardList(queries, userRole);
 
-        return new ArrayList<>(List.of(row1, row2));
+        ArrayList<KeyboardRow> result = new ArrayList<>();
+
+        result.addAll(mainMenuKeyboard);
+        result.addAll(contentMenuKeyboard);
+
+        return CollectionsUtils.cloneListWithStream(result);
     }
 
     /**
      * Создает клавиатуру для подменю "Мистическая Работа".
      * @return List of KeyboardRow для меню "Мистическая Работа".
      */
-    public static List<KeyboardRow> getMysticWorkKeyboard() {
+    public static List<KeyboardRow> getMysticWorkKeyboard(UserRoles userRole) {
 
-        KeyboardButton dhikrBtn = new KeyboardButton(Queries.DHIKR.getQuery());
-        KeyboardButton prayerBtn = new KeyboardButton(Queries.PRAYER.getQuery());
-        KeyboardButton pilgrimageBtn = new KeyboardButton(Queries.PILGRIMAGE.getQuery());
-        KeyboardButton healingBtn = new KeyboardButton(Queries.HEALING.getQuery());
-        KeyboardButton dreamsBtn = new KeyboardButton(Queries.DREAMS.getQuery());
+        List<Queries> queries = List.of(
+                Queries.DHIKR, Queries.PRAYER, Queries.PILGRIMAGE, Queries.HEALING, Queries.DREAMS
+        );
 
-        KeyboardRow row1 = new KeyboardRow(List.of(dhikrBtn, prayerBtn));
-        KeyboardRow row2 = new KeyboardRow(List.of(pilgrimageBtn, healingBtn));
-        KeyboardRow row3 = new KeyboardRow(List.of(dreamsBtn));
+        List<KeyboardRow> mainMenuKeyboard = getMainMenuKeyboard(userRole);
+        List<KeyboardRow> contentMenuKeyboard = createKeyboardList(queries, userRole);
 
-        return new ArrayList<>(List.of(row1, row2, row3));
+        ArrayList<KeyboardRow> result = new ArrayList<>();
+
+        result.addAll(mainMenuKeyboard);
+        result.addAll(contentMenuKeyboard);
+
+        return CollectionsUtils.cloneListWithStream(result);
     }
 
     /**
      * Создает клавиатуру для подменю "Знание".
      * @return List of KeyboardRow для меню "Знание".
      */
-    public static List<KeyboardRow> getSeekerMenuKeyboard() {
-        KeyboardButton booksBtn = new KeyboardButton(Queries.BOOKS.getQuery());
-        KeyboardButton audioBooksBtn = new KeyboardButton(Queries.AUDIO_BOOKS.getQuery());
-        KeyboardButton articleBtn = new KeyboardButton(Queries.ARTICLE.getQuery());
-        KeyboardButton lecturesBtn = new KeyboardButton(Queries.MEDIA_LECTURES.getQuery());
+    public static List<KeyboardRow> getKnowledgeMenuKeyboard(UserRoles userRole) {
 
-        KeyboardRow row1 = new KeyboardRow(List.of(booksBtn, audioBooksBtn));
-        KeyboardRow row2 = new KeyboardRow(List.of(articleBtn, lecturesBtn));
+        List<Queries> queries = List.of(
+                Queries.BOOKS, Queries.AUDIO_BOOKS, Queries.ARTICLE, Queries.MEDIA_LECTURES
+        );
 
-        return List.of(row1, row2);
+        List<KeyboardRow> mainMenuKeyboard = getMainMenuKeyboard(userRole);
+        List<KeyboardRow> contentMenuKeyboard = createKeyboardList(queries, userRole);
+
+        ArrayList<KeyboardRow> result = new ArrayList<>();
+
+        result.addAll(mainMenuKeyboard);
+        result.addAll(contentMenuKeyboard);
+
+        return CollectionsUtils.cloneListWithStream(result);
     }
     private static KeyboardButton getFavBtn() {
         return new KeyboardButton(Queries.FAVOURITE.getQuery());
@@ -201,7 +238,7 @@ public class ReplyKeyboardMarkupFactory {
         List<KeyboardButton> availableButtons = new ArrayList<>();
 
         // Проходим по всем возможным кнопкам
-        for (Queries query : Queries.values()) {
+        for (Queries query : queries) {
             // Добавляем кнопку, только если у пользователя достаточно прав
             if (userRole.hasAccess(query.getRequiredRole())) {
                 availableButtons.add(new KeyboardButton(query.getQuery()));
