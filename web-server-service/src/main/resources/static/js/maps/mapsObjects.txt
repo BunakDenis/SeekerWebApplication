@@ -1,0 +1,52 @@
+    routes[route.routeId] = {
+              shape,
+              markers,
+              shapeStyles: self.shapeStyles,
+              markerStyles,
+              isSelected: false,
+              visible: true,
+              routedata: route
+            }
+    
+route    
+{shape: NewClass, markers: Array(6), shapeStyles: {…}, markerStyles: {…}, isSelected: true, …}
+
+isSelected
+: 
+true
+
+markerStyles
+: 
+{startMarker: NewClass, endMarker: NewClass, startEndMarker: NewClass, pointMarker: NewClass, highlightMarker: NewClass, …}
+
+markers
+: 
+(6) [NewClass, NewClass, NewClass, NewClass, NewClass, NewClass]
+
+routedata
+: 
+{routeCity: 'г. Чернигов', routeName: 'Церкви древнего Чернигова', routeDescription: '<p>Пешеходный маршрут по древним церквям Чернигова…ая Детинец, Елецкий монастырь и Болдины горы.</p>', routeBriefDescription: '<p>Маршрут начинается с Катерининской церкви и пос…глебский, Успенский собор и Антониевы пещеры.</p>', routeComment: 'Рекомендуем начать маршрут утром, чтобы успеть пос…амы и спокойно провести время в тишине и молитве.', …}
+
+shape
+: 
+NewClass {options: {…}, _bounds: LatLngBounds, _latlngs: Array(6), _initHooksCalled: true, _leaflet_id: 59, …}
+
+shapeStyles
+: 
+{defaultStyle: {…}, highlightStyle: {…}}
+
+visible
+: 
+true
+      
+    markerData = {
+        name: point.name,
+        id: point.id,
+        address: point.address,
+        key: point.key,
+        description: point.description,
+        photoPaths: point.photoPaths,
+        photoDescriptions: point.photoDescriptions,
+        role: point.role,
+        routeId: route.routeId
+      }

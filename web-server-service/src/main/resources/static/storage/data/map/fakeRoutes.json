@@ -1,0 +1,232 @@
+{
+  "routes": [
+    {
+      "routeCity": "г. Чернигов",
+      "routeName": "Церкви древнего Чернигова",
+      "routeDescription": "<p>Пешеходный маршрут по древним церквям Чернигова — одному из духовных центров Древней Руси. Маршрут охватывает ключевые православные святыни, расположенные в центральной части города, включая Детинец, Елецкий монастырь и Болдины горы.</p>",
+      "routeBriefDescription": "<p>Маршрут начинается с Катерининской церкви и последовательно проходит через крупнейшие храмы XI–XVII веков: Спасо-Преображенский, Борисоглебский, Успенский собор и Антониевы пещеры.</p>",
+      "routeComment": "Рекомендуем начать маршрут утром, чтобы успеть посетить все храмы и спокойно провести время в тишине и молитве.",
+      "routeId": "chernihiv-churches-route",
+      "type": "polyline",
+      "shapeColor": "#A0522D",
+      "points": [
+        {
+          "coordinates": [51.487, 31.2875],
+          "id": "chernihiv-churches-route-marker-1",
+          "name": "Катерининская церковь",
+          "address": "проспект Мира, 6, Чернигов",
+          "key": "",
+          "description": "Церковь украинского барокко XVII века, один из символов города.",
+          "photoPaths": [
+            "./storage/multimedia/photo/map/chernihiv-churches-route/1/1.jpg",
+            "./storage/multimedia/photo/map/chernihiv-churches-route/1/2.jpg",
+            "./storage/multimedia/photo/map/chernihiv-churches-route/1/3.jpg"
+          ],
+          "photoDescriptions": [
+            "Фото церкви со стороны центра города",
+            "Фото церкви с боку",
+            "Фото церкви со стороны Вала"
+          ],
+          "audioPaths": [
+            "./storage/multimedia/audio/map/chernihiv-churches-route/1/1.m4a"
+          ],
+          "audioDescriptions": ["Запись онлайн экскурсии по церкви"],
+          "videoPaths": [
+            "./storage/multimedia/video/map/chernihiv-churches-route/1/1.mp4"
+          ],
+          "videoDescriptions": ["Прогулка возле церкви"],
+          "role": "start-end"
+        },
+        {
+          "coordinates": [51.488184, 31.28831],
+          "id": "chernihiv-churches-route-marker-2",
+          "name": "Промежуточная точка",
+          "address": "ул. Коцюбинского",
+          "key": "",
+          "description": "",
+          "photoPaths": [],
+          "photoDescriptions": [],
+          "audioPaths": [],
+          "audioDescriptions": [],
+          "videoPaths": [],
+          "videoDescriptions": [],
+          "role": "between"
+        },
+        {
+          "coordinates": [51.490145, 31.291885],
+          "id": "chernihiv-churches-route-marker-3",
+          "name": "Промежуточная точка",
+          "address": "ул. Коцюбинского",
+          "key": "",
+          "description": "",
+          "photoPaths": [
+            "./storage/multimedia/photo/map/chernihiv-churches-route/3/1.PNG",
+            "./storage/multimedia/photo/map/chernihiv-churches-route/3/2.PNG",
+            "./storage/multimedia/photo/map/chernihiv-churches-route/3/3.PNG"
+          ],
+          "photoDescriptions": [
+            "Фото улицы по направлению маршрута",
+            "Фото дома по средине улицы",
+            "Фото улицы по направлению к началу маршрута"
+          ],
+          "audioPaths": [],
+          "audioDescriptions": [],
+          "videoPaths": [],
+          "videoDescriptions": [],
+          "role": "between-multimedia"
+        },
+        {
+          "coordinates": [51.4892, 31.294],
+          "id": "chernihiv-churches-route-marker-4",
+          "name": "Борисоглебский собор",
+          "address": "парк Детинец, Чернигов",
+          "key": "",
+          "description": "Собор XII века, находится рядом со Спасским.",
+          "photoPaths": [],
+          "photoDescriptions": [],
+          "audioPaths": [],
+          "audioDescriptions": [],
+          "videoPaths": [],
+          "videoDescriptions": [],
+          "role": "point"
+        },
+        {
+          "coordinates": [51.4889, 31.2944],
+          "id": "chernihiv-churches-route-marker-5",
+          "name": "Спасо-Преображенский собор",
+          "address": "Преображенская улица, 1, Чернигов",
+          "key": "",
+          "description": "Один из древнейших храмов Киевской Руси, основан в XI веке.",
+          "photoPaths": [
+            "./storage/multimedia/photo/map/chernihiv-churches-route/5/1.jpg"
+          ],
+          "photoDescriptions": ["Фото фасада собора"],
+          "audioPaths": [],
+          "audioDescriptions": [],
+          "videoPaths": [],
+          "videoDescriptions": [],
+          "role": "point"
+        },
+        {
+          "coordinates": [51.4853, 31.2964],
+          "id": "chernihiv-churches-route-marker-6",
+          "name": "Успенский собор Елецкого монастыря",
+          "address": "улица Князя Чёрного, 1, Чернигов",
+          "key": "",
+          "description": "Основан в XI веке. Один из древнейших монастырей Украины.",
+          "photoPaths": [],
+          "photoDescriptions": [],
+          "audioPaths": [],
+          "audioDescriptions": [],
+          "videoPaths": [],
+          "videoDescriptions": [],
+          "role": "point"
+        },
+        {
+          "coordinates": [51.4778, 31.2843],
+          "id": "chernihiv-churches-route-marker-7",
+          "name": "Церковь святого Ильи и Антониевы пещеры",
+          "address": "Ильинская улица, 31, Чернигов",
+          "key": "",
+          "description": "Пещерный монастырь XI века и церковь, воздвигнутая над ним.",
+          "photoPaths": [],
+          "photoDescriptions": [],
+          "audioPaths": [],
+          "audioDescriptions": [],
+          "videoPaths": [],
+          "videoDescriptions": [],
+          "role": "point"
+        },
+        {
+          "coordinates": [51.487, 31.2875],
+          "id": "chernihiv-churches-route-marker-8",
+          "name": "Катерининская церковь (конец маршрута)",
+          "address": "проспект Мира, 6, Чернигов",
+          "key": "",
+          "description": "",
+          "photoPaths": [],
+          "photoDescriptions": [],
+          "audioPaths": [],
+          "audioDescriptions": [],
+          "videoPaths": [],
+          "videoDescriptions": [],
+          "role": "start-end"
+        }
+      ]
+    },
+    {
+      "routeCity": "г. Киев",
+      "routeName": "Исторические церкви Киева",
+      "routeDescription": "<p>Паломнический маршрут по главным православным святыням столицы Украины. Включает архитектурные шедевры XI-XVIII веков, являющиеся объектами Всемирного наследия ЮНЕСКО.</p>",
+      "routeBriefDescription": "<p>Маршрут охватывает Софийский собор, Михайловский Златоверхий монастырь, Андреевскую церковь и Киево-Печерскую лавру.</p>",
+      "routeComment": "Рекомендуется выделить целый день для посещения всех объектов. Обязателен скромный дресс-код.",
+      "routeId": "kyiv-churches-route",
+      "type": "polyline",
+      "shapeColor": "#1E90FF",
+      "points": [
+        {
+          "coordinates": [50.4529, 30.5145],
+          "id": "kyiv-churches-route-marker-1",
+          "name": "Софийский собор",
+          "address": "ул. Владимирская, 24, Киев",
+          "key": "",
+          "description": "Объект ЮНЕСКО, построен в 1037 году Ярославом Мудрым",
+          "photoPaths": [],
+          "photoDescriptions": [],
+          "audioPaths": [],
+          "audioDescriptions": [],
+          "videoPaths": [],
+          "videoDescriptions": [],
+          "role": "start"
+        },
+        {
+          "coordinates": [50.4586, 30.519],
+          "id": "kyiv-churches-route-marker-2",
+          "name": "Андреевская церковь",
+          "address": "Андреевский спуск, 23, Киев",
+          "key": "",
+          "description": "Барокковый храм XVIII века по проекту Растрелли",
+          "photoPaths": [],
+          "photoDescriptions": [],
+          "audioPaths": [],
+          "audioDescriptions": [],
+          "videoPaths": [],
+          "videoDescriptions": [],
+          "role": "point"
+        },
+        {
+          "coordinates": [50.4564, 30.5225],
+          "id": "kyiv-churches-route-marker-3",
+          "name": "Михайловский Златоверхий",
+          "address": "ул. Трёхсвятительская, 6, Киев",
+          "key": "",
+          "description": "Восстановленный в 1999 году собор XII века",
+          "photoPaths": [],
+          "photoDescriptions": [],
+          "audioPaths": [],
+          "audioDescriptions": [],
+          "videoPaths": [],
+          "videoDescriptions": [],
+          "role": "point"
+        },
+        {
+          "coordinates": [50.4352, 30.5567],
+          "id": "kyiv-churches-route-marker-4",
+          "name": "Киево-Печерская лавра",
+          "address": "ул. Лаврская, 15, Киев",
+          "key": "",
+          "description": "Главная святыня православия, основана в 1051 году",
+          "photoPaths": [
+            "./storage/multimedia/photo/map/kyiv-churches-route/4/1.jpg"
+          ],
+          "photoDescriptions": ["Фото всей лавры с высоты птичьего полёта"],
+          "audioPaths": [],
+          "audioDescriptions": [],
+          "videoPaths": [],
+          "videoDescriptions": [],
+          "role": "end"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Регистрация | Кабинет Искателя</title>
+
+    <link rel="icon" th:href="@{/images/icon/al_vadud_vector_title.svg}" type="image/svg"/>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Orelega+One&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"/>
+    <link href="https://unpkg.com/boxicons@2.1.1/css/boxicons.min.css" rel="stylesheet"/>
+
+    <style>
+        /* --- Переменные из _base.scss --- */
+        :root {
+          --page-content-background-color: rgba(255, 255, 255, 0.1);
+          --page-popup-background-color: rgba(238, 226, 226, 0.5);
+          --page-popup-border-color: rgba(248, 240, 240, 0.6);
+          --modal-form-out-background-color: rgba(27, 26, 26, 0.7);
+          --btn-hover-background-color: rgba(255, 255, 255, 0.15);
+          --backdrop-filter-blur: blur(8px);
+          --sb-cnt-backdrop-filter-blur: blur(30px);
+          --fornt-family-for-school-name: 'Lobster', sans-serif;
+          --fornt-family-for-title: 'Orelega One', serif;
+          --fornt-family-for-content: 'Jost', serif;
+          --page-text-color: rgb(255, 255, 255);
+          --page-text-color-hover: gold;
+          --box-sizing: border-box;
+          --z-index-for-background-media: -1;
+          --z-index-for-site-elements: 0;
+          --z-index-for-content: 1;
+          --z-index-for-forms: 10;
+          --z-index-for-icons-in-form: 20;
+          --marging-top-nav-bar-forms: 10vh;
+          --marging-left-logo-container: 17vw;
+          --form-element-focus-box-shadow: 0 3px 6px rgba(0, 0, 0, 0.13);
+          --form-element-focus-border: 2px solid rgb(255, 215, 0);
+          --al-vadud-text-color: red;
+          --pictures-cabinet-page-color: #fff;
+        }
+        *,
+        *::before,
+        *::after {
+          box-sizing: var(--box-sizing);
+        }
+        html {
+          height: 100%;
+        }
+        body {
+          display: flex;
+          position: relative;
+          flex-direction: column;
+          height: 100%;
+          margin: 0;
+          padding: 0;
+        }
+        body header {
+          display: block;
+          position: relative;
+          width: 100%;
+          height: 9%;
+        }
+        body main {
+          display: block;
+          flex-grow: 1;
+          position: relative;
+          width: 100%;
+          min-height: 82%;
+          overflow: auto;
+          margin: 0;
+        }
+        body #page-footer {
+          display: flex;
+          flex-direction: column;
+          gap: 1%;
+          width: 100%;
+          height: 9%;
+          padding-top: 1%;
+          padding-bottom: 2%;
+          background-color: var(--page-content-background-color);
+        }
+        .page-video {
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          z-index: var(--z-index-for-background-media);
+          width: 100%;
+          height: 100%;
+          overflow: hidden;
+        }
+        .page-video .video {
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
+          min-width: 100%;
+          min-height: 100%;
+        }
+
+        /* --- Стили для формы регистрации из _base.scss --- */
+        .registration-container {
+          position: fixed;
+          max-width: 80%;
+          width: 100%;
+          border-radius: 6px;
+          padding: 10px 15px;
+          margin: 30px 10% 0 10%;
+          background-color: rgba(255, 255, 255, 0.1);
+          box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+          font-family: 'Jost', sans-serif;
+          font-optical-sizing: auto;
+          z-index: var(--z-index-for-content);
+        }
+        .registration-container header {
+          position: relative;
+          font-size: 20px;
+          font-weight: 600;
+          color: #333;
+        }
+        .registration-container header::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          bottom: -2px;
+          height: 3px;
+          width: 27px;
+          border-radius: 8px;
+          background-color: #4070f4;
+        }
+        .registration-container form {
+          position: relative;
+          margin-top: 16px;
+          min-height: 490px;
+          overflow: visible;
+        }
+        .registration-container form .title {
+          display: block;
+          margin-bottom: 8px;
+          font-size: 16px;
+          font-weight: 500;
+          margin: 6px 0;
+          color: #333;
+        }
+         .registration-container form .title::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          bottom: -2px;
+          height: 3px;
+          width: 100px;
+          border-radius: 8px;
+          background-color: gold;
+        }
+        .registration-container form .fields {
+          display: flex;
+          align-items: center;
+          justify-content: left;
+          flex-wrap: wrap;
+        }
+        form .fields .input-field {
+          display: flex;
+          width: calc(100% / 3 - 15px);
+          flex-direction: column;
+          margin: 2px 5px;
+        }
+        .input-field label {
+          font-size: 15px;
+          font-weight: 500;
+          color: #2e2e2e;
+          margin: 0;
+        }
+        .input-field input,
+        select {
+          outline: none;
+          font-size: 14px;
+          font-weight: 400;
+          color: black;
+          border-radius: 5px;
+          border: 1px solid #aaa;
+          padding: 0 10px;
+          height: 42px;
+          margin: 5px 0;
+        }
+        .input-field input:focus,
+        .input-field select:focus {
+          box-shadow: var(--form-element-focus-box-shadow);
+          border: var(--form-element-focus-border);
+        }
+        .input-field select,
+        .input-field input[type='date'] {
+          color: #9b8e8e;
+        }
+        .input-field input[type='date']:valid,
+        .input-field select:valid {
+          color: #0a0a0a;
+        }
+        #sign-up-show-password,
+        #sign-up-hide-password {
+          top: 4.2vw;
+          right: 28vw;
+          position: absolute;
+          cursor: pointer;
+          z-index: var(--z-index-for-icons-in-form);
+        }
+        #sign-up-show-password { display: none; }
+        #sign-up-hide-password { display: block; }
+
+        .registration-container form button {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: 45px;
+          max-width: 200px;
+          width: 100%;
+          margin-top: 20px;
+          background: #fff;
+          color: #000;
+          font-weight: 600;
+          border: none;
+          padding: 12px 10px;
+          cursor: pointer;
+          border-radius: 3px;
+          font-size: 16px;
+          border: 2px solid transparent;
+          transition: 0.3s ease;
+        }
+        form button:hover {
+          color: #fff;
+          border-color: #fff;
+          background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Стили для автозаполнения города */
+        .suggestions {
+          position: absolute;
+          background-color: white;
+          border: 1px solid #ddd;
+          border-radius: 5px;
+          width: calc(100% / 3 - 25px);
+          margin-top: 80px;
+          z-index: var(--z-index-for-icons-in-form);
+          max-height: 150px;
+          overflow-y: auto;
+        }
+        .suggestions div {
+          padding: 8px;
+          cursor: pointer;
+          color: #333;
+        }
+        .suggestions div:hover {
+          background-color: #f0f0f0;
+        }
+    </style>
+</head>
+
+<body class="page-user-sign-up">
+<div class="page-video">
+    <video class="video" controls loop="loop" autoplay muted th:poster="@{/images/fly_on_clouds.jpg}">
+        <source th:src="@{/video/fly_on_clouds.mp4}" type="video/mp4" />
+        <source th:src="@{/video/fly_on_clouds.webm}" type="video/webm" />
+    </video>
+</div>
+
+<header id="page-header" th:insert="~{fragments/header :: header}"></header>
+
+<main>
+    <div class="registration-container">
+        <header>Регистрация</header>
+
+        <form action="#">
+            <div class="form first">
+                <div class="details personal">
+                    <header class="title">Персональные данные</header>
+
+                    <div class="fields">
+                        <div class="input-field">
+                            <label>Имя пользователя</label>
+                            <input type="text" placeholder="Введите имя пользователя" required/>
+                        </div>
+
+                        <div class="input-field">
+                            <label>Пароль</label>
+                            <input id="sign-up-pass" type="password" placeholder="Введите пароль" required/>
+                            <i class="fa fa-eye fa-xs" id="sign-up-show-password"></i>
+                            <i class="fa fa-eye-slash fa-xs" id="sign-up-hide-password"></i>
+                        </div>
+
+                        <div class="input-field">
+                            <label>Email</label>
+                            <input type="email" placeholder="Введите свой email" required/>
+                        </div>
+
+                        <div class="input-field">
+                            <label>Имя</label>
+                            <input type="text" placeholder="Введите своё имя" required />
+                        </div>
+
+                        <div class="input-field">
+                            <label>Фамилия</label>
+                            <input type="text" placeholder="Введите свою фамилию" required />
+                        </div>
+
+                        <div class="input-field">
+                            <label>Дата рождения</label>
+                            <input type="date" placeholder="Введите свой день рождения" required/>
+                        </div>
+
+                        <div class="input-field">
+                            <label>Номер телефона</label>
+                            <input id="phone-number" type="tel" placeholder="+380664988869" />
+                        </div>
+
+                        <div class="input-field">
+                            <label>Пол</label>
+                            <select required>
+                                <option disabled selected>Выберите свой пол</option>
+                                <option>Мужской</option>
+                                <option>Женский</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="details ID">
+                    <header class="title">Дополнительные данные</header>
+
+                    <div class="fields">
+                        <div class="input-field">
+                            <label>Аватар</label>
+                            <input type="file" placeholder="Загрузите фото на аватар" />
+                        </div>
+
+                        <div class="input-field">
+                            <label>Место нахождения</label>
+                            <input id="resident-city" type="text" placeholder="Начните вводить город..."/>
+                            <div id="suggestions" class="suggestions"></div>
+                        </div>
+
+                        <div class="input-field">
+                            <label>Дата начала учёбы в Школе</label>
+                            <input type="date" required />
+                        </div>
+
+                        <div class="input-field">
+                            <label>Ваш куратор</label>
+                            <select required>
+                                <option disabled selected>Выберите своего куратора</option>
+                                <option>Руслан Жуковец</option>
+                                <option>Алексей Киселёв</option>
+                                <option>Александр Циганков</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button class="nextBtn" type="submit">
+                        <span class="btnText">Зарегистрироваться</span>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</main>
+
+<footer id="page-footer" th:insert="~{fragments/footer :: footer}"></footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.bundle.min.js"></script>
+<script src="https://kit.fontawesome.com/d6a7640edd.js" crossorigin="anonymous"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      // --- Логика из initFragments.js (для хедера) ---
+
+      // Эта часть кода нужна, если хедер будет загружен на страницу.
+      // Thymeleaf вставит его статически, поэтому скрипты должны найти эти элементы.
+      function initHeaderJS() {
+          const userEmail = 'True_Finder@mystic-school.ru';
+          const userPassword = 'incompleteness2025';
+
+          const alVadudIcon = document.querySelector('.al-vadud');
+          const shcoolName = document.querySelector('.school-name');
+          if(alVadudIcon && shcoolName) {
+              alVadudIcon.addEventListener('mouseenter', () => changeLogoColor(true));
+              alVadudIcon.addEventListener('mouseleave', () => changeLogoColor(false));
+              shcoolName.addEventListener('mouseenter', () => changeLogoColor(true));
+              shcoolName.addEventListener('mouseleave', () => changeLogoColor(false));
+          }
+
+          function changeLogoColor(isFocuse) {
+              if (isFocuse) {
+                  shcoolName.style.color = 'gold';
+                  alVadudIcon.style.fill = 'gold';
+              } else {
+                  shcoolName.style.color = 'red';
+                  alVadudIcon.style.fill = 'red';
+              }
+          }
+
+          const searchToggle = document.querySelector('.searchToggle');
+          if(searchToggle) {
+              searchToggle.addEventListener('click', () => {
+                  searchToggle.classList.toggle('active');
+              });
+          }
+
+          // ... (остальной код для хедера, если он будет на этой странице)
+      }
+
+      // --- Логика из main.js (для страницы регистрации) ---
+
+      // Изменение видимости пароля в форме регистрации
+      const signUpShowPassIcon = document.querySelector('#sign-up-show-password');
+      const signUpHidePassIcon = document.querySelector('#sign-up-hide-password');
+      const signUpInputPass = document.querySelector('#sign-up-pass');
+
+      if (signUpShowPassIcon) {
+          signUpShowPassIcon.addEventListener('click', () => {
+              signUpInputPass.setAttribute('type', 'password');
+              signUpShowPassIcon.style.display = 'none';
+              signUpHidePassIcon.style.display = 'block';
+          });
+      }
+
+      if (signUpHidePassIcon) {
+          signUpHidePassIcon.addEventListener('click', () => {
+              signUpInputPass.setAttribute('type', 'text');
+              signUpShowPassIcon.style.display = 'block';
+              signUpHidePassIcon.style.display = 'none';
+          });
+      }
+
+      // АВТОЗАПОЛНЕНИЕ НАЗВАНИЯ ГОРОДА
+      const input = document.getElementById('resident-city');
+      const suggestionsContainer = document.getElementById('suggestions');
+      const cache = new Map();
+      let debounceTimeout;
+
+      function debounce(func, delay) {
+          return function (...args) {
+              clearTimeout(debounceTimeout);
+              debounceTimeout = setTimeout(() => func.apply(this, args), delay);
+          };
+      }
+
+      function detectLanguage(query) {
+          const cyrillicPattern = /[\u0400-\u04FF]/;
+          return cyrillicPattern.test(query) ? 'ru' : 'en';
+      }
+
+      async function fetchCitySuggestions(query) {
+          if (!query || query.length < 2) {
+              suggestionsContainer.innerHTML = '';
+              return;
+          }
+          const lang = detectLanguage(query);
+          if (cache.has(query)) {
+              displaySuggestions(cache.get(query));
+              return;
+          }
+          try {
+              const response = await fetch(
+                  `https://nominatim.openstreetmap.org/search?format=geocodejson&q=${encodeURIComponent(query)}&addressdetails=1&limit=5&accept-language=${lang}`
+              );
+              const data = await response.json();
+              const features = data.features || [];
+              cache.set(query, features);
+              displaySuggestions(features);
+          } catch (error) {
+              console.error('Ошибка при получении данных с Nominatim API:', error);
+          }
+      }
+
+      function displaySuggestions(suggestions) {
+          suggestionsContainer.innerHTML = '';
+          if (suggestions.length === 0) {
+              return;
+          }
+          const fragment = document.createDocumentFragment();
+          suggestions.forEach(suggestion => {
+              const cityName = suggestion.properties?.geocoding?.name || '';
+              const country = suggestion.properties?.geocoding?.country || '';
+              const displayName = suggestion.properties?.geocoding?.label || '';
+
+              if (cityName && country) {
+                  const suggestionItem = document.createElement('div');
+                  suggestionItem.textContent = `${cityName}, ${country}`;
+                  suggestionItem.addEventListener('click', () => {
+                      input.value = displayName;
+                      suggestionsContainer.innerHTML = '';
+                  });
+                  fragment.appendChild(suggestionItem);
+              }
+          });
+          suggestionsContainer.appendChild(fragment);
+      }
+
+      if (input) {
+          input.addEventListener('input', debounce(() => {
+              const query = input.value.trim();
+              fetchCitySuggestions(query);
+          }, 300));
+
+          document.addEventListener('click', e => {
+              if (!e.target.closest('.input-field')) {
+                  suggestionsContainer.innerHTML = '';
+              }
+          });
+      }
+
+      // Вызываем инициализацию JS для хедера
+      initHeaderJS();
+    });
+</script>
+</body>
+</html>

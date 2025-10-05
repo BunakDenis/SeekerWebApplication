@@ -1,0 +1,440 @@
+{
+  "routes": [
+    {
+      "routeCity": "г. Москва",
+      "routeName": "Обретение совершенства",
+      "routeDescription": "<p>Это пешеходный маршрут, который располагается в Москве, рядом со станцией метро Новослободская (выход №1). <br />Один круг этого маршрута равен примерно 2 км. Не забываем про запись <a href=\"https://mystic-school.ru/pilgrim\">на паломничество.</a></p> <p>Если вы записались на маршрут к определённому времени и в точке начала встретили кого-то из наших – ничего страшного, у вас будет запас времени, чтобы дождаться, пока этот человек уйдёт. Если вы пойдёте по часовой стрелке, то можете попробовать договориться, выяснить, сколько другой человек собирается стоять на точках и дать ему фору по времени в 10-30 минут. Если пойдёте против часовой, то здесь достаточно дождаться пока человек просто уйдёт с точки начала.</p> <p>Маршрут достижения Совершенства можно проходить двумя способами:</p> <ul><li>Для обретения совершенства разных качеств (идём по часовой стрелке)</li> <li>Для избавление от каких-либо качеств (идём против часовой стрелки)</li></ul> <p><strong>Первый способ</strong> включает в себя точку начала, где нужно произносить ключ перед заходом на новый круг и 7 точек, на каждой из которых нужно произносить ключ и стоять открывшись от 5 до 15 минут.</p> <p><strong>Второй способ</strong> включает только точку начала, где нужно произносить ключ перед заходом на новый круг. Подробное описание каждого из способов прохождения будет ниже.</p> <br /><p>Основные правила:</p><ul><li>Маршрут проходится по одиночке, идти друг за другом нужно в идеале с интервалом не менее 30 минут.</li> <li>Это непрерывный маршрут, поэтому останавливаться, кроме как на точках, на нём нельзя. Вы идете не прерывая его, один круг. На маршруте обретения, вы можете отдохнуть после одного круга не более 10 минут (сходить в туалет, съесть что-то быстро), на маршруте избавления – не более 5 минут. Вы не можете пойти и сесть в кафе на час, а потом пойти на новый круг.</li> <li>На точках обретения совершенства нужно стоять минимум 5 минут, максимум 15 минут.</li> <li>Пройти можно только нечётное количество кругов: 1, 3, 5 или 7. Каждый раз при заходе на новый круг в точке начала повторяем ключ.</li> <li>За один день нельзя проходить этот маршрут двумя способами (для обретения и для избавления).</li> <p>Важно понимать, что когда вы приходите на точку начала и проговариваете ключ, вы заключаете с Господом контракт. И теперь, либо вы должны следовать всем правилам прохождения этого маршрута, либо, если вы нарушили какое-то из них, то у Него нет обязательств перед вами и маршрут не будет работать.</p> <p>На этой же точке круг считается пройденным. Перед заходом на новый круг вы можете отдохнуть не более 10 минут (сходить в туалет, съесть что-то быстро)</p>.<p>Если собираемся на новый круг, проговариваем ключ к точке начала.</p>",
+      "routeBriefDescription": "<p>Для обретения совершенства разных качеств вы ходите по часовой стрелке.<br /> На разных точках (кроме точки начала) можно стоять по-разному, но всегда это минимум 5 минут, максимум 15 минут. Если вы чувствуете, что вам не хватает, к примеру, доверия, можно стоять 15 минут на точке Доверия, а на других точках меньше по времени, но пройти всё равно надо все точки.<br /> Высшее достижение – 7 кругов, но это невозможно с первого раза. Вы можете обретать совершенство до обретения Совершенства, пока не почувствуете, что вам достаточно. Но вы должны понимать, что вам надо пройти 7 кругов в полном сознании, с полным чувствованием, с полным принятием. На 7 кругах вы можете стоять по 5 минут на каждой точке, и вы будете всё равно перегружены. И если вы сможете это выдержать, Господь вас отметит.</p>",
+      "routeComment": "Становимся на точку начала маршрута и произносим ключ. И каждый раз, начиная новый круг, вы повторяете ключ на точке начала маршрута.",
+      "routeId": "route-achieving-perfection",
+      "type": "polyline",
+      "shapeColor": "#EA5233",
+      "points": [
+        {
+          "coordinates": [55.779279, 37.601368],
+          "id": "route-achieving-perfection-1",
+          "name": "Начало маршрута/Конец маршрута",
+          "address": "станция метро Новослободская (выход №1) со стороны ул. Селезневская, на площадке перед входом в кафе Stars Coffee.",
+          "key": "Господи, проведи меня к совершенству. Дай мне совершенство моего уровня. Открой мне совершенство новых уровней. Господи, я приложу все усилия к тому, чтобы стать достойным (достойной) совершенства, и чтобы обрести его.",
+          "description": "",
+          "photoPaths": [
+            "./storage/multimedia/photo/map/achieving-perfection-route/startPoint/1.jpg",
+            "./storage/multimedia/photo/map/achieving-perfection-route/startPoint/2.jpg"
+          ],
+          "photoDescriptions": [
+            "Точка начала",
+            "Начало с другого ракурса и направление дальнейшего движения"
+          ],
+          "role": "start-end"
+        },
+        {
+          "coordinates": [55.779634, 37.602779],
+          "id": "route-achieving-perfection-2",
+          "name": "Промежуточная точка",
+          "address": "",
+          "key": "",
+          "description": "",
+          "photoPaths": [
+            "./storage/multimedia/photo/map/achieving-perfection-route/1-between/1.jpg",
+            "./storage/multimedia/photo/map/achieving-perfection-route/1-between/2.jpg"
+          ],
+          "photoDescriptions": [],
+          "role": "between-multimedia"
+        },
+        {
+          "coordinates": [55.779546, 37.602908],
+          "id": "route-achieving-perfection-3",
+          "name": "Промежуточная точка",
+          "address": "",
+          "key": "",
+          "description": "",
+          "photoPaths": [
+            "./storage/multimedia/photo/map/achieving-perfection-route/2-between/1.jpg"
+          ],
+          "photoDescriptions": [],
+          "role": "between-multimedia"
+        },
+        {
+          "coordinates": [55.780147, 37.604958],
+          "id": "route-achieving-perfection-4",
+          "name": "Точка совершенного Следования",
+          "address": "Пересечение ул. Селезневская и ул. Краснопролетарская",
+          "key": "Господи, научи меня совершенству следования, научи меня совершенству восприятия Твоих указаний. Господи, дай мне чувство, когда я отклоняюсь от Пути, возвращай меня на него, дай мне чувство правильного движения. Всё остальное, Господи, упорство, терпение и настойчивость, я обрету сам (сама).",
+          "description": "",
+          "photoPaths": [
+            "./storage/multimedia/photo/map/achieving-perfection-route/1/1.jpg",
+            "./storage/multimedia/photo/map/achieving-perfection-route/1/2.jpg"
+          ],
+          "photoDescriptions": [
+            "Точка совершенного Следования. Через дорогу напротив будет дерево, а за ним старенький музей МВД России.",
+            "Направление дальнейшего движения"
+          ],
+          "role": "point"
+        },
+        {
+          "coordinates": [55.779138, 37.605392],
+          "id": "route-achieving-perfection-5",
+          "name": "Промежуточная точка",
+          "address": "",
+          "key": "",
+          "description": "",
+          "photoPaths": [
+            "./storage/multimedia/photo/map/achieving-perfection-route/3-between/1.jpg",
+            "./storage/multimedia/photo/map/achieving-perfection-route/3-between/2.jpg",
+            "./storage/multimedia/photo/map/achieving-perfection-route/3-between/3.jpg"
+          ],
+          "photoDescriptions": [],
+          "role": "between-multimedia"
+        },
+        {
+          "coordinates": [55.778617, 37.605784],
+          "id": "route-achieving-perfection-6",
+          "name": "Точка совершенства Открытости",
+          "address": "ул. Краснопролетарская, на другой стороне дороги напротив дома №30с1",
+          "key": "Господи, открой меня для Себя. Господи, научи меня быть открытым (открытой) всегда для Твоего Ведения, для Твоей Воли, для Твоей Любви. Господи, научи меня быть открытым (открытой) внешним возможностям и внутренним состояниям. Господи, я открываюсь Тебе, владей мной!",
+          "description": "",
+          "photoPaths": [
+            "./storage/multimedia/photo/map/achieving-perfection-route/2/1.jpg",
+            "./storage/multimedia/photo/map/achieving-perfection-route/2/2.jpg"
+          ],
+          "photoDescriptions": [
+            "Точка совершенства Открытости. Через дорогу напротив будет серая дверь с буквами СКЛ, а чуть правее издательство Просвещение.",
+            "Точка с другого ракурса"
+          ],
+          "role": "point"
+        },
+        {
+          "coordinates": [55.778337, 37.605917],
+          "id": "route-achieving-perfection-7",
+          "name": "Промежуточная точка",
+          "address": "",
+          "key": "",
+          "description": "",
+          "photoPaths": [
+            "./storage/multimedia/photo/map/achieving-perfection-route/4-between/1.jpg",
+            "./storage/multimedia/photo/map/achieving-perfection-route/4-between/2.jpg"
+          ],
+          "photoDescriptions": [],
+          "role": "between-multimedia"
+        },
+        {
+          "coordinates": [55.777293, 37.606618],
+          "id": "route-achieving-perfection-8",
+          "name": "Точка совершенного Доверия",
+          "address": "ул. Краснопролетарская, на другой стороне дороги напротив дома №16с2",
+          "key": "Господи, научи меня полноте доверия, научи меня отстраняться от сомнений и проверять то, что Ты даешь мне, и идти за Тобой, и как бы я не сомневался (не сомневалась), получать опыт, а потом судить. Да будет так!",
+          "description": "",
+          "photoPaths": [
+            "./storage/multimedia/photo/map/achieving-perfection-route/3/1.jpg",
+            "./storage/multimedia/photo/map/achieving-perfection-route/3/2.jpg"
+          ],
+          "photoDescriptions": [
+            "Точка совершенного Доверия",
+            "Точка с другого ракурса. Прямо напротив подъезд №4, bodro coffee, F45."
+          ],
+          "role": "point"
+        },
+        {
+          "coordinates": [55.775603, 37.607579],
+          "id": "route-achieving-perfection-9",
+          "name": "Промежуточная точка",
+          "address": "",
+          "key": "",
+          "description": "",
+          "photoPaths": [
+            "./storage/multimedia/photo/map/achieving-perfection-route/5-between/1.jpg",
+            "./storage/multimedia/photo/map/achieving-perfection-route/5-between/2.jpg",
+            "./storage/multimedia/photo/map/achieving-perfection-route/5-between/3.jpg",
+            "./storage/multimedia/photo/map/achieving-perfection-route/5-between/4.jpg"
+          ],
+          "photoDescriptions": [],
+          "role": "between-multimedia"
+        },
+        {
+          "coordinates": [55.773877, 37.608433],
+          "id": "route-achieving-perfection-10",
+          "name": "Точка совершенства Любви",
+          "address": "ул. Краснопролетарская, на другой стороне дороги напротив дома №4",
+          "key": "Господи, научи меня любить и принимать. Научи меня открываться Твоей Любви. Научи меня выражать мою любовь. Научи меня не прятаться, не бояться и всегда принимать и свою любовь и Твою любовь, и любовь других людей, и давать любви пространство, и давать любви излияние. Да будет так!",
+          "description": "",
+          "photoPaths": [
+            "./storage/multimedia/photo/map/achieving-perfection-route/4/1.jpg"
+          ],
+          "photoDescriptions": [
+            "Точка совершенства Любви. Если поднимите голову – увидите фонарь. Прямо через дорогу синяя квадратная табличка с номером дома 2/4 строение 13."
+          ],
+          "role": "point"
+        },
+        {
+          "coordinates": [55.773457, 37.608656],
+          "id": "route-achieving-perfection-11",
+          "name": "Промежуточная точка",
+          "address": "",
+          "key": "",
+          "description": "",
+          "photoPaths": [
+            "./storage/multimedia/photo/map/achieving-perfection-route/6-between/1.jpg",
+            "./storage/multimedia/photo/map/achieving-perfection-route/6-between/2.jpg",
+            "./storage/multimedia/photo/map/achieving-perfection-route/6-between/3.jpg"
+          ],
+          "photoDescriptions": [],
+          "role": "between-multimedia"
+        },
+        {
+          "coordinates": [55.773191, 37.605491],
+          "id": "route-achieving-perfection-12",
+          "name": "Промежуточная точка",
+          "address": "",
+          "key": "",
+          "description": "",
+          "photoPaths": [
+            "./storage/multimedia/photo/map/achieving-perfection-route/7-between/1.jpg",
+            "./storage/multimedia/photo/map/achieving-perfection-route/7-between/2.jpg"
+          ],
+          "photoDescriptions": [],
+          "role": "between-multimedia"
+        },
+        {
+          "coordinates": [55.773058, 37.60466],
+          "id": "route-achieving-perfection-13",
+          "name": "Точка совершенства Веры",
+          "address": "пересечение Оружейного переулка и улицы Долгоруковской",
+          "key": "Господи, научи меня совершенству Веры. Научи меня верить в Твоё Могущество. Научи меня вере в высочайшие чудеса. Научи меня вере в Себя и в меня. Научи меня вере в то, что я смогу достигнуть величайшего. Дай мне такую крепость веры, какую не пошатнут никакие сомнения. Дай мне веру, которая поможет сбыванию всех моих молитв. Дай мне веру, которая будет двигать горы и двигать меня. Да будет так!",
+          "description": "",
+          "photoPaths": [
+            "./storage/multimedia/photo/map/achieving-perfection-route/5/1.jpg",
+            "./storage/multimedia/photo/map/achieving-perfection-route/5/2.jpg",
+            "./storage/multimedia/photo/map/achieving-perfection-route/5/3.jpg"
+          ],
+          "photoDescriptions": [
+            "<b>ВНИМАНИЕ:</b> этого столба больше нет, ориентируйтесь по фотографии. Точка совершенства Веры работает и без столба",
+            "Точка с другого ракурса и дальнейший маршрут"
+          ],
+          "role": "point"
+        },
+        {
+          "coordinates": [55.774225, 37.604205],
+          "id": "route-achieving-perfection-14",
+          "name": "Промежуточная точка",
+          "address": "",
+          "key": "",
+          "description": "",
+          "photoPaths": [
+            "./storage/multimedia/photo/map/achieving-perfection-route/8-between/1.jpg",
+            "./storage/multimedia/photo/map/achieving-perfection-route/8-between/2.jpg",
+            "./storage/multimedia/photo/map/achieving-perfection-route/8-between/3.jpg"
+          ],
+          "photoDescriptions": [],
+          "role": "between-multimedia"
+        },
+        {
+          "coordinates": [55.774993, 37.604064],
+          "id": "route-achieving-perfection-15",
+          "name": "Точка совершенства Преданности",
+          "address": "ул. Долгоруковская, д.4",
+          "key": "Господи, научи меня такой преданности, когда я не отступлю, не сломлюсь и выполню всё, что обещал (обещала), и всё что должен (должна), когда я смогу всегда делать необходимое, всегда помнить Тебя и всегда пребывать в близости с Тобой. Да будет так!",
+          "description": "",
+          "photoPaths": [
+            "./storage/multimedia/photo/map/achieving-perfection-route/6/1.jpg",
+            "./storage/multimedia/photo/map/achieving-perfection-route/6/2.jpg"
+          ],
+          "photoDescriptions": [
+            "Точка совершенства Преданности",
+            "Точка с другого ракурса и дальнейший маршрут"
+          ],
+          "role": "point"
+        },
+        {
+          "coordinates": [55.77619, 37.603234],
+          "id": "route-achieving-perfection-16",
+          "name": "Промежуточная точка",
+          "address": "",
+          "key": "",
+          "description": "",
+          "photoPaths": [
+            "./storage/multimedia/photo/map/achieving-perfection-route/9-between/1.jpg",
+            "./storage/multimedia/photo/map/achieving-perfection-route/9-between/2.jpg"
+          ],
+          "photoDescriptions": [],
+          "role": "between-multimedia"
+        },
+        {
+          "coordinates": [55.777254, 37.602559],
+          "id": "route-achieving-perfection-17",
+          "name": "Точка совершенства Сдачи",
+          "address": "ул. Долгоруковская, д.34с1, середина",
+          "key": "Господи, научи меня самоотдаче. Научи меня самоотверженности. Господи, научи меня отдавать себя Тебе тогда, когда я Тебе нужен (нужна). Господи, призывай меня, я буду откликаться. Господи, учи меня тому, как отстраняться от себя и принимать Тебя как себя, и отдавать себя Тебе. Да будет так!",
+          "description": "",
+          "photoPaths": [
+            "./storage/multimedia/photo/map/achieving-perfection-route/7/1.jpg",
+            "./storage/multimedia/photo/map/achieving-perfection-route/7/2.jpg"
+          ],
+          "photoDescriptions": [
+            "Точка совершенства Сдачи",
+            "Точка с другого ракурса. Прямо через дорогу \"цветочный маркет\" и \"товары из индии\"."
+          ],
+          "role": "point"
+        },
+        {
+          "coordinates": [55.777987, 37.60209],
+          "id": "route-achieving-perfection-18",
+          "name": "Промежуточная точка",
+          "address": "",
+          "key": "",
+          "description": "",
+          "photoPaths": [
+            "./storage/multimedia/photo/map/achieving-perfection-route/10-between/1.jpg",
+            "./storage/multimedia/photo/map/achieving-perfection-route/10-between/2.jpg"
+          ],
+          "photoDescriptions": [],
+          "role": "between-multimedia"
+        },
+        {
+          "coordinates": [55.779279, 37.601368],
+          "id": "route-achieving-perfection-19",
+          "name": "Начало маршрута/Конец маршрута",
+          "address": "станция метро Новослободская (выход №1) со стороны ул. Селезневская, на площадке перед входом в кафе Stars Coffee.",
+          "key": "Господи, проведи меня к совершенству. Дай мне совершенство моего уровня. Открой мне совершенство новых уровней. Господи, я приложу все усилия к тому, чтобы стать достойным (достойной) совершенства, и чтобы обрести его.",
+          "description": "",
+          "photoPaths": [],
+          "photoDescriptions": [],
+          "role": "start-end"
+        }
+      ]
+    },
+    {
+      "routeCity": "г. Москва",
+      "routeName": "Избавления от качеств, которые мешают",
+      "routeDescription": "<p>Это пешеходный маршрут, который располагается в Москве, рядом со станцией метро Новослободская (выход №1). <br />Один круг этого маршрута равен примерно 2 км. Не забываем про запись <a href=\"https://mystic-school.ru/pilgrim\">на паломничество.</a></p> <p>Если вы записались на маршрут к определённому времени и в точке начала встретили кого-то из наших – ничего страшного, у вас будет запас времени, чтобы дождаться, пока этот человек уйдёт. Если вы пойдёте по часовой стрелке, то можете попробовать договориться, выяснить, сколько другой человек собирается стоять на точках и дать ему фору по времени в 10-30 минут. Если пойдёте против часовой, то здесь достаточно дождаться пока человек просто уйдёт с точки начала.</p> <p>Маршрут достижения Совершенства можно проходить двумя способами:</p> <ul><li>Для обретения совершенства разных качеств (идём по часовой стрелке)</li> <li>Для избавление от каких-либо качеств (идём против часовой стрелки)</li></ul> <p><strong>Первый способ</strong> включает в себя точку начала, где нужно произносить ключ перед заходом на новый круг и 7 точек, на каждой из которых нужно произносить ключ и стоять открывшись от 5 до 15 минут.</p> <p><strong>Второй способ</strong> включает только точку начала, где нужно произносить ключ перед заходом на новый круг. Подробное описание каждого из способов прохождения будет ниже.</p> <br /><p>Основные правила:</p><ul><li>Маршрут проходится по одиночке, идти друг за другом нужно в идеале с интервалом не менее 30 минут.</li> <li>Это непрерывный маршрут, поэтому останавливаться, кроме как на точках, на нём нельзя. Вы идете не прерывая его, один круг. На маршруте обретения, вы можете отдохнуть после одного круга не более 10 минут (сходить в туалет, съесть что-то быстро), на маршруте избавления – не более 5 минут. Вы не можете пойти и сесть в кафе на час, а потом пойти на новый круг.</li> <li>На точках обретения совершенства нужно стоять минимум 5 минут, максимум 15 минут.</li> <li>Пройти можно только нечётное количество кругов: 1, 3, 5 или 7. Каждый раз при заходе на новый круг в точке начала повторяем ключ.</li> <li>За один день нельзя проходить этот маршрут двумя способами (для обретения и для избавления).</li> <p>Важно понимать, что когда вы приходите на точку начала и проговариваете ключ, вы заключаете с Господом контракт. И теперь, либо вы должны следовать всем правилам прохождения этого маршрута, либо, если вы нарушили какое-то из них, то у Него нет обязательств перед вами и маршрут не будет работать.</p> <p>На этой же точке круг считается пройденным. Перед заходом на новый круг вы можете отдохнуть не более 10 минут (сходить в туалет, съесть что-то быстро)</p>.<p>Если собираемся на новый круг, проговариваем ключ к точке начала.",
+      "routeBriefDescription": "<p>Для избавления от мешающих вам качеств вы идете по маршруту достижения Совершенства против часовой стрелки, не заходя на точки, а только произнеся ключ в точке начала, перед каждым заходом на новый круг. Точка начала здесь отличается от варианта с обретением совершенства.</p>",
+      "routeComment": "Вы должны быть готовы к избавлению, вы должны быть достаточно преданными, желающими того, чтобы Господь помог вам. Это символический круг, который вы совершаете после того, как произносите ключ. Вы должны открыться, и пойдет энергия и вы, в ощущении этой энергии, идёте средним темпом, не очень медленно и не очень быстро, по ощущениям. Вы проходите круг и возвращаетесь на точку начала. И если вы чувствуете себя переполненными, вы заканчиваете. Если вы чувствуете, что прошли недостаточно, вы можете пройти еще два круга. Считается только нечетное количество кругов: 1, 3, 5, 7, но за 7 кругов вы должны избавляться от чего-то настолько вам мешающего, настолько вредного, что Господь вас действительно изменит. Прохождение кругов не гарантирует вам полное избавление, это зависит от вашего настроя, состояния. И обычно те, кто приходит на эти круги, они не слишком готовы, иначе они избавились бы от того, что им мешает, сами. После прохождения каждого круга можно делать перерыв не более 5 минут (сходить в туалет, купить пирожок и съесть его на ходу). Но если вы пройдете 7 кругов, что будет очень трудно, то вы избавитесь.",
+      "routeId": "getting-rid-of-qualities-that-interfere",
+      "type": "polyline",
+      "shapeColor": "#29A39F",
+      "points": [
+        {
+          "coordinates": [55.77894, 37.60156],
+          "id": "getting-rid-of-qualities-that-interfere-1",
+          "name": "Начало маршрута/Конец маршрута",
+          "address": "ул. Долгоруковская, д.40",
+          "key": "Господи, избавь меня от … (называете от одного до трёх своих качеств)",
+          "description": "",
+          "photoPaths": [
+            "./storage/multimedia/photo/map/getting-rid-of-qualities-that-interfere/startPoint/1.jpg",
+            "./storage/multimedia/photo/map/getting-rid-of-qualities-that-interfere/startPoint/2.jpg"
+          ],
+          "photoDescriptions": [
+            "Точка начала",
+            "Точка с другого ракурса и направление движения"
+          ],
+          "role": "start-end"
+        },
+        {
+          "coordinates": [55.777987, 37.60206],
+          "id": "getting-rid-of-qualities-that-interfere-2",
+          "name": "Промежуточная точка",
+          "address": "",
+          "key": "",
+          "description": "",
+          "photoPaths": [],
+          "photoDescriptions": [],
+          "role": "between"
+        },
+        {
+          "coordinates": [55.77619, 37.60317],
+          "id": "getting-rid-of-qualities-that-interfere-3",
+          "name": "Промежуточная точка",
+          "address": "",
+          "key": "",
+          "description": "",
+          "photoPaths": [],
+          "photoDescriptions": [],
+          "role": "between"
+        },
+        {
+          "coordinates": [55.773095, 37.604541],
+          "id": "getting-rid-of-qualities-that-interfere-4",
+          "name": "Промежуточная точка",
+          "address": "",
+          "key": "",
+          "description": "",
+          "photoPaths": [],
+          "photoDescriptions": [],
+          "role": "between"
+        },
+        {
+          "coordinates": [55.773457, 37.608596],
+          "id": "getting-rid-of-qualities-that-interfere-5",
+          "name": "Промежуточная точка",
+          "address": "",
+          "key": "",
+          "description": "",
+          "photoPaths": [],
+          "photoDescriptions": [],
+          "role": "between"
+        },
+        {
+          "coordinates": [55.775603, 37.607519],
+          "id": "getting-rid-of-qualities-that-interfere-6",
+          "name": "Промежуточная точка",
+          "address": "",
+          "key": "",
+          "description": "",
+          "photoPaths": [],
+          "photoDescriptions": [],
+          "role": "between"
+        },
+        {
+          "coordinates": [55.778337, 37.605857],
+          "id": "getting-rid-of-qualities-that-interfere-7",
+          "name": "Промежуточная точка",
+          "address": "",
+          "key": "",
+          "description": "",
+          "photoPaths": [],
+          "photoDescriptions": [],
+          "role": "between"
+        },
+        {
+          "coordinates": [55.780191, 37.605009],
+          "id": "getting-rid-of-qualities-that-interfere-8",
+          "name": "Промежуточная точка",
+          "address": "",
+          "key": "",
+          "description": "",
+          "photoPaths": [],
+          "photoDescriptions": [],
+          "role": "between"
+        },
+        {
+          "coordinates": [55.779214, 37.601826],
+          "id": "getting-rid-of-qualities-that-interfere-9",
+          "name": "Промежуточная точка",
+          "address": "",
+          "key": "",
+          "description": "",
+          "photoPaths": [],
+          "photoDescriptions": [],
+          "role": "between"
+        },
+        {
+          "coordinates": [55.77894, 37.60156],
+          "id": "getting-rid-of-qualities-that-interfere-10",
+          "name": "Начало маршрута/Конец маршрута",
+          "address": "ул. Долгоруковская, д.40",
+          "key": "Господи, избавь меня от … (называете от одного до трёх своих качеств)",
+          "description": "",
+          "photoPaths": [
+            "./storage/multimedia/photo/map/getting-rid-of-qualities-that-interfere/startPoint/1.jpg",
+            "./storage/multimedia/photo/map/getting-rid-of-qualities-that-interfere/startPoint/2.jpg"
+          ],
+          "photoDescriptions": [
+            "Точка начала",
+            "Точка с другого ракурса и направление движения"
+          ],
+          "role": "start-end"
+        }
+      ]
+    }
+  ]
+}

@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-@Data
 @Slf4j
 @RequiredArgsConstructor
 public class StartCommandHandlerImpl implements CommandHandler {
@@ -78,6 +77,6 @@ public class StartCommandHandlerImpl implements CommandHandler {
                     log.error("Ошибка получения текущего User {}", err.getMessage(), err);
                     return Mono.just(new SendMessage(Long.toString(chatId), ""));
                 })
-                .doFinally(signalType -> log.debug("Конец метода apply: {}", signalType));
+                .doFinally(signalType -> log.debug("StartCommandImpl конец метода apply: {}", signalType));
     }
 }

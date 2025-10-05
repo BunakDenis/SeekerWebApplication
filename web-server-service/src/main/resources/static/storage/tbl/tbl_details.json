@@ -1,0 +1,25 @@
+{
+    "will": [ {
+                "name" : "will",
+                "titles" : [
+                            
+                                {
+                                    "id" : "will-incoming-date",
+                                    "name" : "Дата получения"
+                
+                                },
+                                {
+                                    "id" : "will-brief-description",
+                                    "name" : "Краткое описание"
+                
+                                },
+                                {
+                                    "id" : "will-comment",
+                                    "name" : "Коментарии"
+                
+                                }
+                            
+                        ]
+}
+]
+}

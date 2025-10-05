@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<div th:fragment="footer">
+    <div class="social">
+    </div>
+    <p class="copyright">
+        «Восходящий Поток» &copy; 2015 — <span th:text="${#dates.year(#dates.createNow())}"></span>
+    </p>
+</div>
+</body>
+</html>

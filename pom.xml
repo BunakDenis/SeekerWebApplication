@@ -7,12 +7,12 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.2.0</version>
+		<version>3.5.6</version>
 		<relativePath/>
 	</parent>
 
 	<groupId>com.example</groupId>
-	<artifactId>TruthSeekerOffice</artifactId>
+	<artifactId>SeekerOffice</artifactId>
 	<version>1.0.1</version>
 	<packaging>pom</packaging>
 
@@ -22,7 +22,8 @@
 		<module>useful-tools</module>
 		<module>telegram-bot-service</module>
         <module>data-provider-service</module>
-	</modules>
+        <module>web-server-service</module>
+    </modules>
 
 	<properties>
 		<java.version>17</java.version>
