@@ -15,7 +15,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css"/>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"/>
-    <link href="https://unpkg.com/boxicons@2.1.1/css/boxicons.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
 
     <style>
         /* --- Переменные из _base.scss --- */
@@ -44,6 +46,11 @@
           --form-element-focus-border: 2px solid rgb(255, 215, 0);
           --al-vadud-text-color: red;
           --pictures-cabinet-page-color: #fff;
+
+          --nav-text-color: #fff;
+          --nav-hover-color: #ffd700;
+          --glass-bg: rgba(255, 255, 255, 0.2);
+          --glass-blur: blur(8px);
         }
         *,
         *::before,
@@ -61,27 +68,23 @@
           margin: 0;
           padding: 0;
         }
-        body header {
-          display: block;
-          position: relative;
-          width: 100%;
-          height: 9%;
-        }
+
         body main {
           display: block;
           flex-grow: 1;
           position: relative;
           width: 100%;
-          min-height: 82%;
-          overflow: auto;
+          height: 92%;
+          max-height: 92%;
+          overflow-x: auto;
           margin: 0;
         }
-        body #page-footer {
+        body footer {
           display: flex;
           flex-direction: column;
           gap: 1%;
           width: 100%;
-          height: 9%;
+          height: 4%;
           padding-top: 1%;
           padding-bottom: 2%;
           background-color: var(--page-content-background-color);
@@ -112,7 +115,7 @@
           width: 100%;
           border-radius: 6px;
           padding: 10px 15px;
-          margin: 30px 10% 0 10%;
+          margin: 5% 10% 5% 10%;
           background-color: rgba(255, 255, 255, 0.1);
           box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
           font-family: 'Jost', sans-serif;
@@ -242,22 +245,81 @@
         .suggestions {
           position: absolute;
           background-color: white;
-          border: 1px solid #ddd;
           border-radius: 5px;
-          width: calc(100% / 3 - 25px);
+
+          width: calc(100% / 3 - 15px);
+
           margin-top: 80px;
+
           z-index: var(--z-index-for-icons-in-form);
-          max-height: 150px;
-          overflow-y: auto;
         }
+
         .suggestions div {
-          padding: 8px;
           cursor: pointer;
-          color: #333;
         }
-        .suggestions div:hover {
-          background-color: #f0f0f0;
-        }
+
+        /* Стили header */
+
+header .navbar-brand .al-vadud {
+  width: auto;
+  height: 30px;
+
+  fill: var(--al-vadud-text-color);
+
+  -webkit-transition: var(--transition--all--04-ease);
+  -o-transition: var(--transition--all--04-ease);
+  transition: var(--transition--all--04-ease);
+}
+
+.navbar-brand .school-name {
+  color: var(--al-vadud-text-color);
+  font-family: var(--fornt-family-for-school-name);
+  font-weight: 100;
+  font-style: normal;
+  font-size: 1.2rem;
+}
+
+.navbar-nav .nav-link {
+  color: var(--nav-text-color) !important;
+  font-family: var(--fornt-family-for-school-name);
+  font-weight: 100;
+  font-style: normal;
+  font-size: 1.2rem;
+}
+
+.navbar-nav .nav-link:hover {
+  color: var(--nav-hover-color) !important;
+}
+
+.bg-glass {
+  background-color: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.75rem;
+}
+
+header i {
+  cursor: pointer;
+
+  -webkit-transition: var(--transition--all--04-ease);
+  -o-transition: var(--transition--all--04-ease);
+  transition: var(--transition--all--04-ease);
+}
+
+header i:hover,
+header i:focus {
+  color: var(--nav-hover-color);
+}
+
+.modal-content {
+  color: black;
+}
+
+.badge {
+  font-size: 0.6rem;
+}
+
     </style>
 </head>
 
@@ -269,7 +331,7 @@
     </video>
 </div>
 
-<header id="page-header" th:insert="~{fragments/header :: header}"></header>
+<header id="page-header" th:replace="~{fragments/header :: header}"></header>
 
 <main>
     <div class="registration-container">
@@ -277,7 +339,7 @@
 
         <form action="#">
             <div class="form first">
-                <div class="details personal">
+                <div class="details-personal">
                     <header class="title">Персональные данные</header>
 
                     <div class="fields">
@@ -329,7 +391,7 @@
                     </div>
                 </div>
 
-                <div class="details ID">
+                <div class="user-details">
                     <header class="title">Дополнительные данные</header>
 
                     <div class="fields">
