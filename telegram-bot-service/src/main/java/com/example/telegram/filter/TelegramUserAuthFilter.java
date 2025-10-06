@@ -96,10 +96,21 @@ public class TelegramUserAuthFilter implements WebFilter {
                 .doOnError(err -> log.error("Ошибка в фильтре аутентификации - {}", err.getMessage(), err))
                 .onErrorResume(err -> {
 
-                    if (err instanceof WebClientRequestException) log.debug("WebClientRequestException");
-                    sender.sendMessage(
-                            UpdateUtilsService.getChatId(update),
-                            WarnMessageProvider.getSorryMsg("бот временно недоступен, попробуйте написать позже!")
+                    if (err instanceof WebClientRequestException) {
+                        log.debug("WebClientRequestException");
+                        sender.sendMessage(
+                                UpdateUtilsService.getChatId(update),
+                                WarnMessageProvider.getSorryMsg("бот временно недоступен, попробуйте написать позже!")
+                        );
+                    }
+
+                    if (err instanceof NullPointerException)
+                        return appFilterService.writeJsonErrorResponse(
+                            exchange.getResponse(),
+                            HttpStatus.BAD_REQUEST,
+                            ApiResponseUtilsService.fail(
+                                    ResponseMessageProvider.REQUEST_BODY_DO_NOT_CONTAINS_TELEGRAM_UPDATE
+                            )
                     );
 
                     return appFilterService.writeJsonErrorResponse(
