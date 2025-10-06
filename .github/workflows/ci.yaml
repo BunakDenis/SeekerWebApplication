@@ -31,6 +31,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GH_TOKEN }}
 
+
       # Сборка и пуш образа telegram-bot-service
       - name: Build & push telegram-bot-service image
         id: build-push-telegram-bot
