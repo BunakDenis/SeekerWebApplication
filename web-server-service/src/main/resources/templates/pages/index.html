@@ -1,12 +1,13 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Главная | Кабинет Искателя</title>
     <link
       rel="icon"
-      href="/images/icon/al_vadud_vector_title.svg"
+      th:href="@{/images/icon/al_vadud_vector_title.svg}"
       type="image/svg"
     />
     <link
@@ -18,25 +19,28 @@
       href="https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css"
       rel="stylesheet"
     />
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+      <script defer th:src="@{/js/main.js}"></script>
+      <script type="module" th:src="@{/js/header.js}"></script>
   </head>
+
   <body class="main-page">
-    <div class="page-video">
-      <video
-        class="video"
-        controls
-        loop="loop"
-        autoplay=""
-        muted=""
-        poster="/images/fly_on_clouds.jpg"
-      >
-        <source src="/video/fly_on_clouds.mp4" type="video/mp4" />
-        <source src="/video/fly_on_clouds.webm" type="video/webm" />
+
+  <div class="page-video">
+      <video class="video" controls loop="loop" autoplay muted th:poster="@{/images/fly_on_clouds.jpg}">
+          <source th:src="@{/video/fly_on_clouds.mp4}" type="video/mp4" />
+          <source th:src="@{/video/fly_on_clouds.webm}" type="video/webm" />
       </video>
-    </div>
+  </div>
 
-    <header id="page-header"></header>
+  <div class="bg-image" id="body-bg-image"></div>
 
-    <main>
+  <header id="page-header" th:replace="~{../static/fragments/header :: header}"></header>
+
+  <main>
+
       <div class="greeding">
         <h1>Приветствуем, дорогие Искатели!</h1>
         <p>
@@ -44,16 +48,27 @@
           Работе над собой!
         </p>
       </div>
+
+      <footer id="page-footer" th:insert="~{../static/fragments/footer :: footer}"></footer>
+
     </main>
 
-    <footer id="page-footer"></footer>
+  <!-- Форма поиска по сайту -->
+  <div th:replace="~{../static/fragments/popups :: search-container}" class="search-container hide"></div>
+  <!-- Форма входа юзера -->
+  <div th:replace="~{../static/fragments/popups :: sign-in-container}" class="sign-in-container" id="sign-in-container"></div>
+  <!-- Форма информации про пользователя -->
+  <div th:replace="~{../static/fragments/popups :: user-information-container}" class="user-information-container" id="user-information-container"></div>
+  <!-- Форма уведомлений -->
+  <div th:replace="~{../static/fragments/popups :: notification-container}" class="notification-container"></div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.bundle.min.js"></script>
-    <script
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.bundle.min.js"></script>
+  <script
       src="https://kit.fontawesome.com/d6a7640edd.js"
       crossorigin="anonymous"
-    ></script>
-    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-    <script src="http://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.14/angular.min.js"></script>
+  ></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.14/angular.min.js"></script>
   </body>
+
 </html>

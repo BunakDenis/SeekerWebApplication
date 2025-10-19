@@ -1,0 +1,126 @@
+{
+    "version": "1.0",
+    "devices": [
+      {
+        "title": "iPhone 14 Pro",
+        "type": "phone",
+        "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+        "screen": {
+          "vertical": { "width": 430, "height": 932 },
+          "horizontal": { "width": 932, "height": 430 }
+        },
+        "deviceScaleFactor": 3,
+        "capabilities": ["touch", "mobile"],
+        "show-by-default": true
+      },
+      {
+        "title": "Google Pixel 8",
+        "type": "phone",
+        "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Mobile Safari/537.36",
+        "screen": {
+          "vertical": { "width": 412, "height": 915 },
+          "horizontal": { "width": 915, "height": 412 }
+        },
+        "deviceScaleFactor": 3,
+        "capabilities": ["touch", "mobile"],
+        "show-by-default": true
+      },
+      {
+        "title": "Samsung Galaxy S24",
+        "type": "phone",
+        "userAgent": "Mozilla/5.0 (Linux; Android 14; SM-S921B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Mobile Safari/537.36",
+        "screen": {
+          "vertical": { "width": 412, "height": 915 },
+          "horizontal": { "width": 915, "height": 412 }
+        },
+        "deviceScaleFactor": 3,
+        "capabilities": ["touch", "mobile"],
+        "show-by-default": true
+      },
+      {
+        "title": "iPad Air (10.9\")",
+        "type": "tablet",
+        "userAgent": "Mozilla/5.0 (iPad; CPU OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+        "screen": {
+          "vertical": { "width": 820, "height": 1180 },
+          "horizontal": { "width": 1180, "height": 820 }
+        },
+        "deviceScaleFactor": 2,
+        "capabilities": ["touch", "mobile"],
+        "show-by-default": true
+      },
+      {
+        "title": "iPad Mini (6th Gen)",
+        "type": "tablet",
+        "userAgent": "Mozilla/5.0 (iPad; CPU OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+        "screen": {
+          "vertical": { "width": 744, "height": 1133 },
+          "horizontal": { "width": 1133, "height": 744 }
+        },
+        "deviceScaleFactor": 2,
+        "capabilities": ["touch", "mobile"],
+        "show-by-default": false
+      },
+      {
+        "title": "Galaxy Tab S9",
+        "type": "tablet",
+        "userAgent": "Mozilla/5.0 (Linux; Android 14; SM-X710) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36",
+        "screen": {
+          "vertical": { "width": 800, "height": 1280 },
+          "horizontal": { "width": 1280, "height": 800 }
+        },
+        "deviceScaleFactor": 2,
+        "capabilities": ["touch", "mobile"],
+        "show-by-default": false
+      },
+      {
+        "title": "MacBook Air (M2)",
+        "type": "notebook",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 13_0) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15",
+        "screen": {
+          "vertical": { "width": 1512, "height": 982 },
+          "horizontal": { "width": 982, "height": 1512 }
+        },
+        "deviceScaleFactor": 2,
+        "capabilities": ["desktop"],
+        "show-by-default": true
+      },
+      {
+        "title": "Windows Laptop 13\"",
+        "type": "notebook",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36",
+        "screen": {
+          "vertical": { "width": 1366, "height": 768 },
+          "horizontal": { "width": 768, "height": 1366 }
+        },
+        "deviceScaleFactor": 1,
+        "capabilities": ["desktop"],
+        "show-by-default": true
+      },
+      {
+        "title": "Desktop Full HD",
+        "type": "desktop",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36",
+        "screen": {
+          "vertical": { "width": 1920, "height": 1080 },
+          "horizontal": { "width": 1080, "height": 1920 }
+        },
+        "deviceScaleFactor": 1,
+        "capabilities": ["desktop"],
+        "show-by-default": true
+      },
+      {
+        "title": "Desktop 2K (WQHD)",
+        "type": "desktop",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36",
+        "screen": {
+          "vertical": { "width": 2560, "height": 1440 },
+          "horizontal": { "width": 1440, "height": 2560 }
+        },
+        "deviceScaleFactor": 1,
+        "capabilities": ["desktop"],
+        "show-by-default": false
+      }
+    ]
+  }
+  

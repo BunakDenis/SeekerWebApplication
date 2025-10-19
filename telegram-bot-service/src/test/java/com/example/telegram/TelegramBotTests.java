@@ -6,6 +6,7 @@ import com.example.data.models.entity.*;
 import com.example.data.models.entity.dto.UserDTO;
 import com.example.data.models.entity.dto.VerificationCodeDTO;
 import com.example.data.models.entity.dto.telegram.*;
+import com.example.data.models.entity.jwt.JwtDataProvideDataImpl;
 import com.example.data.models.entity.jwt.JwtTelegramDataImpl;
 import com.example.data.models.entity.response.ApiResponse;
 import com.example.data.models.enums.JWTDataSubjectKeys;
@@ -1133,18 +1134,12 @@ public class TelegramBotTests extends TelegramTestsBaseClass {
         }
     }
 
-    /*
+/*
     @Test
     public void testJwtService() {
 
-        UserDetails user = User.builder()
+        JwtDataProvideDataImpl jwtTelegramData = JwtDataProvideDataImpl.builder()
                 .username("telegram-bot-service")
-                .password("$2a$12$BDBWx0rCdFlBdfoJ9XCd/OpX3m4zNnBTpFmOUMkFJPG0G/D9LBmue")
-                .roles(UserRoles.ADMIN.getRole())
-                .build();
-
-        JwtTelegramDataImpl jwtTelegramData = JwtTelegramDataImpl.builder()
-                .userDetails(user)
                 .subjects(Map.of("username", "telegram-bot-service"))
                 .expirationTime(DateTimeService.convertDaysToMillis(30L))
                 .build();
@@ -1154,9 +1149,7 @@ public class TelegramBotTests extends TelegramTestsBaseClass {
         log.debug(token);
 
     }
-
-     */
-
+*/
     /*
     @Test
         public void testSendingEmailMessage() {

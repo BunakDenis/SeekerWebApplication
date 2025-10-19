@@ -37,6 +37,8 @@ services:
       - ./.env
     environment:
       SPRING_PROFILES_ACTIVE: dev
+      USEFUL_TOOLS_API_PORT: ${USEFUL_TOOLS_API_PORT}
+      USEFUL_TOOLS_API_URL: ${USEFUL_TOOLS_API_URL}
       USER_PASSWORD: ${USER_PASSWORD}
       MAIL_USERNAME: ${MAIL_USERNAME}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
@@ -47,12 +49,12 @@ services:
       postgres-db:
         condition: service_healthy
     healthcheck:
-      test: [ "CMD", "curl", "-f", "$${USEFUL_TOOLS_API_URL}:$${USEFUL_TOOLS_API_PORT}/actuator/health" ]
+      test: [ "CMD", "curl", "-f", "${USEFUL_TOOLS_API_URL}:${USEFUL_TOOLS_API_PORT}/actuator/health" ]
       interval: 30s
       timeout: 10s
       retries: 3
     ports:
-      - ${USEFUL_TOOLS_API_PORT}:8082
+      - ${USEFUL_TOOLS_API_PORT}:${USEFUL_TOOLS_API_PORT}
 
   data-provider-service:
     image: ${DATA_PROVIDER_SERVICE_IMAGE}
@@ -68,6 +70,7 @@ services:
       POSTGRES_DB_HOST: ${POSTGRES_DB_DOCKER_HOST}
       POSTGRES_DB_PORT: 5432
       DATA_PROVIDER_SERVICE_PORT: ${DATA_PROVIDER_SERVICE_PORT}
+      DATA_PROVIDER_SERVICE_API_URL: ${DATA_PROVIDER_SERVICE_API_DOCKER_URL}
     networks:
       - app-network
     depends_on:
@@ -76,9 +79,9 @@ services:
       useful-tools:
         condition: service_healthy
     ports:
-      - ${DATA_PROVIDER_SERVICE_PORT}:8086
+      - ${DATA_PROVIDER_SERVICE_PORT}:${DATA_PROVIDER_SERVICE_PORT}
     healthcheck:
-      test: [ "CMD", "curl", "-f", "$${DATA_PROVIDER_SERVICE_API_URL}:$${DATA_PROVIDER_SERVICE_PORT}/actuator/health" ]
+      test: [ "CMD", "curl", "-f", "${DATA_PROVIDER_SERVICE_API_DOCKER_URL}/actuator/health" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -89,6 +92,7 @@ services:
       - ./.env
     environment:
       SPRING_PROFILES_ACTIVE: dev
+      TELEGRAM_BOT_PORT: ${TELEGRAM_BOT_PORT}
       USER_PASSWORD: ${USER_PASSWORD}
       TELEGRAM_BOT_NAME: ${TELEGRAM_BOT_NAME}
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
@@ -101,4 +105,26 @@ services:
       data-provider-service:
         condition: service_healthy
     ports:
-      - ${TELEGRAM_BOT_PORT}:8085
+      - ${TELEGRAM_BOT_PORT}:${TELEGRAM_BOT_PORT}
+
+  web-server-service:
+    image: ${WEB_SERVER_SERVICE_IMAGE}
+    env_file:
+      - ./.env
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      WEB_SERVER_SERVICE_PORT: ${WEB_SERVER_SERVICE_PORT}
+      USER_PASSWORD: ${USER_PASSWORD}
+      USEFUL_TOOLS_API_URL: ${USEFUL_TOOLS_API_URL}
+      USEFUL_TOOLS_API_FILE_SERVICE_ENDPOINT: ${USEFUL_TOOLS_API_FILE_SERVICE_ENDPOINT}
+      DATA_PROVIDER_SERVICE_API_URL: ${DATA_PROVIDER_SERVICE_API_DOCKER_URL}
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      MAIL_SEND_FROM: ${MAIL_SEND_FROM}
+    networks:
+      - app-network
+    depends_on:
+      data-provider-service:
+        condition: service_healthy
+    ports:
+      - ${WEB_SERVER_SERVICE_PORT}:${WEB_SERVER_SERVICE_PORT}

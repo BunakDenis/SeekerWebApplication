@@ -4,10 +4,8 @@ import com.example.server.handler.PageHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.server.RouterFunction;
-import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
-import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 
 /**
@@ -23,16 +21,12 @@ public class PageRouter {
      * @return сконфигурированный роутер.
      */
     @Bean
-    public RouterFunction<ServerResponse> mainPageRoute(PageHandler pageHandler) {
+    public RouterFunction<ServerResponse> mainAndAdditionalPagesRoute(PageHandler pageHandler) {
         return route()
-                .GET("/", pageHandler::getMainPage)
-                .build();
-    }
-
-    @Bean
-    public RouterFunction<ServerResponse> registerPageRoute(PageHandler handler) {
-        return route()
-                .GET("/register", handler::registerPage)
+                .path("", builder -> builder
+                        .GET("/", pageHandler::getMainPage)
+                        .GET("/register", pageHandler::registerPage)
+                )
                 .build();
     }
 }

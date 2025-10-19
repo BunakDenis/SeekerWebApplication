@@ -18,309 +18,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-
-    <style>
-        /* --- Переменные из _base.scss --- */
-        :root {
-          --page-content-background-color: rgba(255, 255, 255, 0.1);
-          --page-popup-background-color: rgba(238, 226, 226, 0.5);
-          --page-popup-border-color: rgba(248, 240, 240, 0.6);
-          --modal-form-out-background-color: rgba(27, 26, 26, 0.7);
-          --btn-hover-background-color: rgba(255, 255, 255, 0.15);
-          --backdrop-filter-blur: blur(8px);
-          --sb-cnt-backdrop-filter-blur: blur(30px);
-          --fornt-family-for-school-name: 'Lobster', sans-serif;
-          --fornt-family-for-title: 'Orelega One', serif;
-          --fornt-family-for-content: 'Jost', serif;
-          --page-text-color: rgb(255, 255, 255);
-          --page-text-color-hover: gold;
-          --box-sizing: border-box;
-          --z-index-for-background-media: -1;
-          --z-index-for-site-elements: 0;
-          --z-index-for-content: 1;
-          --z-index-for-forms: 10;
-          --z-index-for-icons-in-form: 20;
-          --marging-top-nav-bar-forms: 10vh;
-          --marging-left-logo-container: 17vw;
-          --form-element-focus-box-shadow: 0 3px 6px rgba(0, 0, 0, 0.13);
-          --form-element-focus-border: 2px solid rgb(255, 215, 0);
-          --al-vadud-text-color: red;
-          --pictures-cabinet-page-color: #fff;
-
-          --nav-text-color: #fff;
-          --nav-hover-color: #ffd700;
-          --glass-bg: rgba(255, 255, 255, 0.2);
-          --glass-blur: blur(8px);
-        }
-        *,
-        *::before,
-        *::after {
-          box-sizing: var(--box-sizing);
-        }
-        html {
-          height: 100%;
-        }
-        body {
-          display: flex;
-          position: relative;
-          flex-direction: column;
-          height: 100%;
-          margin: 0;
-          padding: 0;
-        }
-
-        body main {
-          display: block;
-          flex-grow: 1;
-          position: relative;
-          width: 100%;
-          height: 92%;
-          max-height: 92%;
-          overflow-x: auto;
-          margin: 0;
-        }
-        body footer {
-          display: flex;
-          flex-direction: column;
-          gap: 1%;
-          width: 100%;
-          height: 4%;
-          padding-top: 1%;
-          padding-bottom: 2%;
-          background-color: var(--page-content-background-color);
-        }
-        .page-video {
-          position: absolute;
-          left: 0;
-          top: 0;
-          bottom: 0;
-          z-index: var(--z-index-for-background-media);
-          width: 100%;
-          height: 100%;
-          overflow: hidden;
-        }
-        .page-video .video {
-          position: absolute;
-          left: 50%;
-          top: 50%;
-          transform: translate(-50%, -50%);
-          min-width: 100%;
-          min-height: 100%;
-        }
-
-        /* --- Стили для формы регистрации из _base.scss --- */
-        .registration-container {
-          position: fixed;
-          max-width: 80%;
-          width: 100%;
-          border-radius: 6px;
-          padding: 10px 15px;
-          margin: 5% 10% 5% 10%;
-          background-color: rgba(255, 255, 255, 0.1);
-          box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
-          font-family: 'Jost', sans-serif;
-          font-optical-sizing: auto;
-          z-index: var(--z-index-for-content);
-        }
-        .registration-container header {
-          position: relative;
-          font-size: 20px;
-          font-weight: 600;
-          color: #333;
-        }
-        .registration-container header::before {
-          content: '';
-          position: absolute;
-          left: 0;
-          bottom: -2px;
-          height: 3px;
-          width: 27px;
-          border-radius: 8px;
-          background-color: #4070f4;
-        }
-        .registration-container form {
-          position: relative;
-          margin-top: 16px;
-          min-height: 490px;
-          overflow: visible;
-        }
-        .registration-container form .title {
-          display: block;
-          margin-bottom: 8px;
-          font-size: 16px;
-          font-weight: 500;
-          margin: 6px 0;
-          color: #333;
-        }
-         .registration-container form .title::before {
-          content: '';
-          position: absolute;
-          left: 0;
-          bottom: -2px;
-          height: 3px;
-          width: 100px;
-          border-radius: 8px;
-          background-color: gold;
-        }
-        .registration-container form .fields {
-          display: flex;
-          align-items: center;
-          justify-content: left;
-          flex-wrap: wrap;
-        }
-        form .fields .input-field {
-          display: flex;
-          width: calc(100% / 3 - 15px);
-          flex-direction: column;
-          margin: 2px 5px;
-        }
-        .input-field label {
-          font-size: 15px;
-          font-weight: 500;
-          color: #2e2e2e;
-          margin: 0;
-        }
-        .input-field input,
-        select {
-          outline: none;
-          font-size: 14px;
-          font-weight: 400;
-          color: black;
-          border-radius: 5px;
-          border: 1px solid #aaa;
-          padding: 0 10px;
-          height: 42px;
-          margin: 5px 0;
-        }
-        .input-field input:focus,
-        .input-field select:focus {
-          box-shadow: var(--form-element-focus-box-shadow);
-          border: var(--form-element-focus-border);
-        }
-        .input-field select,
-        .input-field input[type='date'] {
-          color: #9b8e8e;
-        }
-        .input-field input[type='date']:valid,
-        .input-field select:valid {
-          color: #0a0a0a;
-        }
-        #sign-up-show-password,
-        #sign-up-hide-password {
-          top: 4.2vw;
-          right: 28vw;
-          position: absolute;
-          cursor: pointer;
-          z-index: var(--z-index-for-icons-in-form);
-        }
-        #sign-up-show-password { display: none; }
-        #sign-up-hide-password { display: block; }
-
-        .registration-container form button {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          height: 45px;
-          max-width: 200px;
-          width: 100%;
-          margin-top: 20px;
-          background: #fff;
-          color: #000;
-          font-weight: 600;
-          border: none;
-          padding: 12px 10px;
-          cursor: pointer;
-          border-radius: 3px;
-          font-size: 16px;
-          border: 2px solid transparent;
-          transition: 0.3s ease;
-        }
-        form button:hover {
-          color: #fff;
-          border-color: #fff;
-          background: rgba(255, 255, 255, 0.15);
-        }
-
-        /* Стили для автозаполнения города */
-        .suggestions {
-          position: absolute;
-          background-color: white;
-          border-radius: 5px;
-
-          width: calc(100% / 3 - 15px);
-
-          margin-top: 80px;
-
-          z-index: var(--z-index-for-icons-in-form);
-        }
-
-        .suggestions div {
-          cursor: pointer;
-        }
-
-        /* Стили header */
-
-header .navbar-brand .al-vadud {
-  width: auto;
-  height: 30px;
-
-  fill: var(--al-vadud-text-color);
-
-  -webkit-transition: var(--transition--all--04-ease);
-  -o-transition: var(--transition--all--04-ease);
-  transition: var(--transition--all--04-ease);
-}
-
-.navbar-brand .school-name {
-  color: var(--al-vadud-text-color);
-  font-family: var(--fornt-family-for-school-name);
-  font-weight: 100;
-  font-style: normal;
-  font-size: 1.2rem;
-}
-
-.navbar-nav .nav-link {
-  color: var(--nav-text-color) !important;
-  font-family: var(--fornt-family-for-school-name);
-  font-weight: 100;
-  font-style: normal;
-  font-size: 1.2rem;
-}
-
-.navbar-nav .nav-link:hover {
-  color: var(--nav-hover-color) !important;
-}
-
-.bg-glass {
-  background-color: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 0.75rem;
-}
-
-header i {
-  cursor: pointer;
-
-  -webkit-transition: var(--transition--all--04-ease);
-  -o-transition: var(--transition--all--04-ease);
-  transition: var(--transition--all--04-ease);
-}
-
-header i:hover,
-header i:focus {
-  color: var(--nav-hover-color);
-}
-
-.modal-content {
-  color: black;
-}
-
-.badge {
-  font-size: 0.6rem;
-}
-
-    </style>
+    <script defer th:src="@{/js/main.js}"></script>
+    <script type="module" th:src="@{/js/header.js}"></script>
 </head>
 
 <body class="page-user-sign-up">
@@ -331,33 +30,49 @@ header i:focus {
     </video>
 </div>
 
-<header id="page-header" th:replace="~{fragments/header :: header}"></header>
+<header id="page-header" th:replace="~{../static/fragments/header :: header}"></header>
+
+<div class="bg-image" id="body-bg-image"></div>
 
 <main>
+
+    <!-- Форма регистрации -->
     <div class="registration-container">
         <header>Регистрация</header>
 
         <form action="#">
             <div class="form first">
-                <div class="details-personal">
+                <div class="details personal">
                     <header class="title">Персональные данные</header>
 
                     <div class="fields">
                         <div class="input-field">
                             <label>Имя пользователя</label>
-                            <input type="text" placeholder="Введите имя пользователя" required/>
+                            <input
+                                    type="text"
+                                    placeholder="Введите имя пользователя"
+                                    required
+                            />
                         </div>
 
                         <div class="input-field">
                             <label>Пароль</label>
-                            <input id="sign-up-pass" type="password" placeholder="Введите пароль" required/>
-                            <i class="fa fa-eye fa-xs" id="sign-up-show-password"></i>
-                            <i class="fa fa-eye-slash fa-xs" id="sign-up-hide-password"></i>
+                            <input
+                                    id="sign-up-password-input"
+                                    type="password"
+                                    placeholder="Введите пароль"
+                                    required
+                            />
+                            <i class="fa fa-eye-slash fa-xs" id="sign-up-password"></i>
                         </div>
 
                         <div class="input-field">
                             <label>Email</label>
-                            <input type="email" placeholder="Введите свой email" required/>
+                            <input
+                                    type="email"
+                                    placeholder="Введите свой email"
+                                    required
+                            />
                         </div>
 
                         <div class="input-field">
@@ -367,17 +82,31 @@ header i:focus {
 
                         <div class="input-field">
                             <label>Фамилия</label>
-                            <input type="text" placeholder="Введите свою фамилию" required />
+                            <input
+                                    type="text"
+                                    placeholder="Введите свою фамилию"
+                                    required
+                            />
                         </div>
 
                         <div class="input-field">
                             <label>Дата рождения</label>
-                            <input type="date" placeholder="Введите свой день рождения" required/>
+                            <input
+                                    type="date"
+                                    placeholder="Введите свой день рождения"
+                                    required
+                            />
                         </div>
 
                         <div class="input-field">
                             <label>Номер телефона</label>
-                            <input id="phone-number" type="tel" placeholder="+380664988869" />
+                            <span class="validity"></span>
+                            <input
+                                    id="phone-number"
+                                    type="tel"
+                                    placeholder="+380664988869"
+                                    pattern="[0-9]{5}-[0-9]{2}-[0-9]{3}-[0-9]{2}"
+                            />
                         </div>
 
                         <div class="input-field">
@@ -391,8 +120,8 @@ header i:focus {
                     </div>
                 </div>
 
-                <div class="user-details">
-                    <header class="title">Дополнительные данные</header>
+                <div class="details ID">
+                    <header class="title">Дополнительный данные</header>
 
                     <div class="fields">
                         <div class="input-field">
@@ -402,7 +131,11 @@ header i:focus {
 
                         <div class="input-field">
                             <label>Место нахождения</label>
-                            <input id="resident-city" type="text" placeholder="Начните вводить город..."/>
+                            <input
+                                    id="resident-city"
+                                    type="text"
+                                    placeholder="Начните вводить город..."
+                            />
                             <div id="suggestions" class="suggestions"></div>
                         </div>
 
@@ -429,9 +162,19 @@ header i:focus {
             </div>
         </form>
     </div>
+
+    <footer id="page-footer" th:insert="~{../static/fragments/footer :: footer}"></footer>
+
 </main>
 
-<footer id="page-footer" th:insert="~{fragments/footer :: footer}"></footer>
+<!-- Форма поиска по сайту -->
+<div th:replace="~{../static/fragments/popups :: search-container}" class="search-container hide"></div>
+<!-- Форма входа юзера -->
+<div th:replace="~{../static/fragments/popups :: sign-in-container}" class="sign-in-container" id="sign-in-container"></div>
+<!-- Форма информации про пользователя -->
+<div th:replace="~{../static/fragments/popups :: user-information-container}" class="user-information-container" id="user-information-container"></div>
+<!-- Форма уведомлений -->
+<div th:replace="~{../static/fragments/popups :: notification-container}" class="notification-container"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.bundle.min.js"></script>

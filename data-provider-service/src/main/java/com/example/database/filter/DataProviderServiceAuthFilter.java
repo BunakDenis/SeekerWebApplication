@@ -27,6 +27,7 @@ import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Objects;
 
@@ -50,36 +51,58 @@ public class DataProviderServiceAuthFilter implements WebFilter {
 
         ServerHttpRequest request = exchange.getRequest();
         HttpHeaders headers = request.getHeaders();
+        URI uri = request.getURI();
 
-        log.debug("DataProviderServiceAuthFilter invoked for {}", request.getURI());
+        log.debug("DataProviderServiceAuthFilter invoked for {}", uri);
 
         List<String> apiKeyValue = headers.get(apiKeyHeaderName);
 
         String apiKey = Objects.isNull(apiKeyValue) ? "" : apiKeyValue.get(0);
 
         if (StringUtils.hasText(apiKey)) {
+            return Mono.just(jwtService.extractUsername(apiKey))
+                    .flatMap(username -> {
 
-            String username = jwtService.extractUsername(apiKey);
+                        // Авторизуем как default user
+                        UserDetails userDetails = userService.loadUserByUsername(username);
 
-            // Авторизуем как default user
-            UserDetails userDetails = userService.loadUserByUsername(username);
+                        if (userDetails == null) {
+                            log.warn("UserDetails is null - skipping auth");
+                            return chain.filter(exchange);
+                        }
 
-            if (userDetails == null) {
-                log.warn("UserDetails is null - skipping auth");
-                return chain.filter(exchange);
-            }
+                        Authentication auth = new UsernamePasswordAuthenticationToken(
+                                userDetails,
+                                null,
+                                userDetails.getAuthorities()
+                        );
+
+                        log.debug("ApiKey header found -> authenticating as user: {}", userDetails.getUsername());
+
+                        return appFiltersService.getBodyFromRequest(exchange)
+                                .flatMap(body -> chain.filter(exchange.mutate().request(
+                                                                        appFiltersService.decorateRequestWithApiKey(exchange, body.toString(), apiKey)
+                                                                )
+                                                                .build()
+                                                )
+                                                .contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth))
+
+                                );
+                    });
+        }
+
+        if (uri.toString().contains("/actuator/health")) {
+            UserDetails defaultUser = userService.getDefaultUser();
 
             Authentication auth = new UsernamePasswordAuthenticationToken(
-                    userDetails,
+                    defaultUser,
                     null,
-                    userDetails.getAuthorities()
+                    defaultUser.getAuthorities()
             );
-
-            log.debug("ApiKey header found -> authenticating as user: {}", userDetails.getUsername());
 
             return appFiltersService.getBodyFromRequest(exchange)
                     .flatMap(body -> chain.filter(exchange.mutate().request(
-                                                            appFiltersService.decorateRequestWithApiKey(exchange, body.toString(), apiKey)
+                                                            appFiltersService.decorateRequestWithApiKey(exchange, body.toString(), "")
                                                     )
                                                     .build()
                                     )
@@ -89,18 +112,18 @@ public class DataProviderServiceAuthFilter implements WebFilter {
 
         }
 
-        ApiResponse<Object> response = ApiResponseUtilsService.fail(
+        return Mono.just(ApiResponseUtilsService.fail(
                 ResponseMessageProvider.REQUEST_DO_NOT_CONTAIN_API_KEY
-        );
+        ))
+                .flatMap(response -> {
+                    log.debug("No api-key header found -> proceed without authentication");
 
-        log.debug("No api-key header found -> proceed without authentication");
-
-        return appFiltersService.writeJsonErrorResponse(
-                exchange.getResponse(),
-                HttpStatus.UNAUTHORIZED,
-                response
-        );
-
+                    return appFiltersService.writeJsonErrorResponse(
+                            exchange.getResponse(),
+                            HttpStatus.UNAUTHORIZED,
+                            response
+                    );
+                });
     }
 
 }
