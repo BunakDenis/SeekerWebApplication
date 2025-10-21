@@ -43,7 +43,7 @@
         <button class="sign-in-button" type="submit">Войти</button>
         <div class="register">
             <p>У вас нет аккаунта?</p>
-            <a class="sign-in-form-link" href="./userSignUp.html"
+            <a class="sign-in-form-link" th:href="@{/register}"
             >Зарегистрироваться
             </a>
         </div>
@@ -59,7 +59,7 @@
         </h2>
         <p class="user-information-content">user@gmailcom</p>
         <div class="user-information-links-container">
-            <a class="user-fw-profile-link" href="./userProfile.html">Профиль</a>
+            <a class="user-fw-profile-link" th:href="@{/userProfile}">Профиль</a>
             <a class="sign-out-link" href="#">Выйти</a>
         </div>
     </form>
