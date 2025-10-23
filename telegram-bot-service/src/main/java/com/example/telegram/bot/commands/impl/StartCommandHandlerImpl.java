@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -35,7 +36,7 @@ public class StartCommandHandlerImpl implements CommandHandler {
     private final ObjectMapper objectMapper;
 
     @Override
-    public Mono<SendMessage> apply(Update update, TelegramChat lastTelegramChat) {
+    public Mono<List<SendMessage>> apply(Update update, TelegramChat lastTelegramChat) {
 
         log.debug("StartCommandImpl метод apply");
 
@@ -51,8 +52,14 @@ public class StartCommandHandlerImpl implements CommandHandler {
 
         greeting.append(MessageProvider.START_MSG);
 
-        SendMessage answer = new SendMessage(String.valueOf(chatId),
+        SendMessage greetingAnswer = new SendMessage(String.valueOf(chatId),
                 greeting.toString());
+
+        // Указываем, что используем HTML-разметку (включая <a href="...">)
+        greetingAnswer.setParseMode("html");
+
+        // Отключаем превью сайта
+        greetingAnswer.setDisableWebPagePreview(true);
 
         return userService.getUserByTelegramUserId(telegramUserId)
                 .flatMap(currentUser -> {
@@ -69,13 +76,13 @@ public class StartCommandHandlerImpl implements CommandHandler {
 
                     ReplyKeyboardMarkup replyKeyboard = ReplyKeyboardMarkupFactory.getReplyKeyboard(mainMenuKeyboard);
 
-                    answer.setReplyMarkup(replyKeyboard);
+                    greetingAnswer.setReplyMarkup(replyKeyboard);
 
-                    return Mono.just(answer);
+                    return Mono.just(List.of(greetingAnswer));
                 })
                 .onErrorResume(err -> {
                     log.error("Ошибка получения текущего User {}", err.getMessage(), err);
-                    return Mono.just(new SendMessage(Long.toString(chatId), ""));
+                    return Mono.just(List.of(new SendMessage(Long.toString(chatId), "")));
                 })
                 .doFinally(signalType -> log.debug("StartCommandImpl конец метода apply: {}", signalType));
     }

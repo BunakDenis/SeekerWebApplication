@@ -6,8 +6,10 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 public interface CommandHandler {
 
-    Mono<SendMessage> apply(Update update, TelegramChat lastTelegramChat);
+    Mono<List<SendMessage>> apply(Update update, TelegramChat lastTelegramChat);
 
 }

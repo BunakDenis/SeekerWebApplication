@@ -35,6 +35,23 @@ function changeLogoColor(isFocuse) {
 //Контейнер поиска по сайту
 const pageHeader = document.getElementById("page-header");
 
+// Дебаунс для оптимизации количества запросов
+function debounce(func, delay) {
+  return function (...args) {
+    clearTimeout(debounceTimeout);
+    debounceTimeout = setTimeout(() => func.apply(this, args), delay);
+  };
+}
+
+window.addEventListener("resize", () => {
+  debounce(setNavLinksPanelPosition(), 150);
+  debounce(setSearchFieldPosition(), 150);
+  debounce(setUserProfileInfoPoupPosition(), 150);
+  debounce(setSignInPoupPosition(), 150);
+  debounce(setNotificationPopupPosition(), 150);
+  debounce(setNavLinksPanelToggleIconPosition(), 150);
+});
+
 //Глобальный слушатель для модальных форм
 document.addEventListener("click", (e) => {
   const target = e.target;
@@ -204,10 +221,13 @@ setNotificationPopupPosition();
 setNavLinksPanelToggleIconPosition();
 
 function setSearchFieldPosition() {
+  const windowWidth = window.innerWidth;
   const searchSiteIcon = document.getElementById("search-site-icon");
   const searchContainer = document.querySelector(".search-container");
 
   setHeaderPoupPosition(searchSiteIcon, searchContainer);
+
+  searchContainer.style.right = "5vw";
 
   /*
     console.log('window.innerWidth =', window.innerWidth)
@@ -304,7 +324,7 @@ function changeNavLinksPanelToggleIconPosition() {
     const translateY = -distance;
 
     // Применим transform. Явно добавляем 'px' и используем requestAnimationFrame
-    icon.style.transform = `translateY(${translateY - 35}px)`;
+    icon.style.transform = `translateY(${translateY - 15}px)`;
   } else if (icon.classList.contains("bi-arrow-up-square-fill")) {
     icon.style.transform = `translateY(0)`;
   }

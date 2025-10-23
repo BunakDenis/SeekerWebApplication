@@ -56,7 +56,7 @@ public class AuthCommandHandlerImpl implements CommandHandler {
 
 
     @Override
-    public Mono<SendMessage> apply(Update update, TelegramChat chat) {
+    public Mono<List<SendMessage>> apply(Update update, TelegramChat chat) {
 
         TelegramChat newChat = new TelegramChat();
 
@@ -112,7 +112,7 @@ public class AuthCommandHandlerImpl implements CommandHandler {
                         .flatMap(resp -> {
                             log.debug("Сохранённый чат {}", resp);
                             log.debug("Telegram user={}", resp.getTelegramUser());
-                            return Mono.just(tuple.getT1());
+                            return Mono.just(List.of(tuple.getT1()));
                         })
                 );
     }

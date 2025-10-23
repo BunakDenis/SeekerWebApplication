@@ -10,18 +10,20 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 @Component
 @Log4j2
 @Data
 public class RegCommandHandlerImpl implements CommandHandler {
 
     @Override
-    public Mono<SendMessage> apply(Update update, TelegramChat lastTelegramChat) {
+    public Mono<List<SendMessage>> apply(Update update, TelegramChat lastTelegramChat) {
         SendMessage result = new SendMessage();
 
         result.setChatId(UpdateUtilsService.getChatId(update));
         result.setText("Процедура регистрации находится в разработке");
 
-        return Mono.just(result);
+        return Mono.just(List.of(result));
     }
 }

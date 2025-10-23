@@ -13,6 +13,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Component
 @Data
@@ -22,6 +23,10 @@ public class TelegramBotMessageSender {
 
     @Value("${telegram.bot.max.length}")
     private int maxMessageLength;
+
+    // Регистронезависимый поиск тега <a ...>...</a>
+    private static final Pattern ANCHOR_TAG_PATTERN =
+            Pattern.compile("(?i)<\\s*a\\b[^>]*>.*?</\\s*a\\s*>", Pattern.DOTALL);
 
     private final ApplicationContext applicationContext;
 
@@ -91,6 +96,16 @@ public class TelegramBotMessageSender {
      */
     private void sendSingleMessage(Long chatId, String text) {
         SendMessage message = new SendMessage(String.valueOf(chatId), text);
+
+        if (containsAnchorTag(text)) {
+            // Для совместимости используем строковый вариант. В новых версиях можно использовать ParseMode.HTML
+            message.setParseMode("html");
+            message.setDisableWebPagePreview(true);
+        } else {
+            // Очищаем parseMode — оставляем как по умолчанию
+            message.setParseMode(null);
+        }
+
         executeSafely(message);
     }
 
@@ -130,6 +145,18 @@ public class TelegramBotMessageSender {
      */
     private boolean isTextValidForSending(String text) {
         return text.length() < maxMessageLength;
+    }
+
+
+    /**
+     * Простая проверка — содержит ли переданная строка HTML-тег <a ...>...</a>.
+     *
+     * @param text входной текст (может быть null)
+     * @return true если найден <a>...</a>, иначе false
+     */
+    public static boolean containsAnchorTag(String text) {
+        if (text == null) return false;
+        return ANCHOR_TAG_PATTERN.matcher(text).find();
     }
 
 }

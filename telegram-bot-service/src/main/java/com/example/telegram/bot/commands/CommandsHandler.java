@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import reactor.core.publisher.Mono;
@@ -37,17 +38,21 @@ public class CommandsHandler {
         log.debug("chat_id = " + chatId + ", command = " + command);
         log.debug("Последний чат {}", lastTelegramChat);
 
-
-        if (!lastCommand.isEmpty()) command = lastCommand;
+        if (command.equals(Commands.START.getCommand())) {
+            log.debug("Выполнение команды start");
+        } else if (command.equals(Commands.REGISTER.getCommand())) {
+            log.debug("Процедура регистрации юзера в боте.");
+        } else if (!lastCommand.isEmpty()) command = lastCommand;
 
         CommandHandler commandHandler = commandsHandlersService.getCommandHandler(command);
-
 
         if (Objects.nonNull(commandHandler)) {
 
             return commandHandler.apply(update, lastTelegramChat)
-                    .flatMap(upd -> {
-                        sender.sendMessage(upd);
+                    .flatMap(upds -> {
+
+                        upds.forEach(upd -> sender.sendMessage(upd));
+
                         return Mono.just(true);
                     });
 
@@ -57,5 +62,4 @@ public class CommandsHandler {
 
         return Mono.just(false);
     }
-
 }
