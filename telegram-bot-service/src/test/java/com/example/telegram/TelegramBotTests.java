@@ -1134,7 +1134,7 @@ public class TelegramBotTests extends TelegramTestsBaseClass {
         }
     }
 
-/*
+
     @Test
     public void testJwtService() {
 
@@ -1149,7 +1149,7 @@ public class TelegramBotTests extends TelegramTestsBaseClass {
         log.debug(token);
 
     }
-*/
+
     /*
     @Test
         public void testSendingEmailMessage() {

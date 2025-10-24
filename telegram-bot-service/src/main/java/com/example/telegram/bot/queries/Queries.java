@@ -5,9 +5,9 @@ import com.example.data.models.enums.UserRoles;
 public enum Queries {
 
     //Навигация
-    PREV_MENU ("⬅️ Предыдущее меню", UserRoles.TOURIST),
-    MAIN_MENU ("Главное меню", UserRoles.TOURIST),
-    FAVOURITE("⭐ Избранное", UserRoles.TOURIST),
+    PREV_MENU ("⬅️", UserRoles.TOURIST),
+    MAIN_MENU ("\uD83C\uDFE1", UserRoles.TOURIST),
+    FAVOURITE("⭐", UserRoles.TOURIST),
 
     //Главное меню
     GENERAL_RESULTS ("Общие результаты", UserRoles.TOURIST),

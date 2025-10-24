@@ -40,4 +40,7 @@ public interface UserRepo extends JpaRepository<User, Long> {
               WHERE tu.telegramUserId = :telegramUserId
     """)
     Optional<User> findFullByTelegramUser_id(@Param("telegramUserId") Long id);
+
+    Boolean existsByUsername(String username);
+    Boolean existsByEmail(String email);
 }

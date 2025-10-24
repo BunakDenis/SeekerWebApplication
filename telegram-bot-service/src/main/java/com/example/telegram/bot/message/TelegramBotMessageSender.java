@@ -85,6 +85,9 @@ public class TelegramBotMessageSender {
             int end = Math.min(length, i + maxMessageLength);
             parts.add(text.substring(i, end));
         }
+
+        log.debug("Разбитое сообщение на части для отправки {}", parts);
+
         return parts;
     }
 

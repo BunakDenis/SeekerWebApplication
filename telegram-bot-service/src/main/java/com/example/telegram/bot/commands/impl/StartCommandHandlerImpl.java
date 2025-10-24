@@ -1,11 +1,14 @@
 package com.example.telegram.bot.commands.impl;
 
 import com.example.data.models.enums.UserRoles;
+import com.example.telegram.bot.chat.UiElements;
 import com.example.telegram.bot.commands.CommandHandler;
 import com.example.data.models.entity.TelegramChat;
+import com.example.telegram.bot.commands.Commands;
 import com.example.telegram.bot.keyboard.ReplyKeyboardMarkupFactory;
 import com.example.telegram.bot.message.MessageProvider;
 import com.example.telegram.bot.service.AuthService;
+import com.example.telegram.bot.service.TelegramChatService;
 import com.example.telegram.bot.service.UserService;
 import com.example.telegram.bot.utils.update.UpdateUtilsService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,10 +36,11 @@ public class StartCommandHandlerImpl implements CommandHandler {
 
     private final AuthService authService;
     private final UserService userService;
+    private final TelegramChatService chatService;
     private final ObjectMapper objectMapper;
 
     @Override
-    public Mono<List<SendMessage>> apply(Update update, TelegramChat lastTelegramChat) {
+    public Mono<SendMessage> apply(Update update, TelegramChat lastTelegramChat) {
 
         log.debug("StartCommandImpl метод apply");
 
@@ -78,11 +82,22 @@ public class StartCommandHandlerImpl implements CommandHandler {
 
                     greetingAnswer.setReplyMarkup(replyKeyboard);
 
-                    return Mono.just(List.of(greetingAnswer));
+                    return Mono.just(greetingAnswer);
+                })
+                .flatMap(sendMsg -> {
+                    TelegramChat tgChatForSave = TelegramChat.builder()
+                            .telegramChatId(chatId)
+                            .uiElement(UiElements.COMMAND.getUiElement())
+                            .uiElementValue(Commands.START.getCommand())
+                            .chatState("")
+                            .telegramUser(lastTelegramChat.getTelegramUser())
+                            .build();
+
+                    return chatService.save(tgChatForSave).then(Mono.just(sendMsg));
                 })
                 .onErrorResume(err -> {
                     log.error("Ошибка получения текущего User {}", err.getMessage(), err);
-                    return Mono.just(List.of(new SendMessage(Long.toString(chatId), "")));
+                    return Mono.just(new SendMessage(Long.toString(chatId), ""));
                 })
                 .doFinally(signalType -> log.debug("StartCommandImpl конец метода apply: {}", signalType));
     }

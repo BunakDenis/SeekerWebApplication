@@ -159,6 +159,16 @@ public class UserService implements UserDetailsService {
 
         return resp;
     }
+    public ApiResponse<Boolean> existsByUsername(String username) {
+        Boolean result = repo.existsByUsername(username);
+
+        return ApiResponse.<Boolean>builder().data(result).build();
+    }
+    public ApiResponse<Boolean> existsByEmail(String email) {
+        Boolean result = repo.existsByEmail(email);
+
+        return ApiResponse.<Boolean>builder().data(result).build();
+    }
     public ApiResponse<Boolean> delete(Long id) {
         try {
             ApiResponse<UserDTO> getResponse = getUserById(id);

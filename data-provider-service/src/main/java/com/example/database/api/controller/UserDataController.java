@@ -11,6 +11,7 @@ import com.example.database.api.client.MysticSchoolClient;
 import com.example.database.entity.User;
 import com.example.database.service.ModelMapperService;
 import com.example.database.service.UserService;
+import jakarta.ws.rs.QueryParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -150,6 +151,41 @@ public class UserDataController {
         ApiResponse<UserDTO> response = userService.getUserByTelegramUserIdFull(id);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/user/exists")
+    public ResponseEntity<ApiResponse<Boolean>> exists(
+            @RequestParam(value = "username", required = false) String username,
+            @RequestParam(value = "email", required = false) String email) {
+
+        // Валидация входа: хотя бы один параметр обязателен
+        if ((username == null || username.isBlank()) && (email == null || email.isBlank())) {
+            ApiResponse<Boolean> err = ApiResponse.<Boolean>builder()
+                    .data(false)
+                    .message("Request must consists at least one query parameter: username or email")
+                    .build();
+            return ResponseEntity.badRequest().body(err);
+        }
+
+        // Если оба параметра заданы — проверяем OR (существует ли пользователь хотя бы по одному)
+        if (username != null && !username.isBlank() && email != null && !email.isBlank()) {
+            ApiResponse<Boolean> byUsername = userService.existsByUsername(username);
+            // если у тебя ApiResponse хранит результат в getData()
+            if (Boolean.TRUE.equals(byUsername.getData())) {
+                return ResponseEntity.ok(byUsername);
+            }
+            // если username не найден — проверяем по email и возвращаем результат
+            ApiResponse<Boolean> byEmail = userService.existsByEmail(email);
+            return ResponseEntity.ok(byEmail);
+        }
+
+        // Если задан только username
+        if (username != null && !username.isBlank()) {
+            return ResponseEntity.ok(userService.existsByUsername(username));
+        }
+
+        // Иначе (только email)
+        return ResponseEntity.ok(userService.existsByEmail(email));
     }
 
     @GetMapping("/user/check/auth/{id}")

@@ -10,6 +10,6 @@ import java.util.List;
 
 public interface CommandHandler {
 
-    Mono<List<SendMessage>> apply(Update update, TelegramChat lastTelegramChat);
+    Mono<SendMessage> apply(Update update, TelegramChat lastTelegramChat);
 
 }

@@ -9,14 +9,15 @@ public class MessageProvider {
 
 
     public static final String START_MSG = "Добро пожаловать в телеграмм бот Искателей!\n\n" +
-            "Для регистрации в боте напишите " + Commands.REGISTER.getCommand() + " и пройдите процедуру регистрации.\n\n" +
+            Commands.REGISTER.getCommand() + "  -  команда для регистрации в боте.\n\n" +
+            Commands.AUTHORIZE.getCommand() + "  -  команда для авторизации в боте. " +
             "Если Вы являетесь учеником Школы \"Восходящий Поток\" " +
-            "и зарегистрированы на <a href=\"https://mystic-school.ru/\">официальном сайте Школы</a>, " +
-            "для авторизации в боте используйте те же данные что и на сайте Школы.\n" +
-            "Так же если вы зарегистрированы в боте напишите " + Commands.AUTHORIZE.getCommand() +
-            " для прохождения процедуры авторизации.\n\n" +
+            "и зарегистрированы на <a href=\"https://mystic-school.ru/\">официальном сайте Школы</a> или " +
+            "зарегистрированы на сайте <a href=\"https://truthseekeroffice.club/web-site/\">кабинета искателя</a> " +
+            "для авторизации в боте используйте данные введённые при регистрации на выше перечисленных сайтах.\n\n" +
             "Для дальнейшей работы с ботом выберите пункт меню:";
-
+    public static final String REGISTERED_MSG = "Для прохождения процедуры регистрации перейдите по " +
+            "<a href=\"https://truthseekeroffice.club/web-site/register\">ссылке</a>.";
     public static final String EMAIL_CHECKING_MSG = "Введите свой email адрес";
     private static final String EMAIL_VERIFICATION_MSG = "На email адрес {0} было выслано письмо с кодом подтверждения.\n" +
             "Пожалуйста, введите код подтверждения";

@@ -29,6 +29,7 @@ import reactor.core.publisher.Mono;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 
@@ -54,6 +55,14 @@ public class DataProviderServiceAuthFilter implements WebFilter {
         URI uri = request.getURI();
 
         log.debug("DataProviderServiceAuthFilter invoked for {}", uri);
+
+        /*
+        for (Map.Entry<String, List<String>> stringListEntry : headers.entrySet()) {
+            log.debug("header = {}, value = {}", stringListEntry, stringListEntry.getValue());
+        }
+
+        log.debug("Метод = {}", exchange.getRequest().getMethod());
+        */
 
         List<String> apiKeyValue = headers.get(apiKeyHeaderName);
 
