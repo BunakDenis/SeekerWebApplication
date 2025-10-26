@@ -774,9 +774,14 @@ public class UserDataControllerTests extends DataProviderTestsBaseClass {
                         .withBody(objectMapper.writeValueAsString(apiRequest))
         );
 
+
+
         Mockito.when(
                 mockMysticSchoolClient.checkUserAuthentication(any())
-        ).thenReturn(Mono.just(expectedCheckUserResponse));
+        ).thenReturn(Mono.just(ApiResponse.<CheckUserResponse>builder()
+                .data(expectedCheckUserResponse)
+                .build()
+        ));
 
         //Then
         client.get()
@@ -827,7 +832,11 @@ public class UserDataControllerTests extends DataProviderTestsBaseClass {
 
         Mockito.when(
                 mockMysticSchoolClient.checkUserAuthentication(any())
-        ).thenReturn(Mono.just(expectedCheckUserResponse));
+        ).thenReturn(Mono.just(
+                ApiResponse.<CheckUserResponse>builder()
+                        .data(expectedCheckUserResponse)
+                        .build()
+        ));
 
         //Then
         client.get()

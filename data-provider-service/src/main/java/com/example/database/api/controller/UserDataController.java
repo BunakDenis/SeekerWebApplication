@@ -216,8 +216,8 @@ public class UserDataController {
                 });
     }
 
-    @GetMapping("/user/check/auth/")
-    public Mono<ResponseEntity<CheckUserResponse>> checkUserAuthenticationInMysticSchoolDbByUserEmail(
+    @GetMapping(path = {"/user/check/auth/", "/user/check/auth"})
+    public Mono<ResponseEntity<ApiResponse<CheckUserResponse>>> checkUserAuthenticationInMysticSchoolDbByUserEmail(
             @RequestParam("email") String email
     ) {
 

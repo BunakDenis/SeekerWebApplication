@@ -50,6 +50,9 @@ public class ApplicationFiltersService {
                     } finally {
                         DataBufferUtils.release(buffer);
                     }
+
+                    log.debug("Тело запроса {}", body);
+
                     return Mono.just(body);
                 });
 
