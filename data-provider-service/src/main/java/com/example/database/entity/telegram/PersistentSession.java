@@ -1,4 +1,4 @@
-package com.example.database.entity;
+package com.example.database.entity.telegram;
 
 
 import jakarta.persistence.*;

@@ -1,5 +1,6 @@
-package com.example.database.entity;
+package com.example.database.entity.telegram;
 
+import com.example.database.entity.TransientSession;
 import jakarta.persistence.*;
 import lombok.*;
 

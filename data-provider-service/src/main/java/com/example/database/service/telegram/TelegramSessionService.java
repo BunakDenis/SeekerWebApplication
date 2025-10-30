@@ -1,18 +1,14 @@
 package com.example.database.service.telegram;
 
 
-import com.example.data.models.entity.dto.telegram.PersistentSessionDTO;
 import com.example.data.models.entity.dto.telegram.TelegramSessionDTO;
 import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
 import com.example.data.models.entity.response.ApiResponse;
-import com.example.data.models.entity.dto.telegram.TransientSessionDTO;
 import com.example.data.models.enums.ResponseIncludeDataKeys;
 import com.example.data.models.exception.EntityNotFoundException;
 import com.example.data.models.exception.EntityNotSavedException;
-import com.example.database.entity.PersistentSession;
-import com.example.database.entity.TelegramSession;
-import com.example.database.entity.TelegramUser;
-import com.example.database.entity.TransientSession;
+import com.example.database.entity.telegram.TelegramSession;
+import com.example.database.entity.telegram.TelegramUser;
 import com.example.database.repo.jpa.telegram.TelegramSessionRepo;
 import com.example.database.service.ModelMapperService;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import static com.example.data.models.utils.ApiResponseUtilsService.*;

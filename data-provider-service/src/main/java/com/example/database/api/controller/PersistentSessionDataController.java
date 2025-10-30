@@ -1,11 +1,11 @@
 package com.example.database.api.controller;
 
 import com.example.data.models.enums.ResponseIncludeDataKeys;
-import com.example.database.entity.PersistentSession;
+import com.example.database.entity.telegram.PersistentSession;
 import com.example.data.models.entity.request.ApiRequest;
 import com.example.data.models.entity.response.ApiResponse;
 import com.example.data.models.entity.dto.telegram.PersistentSessionDTO;
-import com.example.database.entity.TelegramSession;
+import com.example.database.entity.telegram.TelegramSession;
 import com.example.database.service.ModelMapperService;
 import com.example.database.service.telegram.PersistentSessionService;
 import lombok.RequiredArgsConstructor;

@@ -9,7 +9,7 @@ import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
 import com.example.data.models.enums.UserRoles;
 import com.example.data.models.exception.*;
 import com.example.data.models.utils.ApiResponseUtilsService;
-import com.example.database.entity.TelegramUser;
+import com.example.database.entity.telegram.TelegramUser;
 import com.example.database.entity.User;
 import com.example.database.repo.jpa.UserRepo;
 import lombok.RequiredArgsConstructor;

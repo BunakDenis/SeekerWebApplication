@@ -2,6 +2,7 @@ package com.example.database;
 
 
 import com.example.data.models.service.JWTService;
+import com.example.database.service.CuratorService;
 import com.example.database.service.ModelMapperService;
 import com.example.database.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -46,6 +47,8 @@ public abstract class DataProviderTestsBaseClass {
     protected ModelMapperService mapperService;
     @Autowired
     protected UserService userService;
+    @Autowired
+    protected CuratorService curatorService;
     @MockBean
     protected JWTService jwtService;
 

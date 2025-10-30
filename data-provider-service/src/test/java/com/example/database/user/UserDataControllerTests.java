@@ -7,7 +7,7 @@ import com.example.data.models.enums.ResponseIncludeDataKeys;
 import com.example.data.models.enums.UserRoles;
 import com.example.data.models.exception.*;
 import com.example.database.api.client.MysticSchoolClient;
-import com.example.database.entity.TelegramUser;
+import com.example.database.entity.telegram.TelegramUser;
 import com.example.database.entity.User;
 import com.example.data.models.entity.dto.UserDTO;
 import com.example.data.models.entity.request.ApiRequest;
@@ -80,7 +80,6 @@ public class UserDataControllerTests extends DataProviderTestsBaseClass {
 
         mysticSchoolBaseUrl = dotenv.get("MYSTIC_SCHOOL_API_URL") + dotenv.get("MYSTIC_SCHOOL_API_VERSION");
     }
-
 
     @DynamicPropertySource
     static void overrideProperties(DynamicPropertyRegistry registry) {

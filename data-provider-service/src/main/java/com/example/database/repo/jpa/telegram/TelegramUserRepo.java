@@ -1,7 +1,6 @@
 package com.example.database.repo.jpa.telegram;
 
-import com.example.database.entity.TelegramUser;
-import org.springframework.data.jpa.repository.EntityGraph;
+import com.example.database.entity.telegram.TelegramUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

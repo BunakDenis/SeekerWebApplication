@@ -1,9 +1,8 @@
 package com.example.database.api.controller;
 
 
-import com.example.data.models.entity.dto.telegram.PersistentSessionDTO;
 import com.example.data.models.enums.ResponseIncludeDataKeys;
-import com.example.database.entity.TelegramSession;
+import com.example.database.entity.telegram.TelegramSession;
 import com.example.database.entity.TransientSession;
 import com.example.data.models.entity.request.ApiRequest;
 import com.example.data.models.entity.response.ApiResponse;

@@ -35,7 +35,7 @@ public class CuratorService {
     public ApiResponse<CuratorDTO> getById(Long id) {
         Optional<Curator> found = repo.findById(id);
 
-        if (!found.isPresent()) throw new EntityNotFoundException("Curator with id=" + id + "is not found", new Curator());
+        if (!found.isPresent()) throw new EntityNotFoundException("Curator with id=" + id + " is not found", new Curator());
 
         return success(mapperService.toDTO(found.get(), CuratorDTO.class));
     }

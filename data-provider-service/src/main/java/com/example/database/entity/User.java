@@ -1,5 +1,6 @@
 package com.example.database.entity;
 
+import com.example.database.entity.telegram.TelegramUser;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

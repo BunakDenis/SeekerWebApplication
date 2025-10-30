@@ -1,6 +1,6 @@
 package com.example.database.repo.jpa.telegram;
 
-import com.example.database.entity.TelegramSession;
+import com.example.database.entity.telegram.TelegramSession;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

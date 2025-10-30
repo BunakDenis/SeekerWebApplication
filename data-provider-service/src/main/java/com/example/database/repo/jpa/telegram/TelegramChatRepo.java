@@ -1,6 +1,6 @@
 package com.example.database.repo.jpa.telegram;
 
-import com.example.database.entity.TelegramChat;
+import com.example.database.entity.telegram.TelegramChat;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

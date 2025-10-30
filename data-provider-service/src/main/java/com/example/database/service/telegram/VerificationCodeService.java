@@ -7,7 +7,7 @@ import com.example.data.models.entity.response.ApiResponse;
 import com.example.data.models.enums.ResponseIncludeDataKeys;
 import com.example.data.models.exception.EntityNotFoundException;
 import com.example.data.models.exception.EntityNotSavedException;
-import com.example.database.entity.TelegramSession;
+import com.example.database.entity.telegram.TelegramSession;
 import com.example.database.entity.User;
 import com.example.database.entity.VerificationCode;
 import com.example.database.repo.jpa.VerificationCodeRepo;

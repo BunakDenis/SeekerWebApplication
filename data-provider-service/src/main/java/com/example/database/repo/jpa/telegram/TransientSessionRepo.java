@@ -1,6 +1,5 @@
 package com.example.database.repo.jpa.telegram;
 
-import com.example.database.entity.PersistentSession;
 import com.example.database.entity.TransientSession;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

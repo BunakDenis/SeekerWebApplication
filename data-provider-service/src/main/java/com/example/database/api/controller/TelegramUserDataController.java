@@ -5,14 +5,13 @@ import com.example.data.models.entity.request.ApiRequest;
 import com.example.data.models.entity.response.ApiResponse;
 import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
 import com.example.data.models.enums.ResponseIncludeDataKeys;
-import com.example.database.entity.TelegramUser;
+import com.example.database.entity.telegram.TelegramUser;
 import com.example.database.entity.User;
 import com.example.database.service.ModelMapperService;
 import com.example.database.service.telegram.TelegramUserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

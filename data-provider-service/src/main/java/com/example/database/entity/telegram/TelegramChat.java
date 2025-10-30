@@ -1,4 +1,4 @@
-package com.example.database.entity;
+package com.example.database.entity.telegram;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;

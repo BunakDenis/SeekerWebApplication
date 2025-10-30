@@ -1,9 +1,8 @@
 package com.example.database.entity;
 
+import com.example.database.entity.telegram.TelegramSession;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
