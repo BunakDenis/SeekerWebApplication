@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -34,7 +35,10 @@ public class User {
     private String role;
 
     @Column(nullable = false)
-    private Boolean isActive;
+    private Boolean active;
+
+    @Column
+    private LocalDateTime registeredAt;
 
     @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
     private UserDetails userDetails;

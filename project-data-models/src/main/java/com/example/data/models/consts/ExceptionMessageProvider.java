@@ -8,6 +8,7 @@ public class ExceptionMessageProvider {
 
 
     private static final String ENTITY_NULL_EXCEPTION_TEXT = "Entity {0} is null";
+    private static final String ENTITY_NOT_FOUND_EXCEPTION_TEXT = "Entity {0} with {1}={2} is not found";
     private static final String ENTITY_EMPTY_FIELD_EXCEPTION_TEXT = "Field {0} is empty";
     private static final String ENTITY_NULL_FIELD_EXCEPTION_TEXT = "Field {0} is null";
     public static final String EXPIRED_PERSISTENT_SESSION = "Срок действия долгосрочной и краткосрочной сессии истёк.";
@@ -19,6 +20,9 @@ public class ExceptionMessageProvider {
         String entityName = EntityUtilsService.getEntityName(object);
 
         return MessageFormat.format(ENTITY_NULL_EXCEPTION_TEXT, entityName);
+    }
+    public static String getEntityNotFoundExceptionText(String entityName, String fieldName, String fieldValue) {
+        return MessageFormat.format(ENTITY_NOT_FOUND_EXCEPTION_TEXT, entityName, fieldName, fieldValue);
     }
     public static String getEntityNullFieldExceptionText(String fieldName) {
         return MessageFormat.format(ENTITY_NULL_FIELD_EXCEPTION_TEXT, fieldName);

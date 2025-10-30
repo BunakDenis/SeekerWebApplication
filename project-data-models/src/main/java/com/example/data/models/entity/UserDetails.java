@@ -29,8 +29,6 @@ public class UserDetails {
 
     private LocalDateTime dateStartStudyingSchool;
 
-    private String curator;
-
     private User user;
 
 }

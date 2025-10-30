@@ -5,7 +5,8 @@ CREATE TABLE IF NOT EXISTS users (
     password VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     role VARCHAR(255) DEFAULT 'GUEST',
-    is_active BOOLEAN NOT NULL DEFAULT TRUE
+    active BOOLEAN NOT NULL DEFAULT FALSE,
+    registered_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 CREATE TABLE IF NOT EXISTS user_details (
@@ -18,8 +19,19 @@ CREATE TABLE IF NOT EXISTS user_details (
     gender VARCHAR(50),
     avatar_link VARCHAR(255),
     location VARCHAR(255),
-    date_start_studying_school DATE,
-    curator VARCHAR(255)
+    date_start_studying_school DATE
+);
+
+CREATE TABLE IF NOT EXISTS curators (
+    id BIGINT PRIMARY KEY,
+    user_id BIGINT REFERENCES users(id),
+    disciple_id BIGINT
+);
+
+CREATE TABLE IF NOT EXISTS disciples (
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT REFERENCES users(id),
+    curator_id BIGINT REFERENCES curators(id)
 );
 
 CREATE TABLE verification_codes (
@@ -28,7 +40,7 @@ CREATE TABLE verification_codes (
     otp_hash VARCHAR(255) NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
-    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    active BOOLEAN NOT NULL DEFAULT TRUE,
     attempts INT DEFAULT 0,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
@@ -38,7 +50,8 @@ CREATE TABLE IF NOT EXISTS telegram_users (
     id BIGSERIAL PRIMARY KEY,
     telegram_user_id BIGINT,
     username VARCHAR(255),
-    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     user_id BIGINT REFERENCES users(id) NOT NULL
 );
 
@@ -57,7 +70,7 @@ CREATE TABLE IF NOT EXISTS persistent_sessions (
     id BIGSERIAL PRIMARY KEY,
     telegram_session_id BIGINT NOT NULL,
     persistent_session_data VARCHAR(255),
-    is_active BOOLEAN NOT NULL DEFAULT TRUE
+    active BOOLEAN NOT NULL DEFAULT TRUE
 );
 
 -- Краткосрочная сессия
@@ -65,7 +78,7 @@ CREATE TABLE IF NOT EXISTS transient_sessions (
     id BIGSERIAL PRIMARY KEY,
     telegram_session_id BIGINT NOT NULL,
     transient_session_data VARCHAR(255),
-    is_active BOOLEAN NOT NULL DEFAULT TRUE
+    active BOOLEAN NOT NULL DEFAULT TRUE
 );
 
 -- Сессии пользователя Telegram

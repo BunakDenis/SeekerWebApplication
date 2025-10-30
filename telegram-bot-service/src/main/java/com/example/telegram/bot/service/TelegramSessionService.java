@@ -183,7 +183,7 @@ public class TelegramSessionService {
 
                                         PersistentSession newPersistentSession = PersistentSession.builder()
                                                 .telegramSession(persistentSession.getTelegramSession())
-                                                .isActive(true)
+                                                .active(true)
                                                 .data(token)
                                                 .build();
 
@@ -245,7 +245,7 @@ public class TelegramSessionService {
                                 TransientSession newTransientSession = TransientSession.builder()
                                         .telegramSession(session)
                                         .data(token)
-                                        .isActive(true)
+                                        .active(true)
                                         .build();
 
                                 return trSessionService.update(transientSession)

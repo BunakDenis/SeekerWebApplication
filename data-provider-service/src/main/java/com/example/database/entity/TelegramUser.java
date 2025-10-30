@@ -3,6 +3,7 @@ package com.example.database.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -24,8 +25,11 @@ public class TelegramUser {
     @Column(name = "username")
     private String username;
 
-    @Column(name = "is_active")
-    private boolean isActive;
+    @Column(name = "active")
+    private Boolean active;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)

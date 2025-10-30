@@ -21,8 +21,8 @@ public class TransientSession {
         @Column(name = "transient_session_data")
         private String data;
 
-        @Column(name = "is_active", nullable = false)
-        private boolean isActive;
+        @Column(name = "active", nullable = false)
+        private boolean active;
 
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "telegram_session_id", referencedColumnName = "id", nullable = false)

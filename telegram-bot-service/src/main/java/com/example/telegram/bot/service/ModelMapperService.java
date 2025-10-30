@@ -26,7 +26,7 @@ public class ModelMapperService {
     public TelegramUser apiTelegramUserToEntity(org.telegram.telegrambots.meta.api.objects.User user) {
         return TelegramUser.builder()
                 .telegramUserId(user.getId())
-                .isActive(true)
+                .active(true)
                 .build();
     }
 

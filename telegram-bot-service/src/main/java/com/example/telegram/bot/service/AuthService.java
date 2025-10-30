@@ -65,7 +65,7 @@ public class AuthService {
                                     TelegramUser tgUser = TelegramUser.builder()
                                             .user(user)
                                             .username(UpdateUtilsService.getTelegramUsername(update))
-                                            .isActive(true)
+                                            .active(true)
                                             .build();
 
                                     return telegramUserService.save(tgUser);

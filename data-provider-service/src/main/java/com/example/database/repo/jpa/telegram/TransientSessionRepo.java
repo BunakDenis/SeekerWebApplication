@@ -15,7 +15,7 @@ public interface TransientSessionRepo extends JpaRepository<TransientSession, Lo
 
     @Query("""
             SELECT tr FROM TransientSession tr
-            WHERE tr.isActive = true AND
+            WHERE tr.active = true AND
             tr.id = :id
             """)
     Optional<TransientSession> findActiveById(@Param("id") Long id);
@@ -25,7 +25,7 @@ public interface TransientSessionRepo extends JpaRepository<TransientSession, Lo
             JOIN tr.telegramSession ts
             JOIN ts.telegramUser tu
             WHERE tu.telegramUserId = :telegramUserId
-            AND tr.isActive = true
+            AND tr.active = true
             """)
     Optional<TransientSession> findActiveByTelegramUserId(@Param("telegramUserId") Long id);
 

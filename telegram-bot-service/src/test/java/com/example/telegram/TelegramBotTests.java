@@ -261,14 +261,14 @@ public class TelegramBotTests extends TelegramTestsBaseClass {
         PersistentSession persistentSession = PersistentSession.builder()
                 .id(45678L)
                 .data(persistentToken)
-                .isActive(true)
+                .active(true)
                 .telegramSession(TELEGRAM_SESSION_FOR_TESTS)
                 .build();
 
         TransientSession transientSession = TransientSession.builder()
                 .id(56789L)
                 .data(transientToken)
-                .isActive(true)
+                .active(true)
                 .telegramSession(TELEGRAM_SESSION_FOR_TESTS)
                 .build();
 
@@ -1003,14 +1003,14 @@ public class TelegramBotTests extends TelegramTestsBaseClass {
         PersistentSession persistentSession = PersistentSession.builder()
                 .id(45678L)
                 .data(persistentToken)
-                .isActive(true)
+                .active(true)
                 .telegramSession(TELEGRAM_SESSION_FOR_TESTS)
                 .build();
 
         TransientSession transientSession = TransientSession.builder()
                 .id(56789L)
                 .data(transientToken)
-                .isActive(true)
+                .active(true)
                 .telegramSession(TELEGRAM_SESSION_FOR_TESTS)
                 .build();
 

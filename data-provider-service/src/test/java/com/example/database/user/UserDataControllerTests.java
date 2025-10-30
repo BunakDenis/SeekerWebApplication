@@ -1,6 +1,7 @@
 package com.example.database.user;
 
 
+import com.example.data.models.consts.ExceptionMessageProvider;
 import com.example.data.models.entity.response.CheckUserResponse;
 import com.example.data.models.enums.ResponseIncludeDataKeys;
 import com.example.data.models.enums.UserRoles;
@@ -587,7 +588,6 @@ public class UserDataControllerTests extends DataProviderTestsBaseClass {
                     assertEquals(expectedUserDetails.getAvatarLink(), actualUserDetails.getAvatarLink());
                     assertEquals(expectedUserDetails.getLocation(), actualUserDetails.getLocation());
                     assertEquals(expectedUserDetails.getDateStartStudyingSchool(), actualUserDetails.getDateStartStudyingSchool());
-                    assertEquals(expectedUserDetails.getCurator(), actualUserDetails.getCurator());
                 });
     }
     @Test
@@ -636,11 +636,10 @@ public class UserDataControllerTests extends DataProviderTestsBaseClass {
                     assertEquals(expectedUserDetails.getAvatarLink(), actualUserDetails.getAvatarLink());
                     assertEquals(expectedUserDetails.getLocation(), actualUserDetails.getLocation());
                     assertEquals(expectedUserDetails.getDateStartStudyingSchool(), actualUserDetails.getDateStartStudyingSchool());
-                    assertEquals(expectedUserDetails.getCurator(), actualUserDetails.getCurator());
 
                     assertEquals(expectedTelegramUser.getTelegramUserId(), actualTelegramUser.getTelegramUserId());
                     assertEquals(expectedTelegramUser.getUsername(), actualTelegramUser.getUsername());
-                    assertEquals(expectedTelegramUser.isActive(), actualTelegramUser.isActive());
+                    assertEquals(expectedTelegramUser.getActive(), actualTelegramUser.getActive());
 
                 });
     }
@@ -719,6 +718,10 @@ public class UserDataControllerTests extends DataProviderTestsBaseClass {
 
         long userId = 500L;
         ApiRequest apiRequest = getUserRequest();
+        String expectedAnswer =
+                ExceptionMessageProvider.getEntityNotFoundExceptionText(
+                        "User", "id", Long.toString(userId)
+                );
 
         //Then
         client.post()
@@ -733,21 +736,13 @@ public class UserDataControllerTests extends DataProviderTestsBaseClass {
 
                     assertNotNull(deleteResponseBody.getData());
 
-                    EntityNotFoundException entityNotFoundException = assertThrows(
-                            EntityNotFoundException.class, () ->
-                                    userService.getUserById(userId)
-                    );
-
-                    String expectedExceptionMsg = entityNotFoundException.getMessage();
-                    String actualExceptionMsg = deleteResponseBody.getMessage();
-
                     Boolean expectedDeleteAnswer = objectMapper.convertValue(
                             deleteResponseBody.getData(),
                             Boolean.class
                     );
 
                     assertFalse(expectedDeleteAnswer);
-                    assertEquals(expectedExceptionMsg, actualExceptionMsg);
+                    assertEquals(expectedAnswer, deleteResponseBody.getMessage());
                 });
     }
     @Test
@@ -778,7 +773,8 @@ public class UserDataControllerTests extends DataProviderTestsBaseClass {
 
         Mockito.when(
                 mockMysticSchoolClient.checkUserAuthentication(any())
-        ).thenReturn(Mono.just(ApiResponse.<CheckUserResponse>builder()
+        ).thenReturn(
+                Mono.just(ApiResponse.<CheckUserResponse>builder()
                 .data(expectedCheckUserResponse)
                 .build()
         ));
@@ -860,6 +856,8 @@ public class UserDataControllerTests extends DataProviderTestsBaseClass {
                     assertFalse(checkUserResponse.isFound());
                 });
     }
+
+
     private ApiRequest getUserRequest() {
 
         User vasya = User.builder()
@@ -867,7 +865,7 @@ public class UserDataControllerTests extends DataProviderTestsBaseClass {
                 .password("12345")
                 .role(UserRoles.USER.getRole())
                 .email("vs@gmail.com")
-                .isActive(true)
+                .active(true)
                 .build();
 
         UserDTO userDTO = mapperService.toDTO(vasya, UserDTO.class);

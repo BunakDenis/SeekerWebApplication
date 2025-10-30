@@ -2,7 +2,7 @@ package com.example.data.models.entity.dto.telegram;
 
 import lombok.*;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -13,6 +13,7 @@ public class TelegramUserDTO {
     private Long id;
     private Long telegramUserId;
     private String username;
-    private boolean isActive;
+    private boolean active;
+    private LocalDateTime createdAt;
 
 }

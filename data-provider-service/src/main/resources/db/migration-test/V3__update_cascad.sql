@@ -6,6 +6,22 @@ ALTER TABLE user_details
 ADD CONSTRAINT user_details_user_id_fkey
 FOREIGN KEY (user_id) REFERENCES users(id) ON UPDATE CASCADE;
 
+-- Обновляем внешний ключ в таблице curators
+ALTER TABLE curators
+DROP CONSTRAINT IF EXISTS curators_disciple_id_fkey;
+
+ALTER TABLE curators
+ADD CONSTRAINT curators_disciple_id_fkey
+FOREIGN KEY (disciple_id) REFERENCES disciples(id) ON UPDATE CASCADE;
+
+-- Обновляем внешний ключ в таблице discipless
+ALTER TABLE disciples
+DROP CONSTRAINT IF EXISTS disciples_curator_id_fkey;
+
+ALTER TABLE disciples
+ADD CONSTRAINT disciples_curator_id_fkey
+FOREIGN KEY (curator_id) REFERENCES curators(id) ON UPDATE CASCADE;
+
 -- Обновляем внешний ключ в таблице verification_codes
 ALTER TABLE verification_codes
 DROP CONSTRAINT IF EXISTS verification_codes_user_id_fkey;

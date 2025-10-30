@@ -2,6 +2,7 @@ package com.example.data.models.entity;
 
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -21,7 +22,9 @@ public class User {
 
     private String role;
 
-    private Boolean isActive;
+    private Boolean active;
+
+    private LocalDateTime registeredAt;
 
     private UserDetails userDetails;
 

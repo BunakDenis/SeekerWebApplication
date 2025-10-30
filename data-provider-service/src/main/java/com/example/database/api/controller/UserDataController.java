@@ -202,23 +202,23 @@ public class UserDataController {
                         return mysticSchoolClient.checkUserAuthentication(user.getEmail());
                     }
 
-                    return Mono.just(CheckUserResponse.builder()
-                            .found(false)
-                            .build());
+                    return Mono.just(success(
+                            CheckUserResponse.builder()
+                                    .found(false)
+                                    .build()
+                    ));
                 })
                 .map(mysticSchoolResponse -> {
 
                     log.debug(mysticSchoolResponse.toString());
 
-                    return ResponseEntity.status(HttpStatus.OK).body(
-                            success(mysticSchoolResponse)
-                    );
+                    return ResponseEntity.status(HttpStatus.OK).body(mysticSchoolResponse);
                 });
     }
 
-    @GetMapping(path = {"/user/check/auth/", "/user/check/auth"})
+    @GetMapping("/user/check/auth/email/{email}")
     public Mono<ResponseEntity<ApiResponse<CheckUserResponse>>> checkUserAuthenticationInMysticSchoolDbByUserEmail(
-            @RequestParam("email") String email
+            @PathVariable("email") String email
     ) {
 
         log.debug("Запрос на проверку авторизации юзера с email {}", email);

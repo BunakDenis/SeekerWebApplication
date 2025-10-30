@@ -2,6 +2,7 @@ package com.example.data.models.entity;
 
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -15,7 +16,8 @@ public class TelegramUser {
     private Long id;
     private Long telegramUserId;
     private String username;
-    private boolean isActive;
+    private boolean active;
+    private LocalDateTime createdAt;
     @ToString.Exclude
     private User user;
     private List<TelegramChat> telegramChats;

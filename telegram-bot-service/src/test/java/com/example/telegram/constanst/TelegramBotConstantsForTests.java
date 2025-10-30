@@ -20,7 +20,7 @@ public class TelegramBotConstantsForTests {
 
     private static final User USER_FOR_TESTS = new User(
             1L, "testUser", "truthseeker", "test@exemple.com", UserRoles.ADMIN.getRole(),
-            true, null, null
+            true, LocalDateTime.now(), null, null
     );
 
     public static final CheckUserRequest CHECK_USER_REQUEST = CheckUserRequest.builder()
@@ -47,7 +47,7 @@ public class TelegramBotConstantsForTests {
     public static final TelegramUser TELEGRAM_USER_FOR_TESTS = TelegramUser.builder()
             .telegramUserId(12345L)
             .username("max")
-            .isActive(true)
+            .active(true)
             .build();
 
     public static final TelegramSession TELEGRAM_SESSION_FOR_TESTS = TelegramSession.builder()

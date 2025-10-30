@@ -2,7 +2,7 @@ package com.example.database.service;
 
 import com.example.data.models.entity.dto.UserDetailsDTO;
 import com.example.database.entity.UserDetails;
-import com.example.database.repo.jpa.telegram.UserDetailsRepo;
+import com.example.database.repo.jpa.UserDetailsRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -62,7 +62,6 @@ public class UserDetailsService {
                 .location(dto.getLocation())
                 .avatarLink(dto.getAvatarLink())
                 .dateStartStudyingSchool(dto.getDateStartStudyingSchool())
-                .curator(dto.getCurator())
                 .build();
 
     }
@@ -79,7 +78,6 @@ public class UserDetailsService {
                     .location(userDetails.getLocation())
                     .avatarLink(userDetails.getAvatarLink())
                     .dateStartStudyingSchool(userDetails.getDateStartStudyingSchool())
-                    .curator(userDetails.getCurator())
                     .build();
     }
 

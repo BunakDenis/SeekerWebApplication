@@ -3,7 +3,6 @@ package com.example.database.service;
 import com.example.data.models.consts.ExceptionMessageProvider;
 import com.example.data.models.entity.dto.UserDTO;
 import com.example.data.models.entity.dto.UserDetailsDTO;
-import com.example.data.models.entity.dto.VerificationCodeDTO;
 import com.example.data.models.entity.response.ApiResponse;
 import com.example.data.models.enums.ResponseIncludeDataKeys;
 import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
@@ -12,17 +11,16 @@ import com.example.data.models.exception.*;
 import com.example.data.models.utils.ApiResponseUtilsService;
 import com.example.database.entity.TelegramUser;
 import com.example.database.entity.User;
-import com.example.database.entity.VerificationCode;
-import com.example.database.repo.jpa.telegram.UserRepo;
+import com.example.database.repo.jpa.UserRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -170,18 +168,18 @@ public class UserService implements UserDetailsService {
         return ApiResponse.<Boolean>builder().data(result).build();
     }
     public ApiResponse<Boolean> delete(Long id) {
-        try {
-            ApiResponse<UserDTO> getResponse = getUserById(id);
+        boolean isExists = repo.existsById(id);
 
-            repo.deleteById(id);
-            return ApiResponseUtilsService.success(true);
-        } catch (EntityNotFoundException e) {
-            ApiResponse<Boolean> response = success(false);
+        if (!isExists) return ApiResponseUtilsService.success(
+                HttpStatus.OK,
+                false,
+                ExceptionMessageProvider.getEntityNotFoundExceptionText(
+                        "User", "id", Long.toString(id)
+                )
+        );
 
-            response.setMessage(e.getMessage());
-
-            return response;
-        }
+        repo.deleteById(id);
+        return ApiResponseUtilsService.success(true);
     }
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -210,6 +208,7 @@ public class UserService implements UserDetailsService {
                 .roles(UserRoles.TOURIST.getRole())
                 .build();
     }
+
     public void checkUser(User user) {
 
         if (isNull(user)) throw new EntityNullException(

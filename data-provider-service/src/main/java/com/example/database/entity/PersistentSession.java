@@ -4,8 +4,6 @@ package com.example.database.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,8 +20,8 @@ public class PersistentSession {
     @Column(name = "persistent_session_data")
     private String data;
 
-    @Column(name = "is_active", nullable = false)
-    private boolean isActive;
+    @Column(name = "active", nullable = false)
+    private Boolean active;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "telegram_session_id", referencedColumnName = "id", nullable = false)

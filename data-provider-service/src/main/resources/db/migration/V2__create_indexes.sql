@@ -4,6 +4,9 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email ON users (email);
 -- Индекс для user_id в таблице user_details
 CREATE INDEX IF NOT EXISTS idx_user_details_user_id ON user_details (user_id);
 
+-- Уникальный индекс для curator_id в таблице disciples
+CREATE UNIQUE INDEX IF NOT EXISTS idx_disciples_curator_id ON disciples (curator_id);
+
 -- Индекс для user_id в таблице verification_codes
 CREATE INDEX IF NOT EXISTS idx_verification_codes_user_id ON verification_codes (user_id);
 

@@ -23,6 +23,6 @@ public class PageHandler {
     }
 
     public Mono<ServerResponse> registerPage(ServerRequest request) {
-        return ServerResponse.ok().render("pages/userSignUp");
+        return ServerResponse.ok().render("pages/telegramUserSignUp");
     }
 }

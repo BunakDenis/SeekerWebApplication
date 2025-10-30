@@ -24,6 +24,14 @@ public class ApiResponseUtilsService {
                 .build();
     }
 
+    public static <T> ApiResponse<T> success(HttpStatus status, T data, String msg) {
+        return ApiResponse.<T>builder()
+                .status(status)
+                .message(msg)
+                .data(data)
+                .build();
+    }
+
     public static ApiResponse<Object> fail(String msg) {
         return ApiResponse.<Object>builder()
                 .message(msg)

@@ -12,6 +12,6 @@ public class PersistentSessionDTO {
 
     private String data;
 
-    private boolean isActive;
+    private boolean active;
 
 }

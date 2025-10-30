@@ -71,7 +71,7 @@ public class VerificationCodeService {
         code.setOtpHash(hashCode);
         code.setCreatedAt(createdAt);
         code.setExpiresAt(expiresAt);
-        code.setIsActive(true);
+        code.setActive(true);
 
         User user = code.getUser();
 

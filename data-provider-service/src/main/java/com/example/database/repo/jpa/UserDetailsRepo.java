@@ -1,4 +1,4 @@
-package com.example.database.repo.jpa.telegram;
+package com.example.database.repo.jpa;
 
 import com.example.database.entity.UserDetails;
 import org.springframework.data.jpa.repository.JpaRepository;

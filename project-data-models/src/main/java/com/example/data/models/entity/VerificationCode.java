@@ -1,6 +1,5 @@
 package com.example.data.models.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -21,7 +20,7 @@ public class VerificationCode {
 
     private LocalDateTime expiresAt;
 
-    private Boolean isActive;
+    private Boolean active;
 
     private Integer attempts;
 

@@ -7,16 +7,15 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString
+@ToString(exclude = {"telegramSession"})
 public class PersistentSession {
 
     private Long id;
 
     private String data;
 
-    private boolean isActive;
+    private boolean active;
 
-    @ToString.Exclude
     private TelegramSession telegramSession;
 
 }

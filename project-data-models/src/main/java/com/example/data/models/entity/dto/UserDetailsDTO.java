@@ -29,6 +29,4 @@ public class UserDetailsDTO {
 
     private LocalDate dateStartStudyingSchool;
 
-    private String curator;
-
 }

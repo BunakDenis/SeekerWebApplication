@@ -41,9 +41,6 @@ public class UserDetails {
     @Column(name = "date_start_studying_school")
     private LocalDate dateStartStudyingSchool;
 
-    @Column
-    private String curator;
-
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User user;

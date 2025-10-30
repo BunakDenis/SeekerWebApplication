@@ -1,4 +1,4 @@
-package com.example.database.repo.jpa.telegram;
+package com.example.database.repo.jpa;
 
 import com.example.database.entity.VerificationCode;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,14 +12,14 @@ public interface VerificationCodeRepo extends JpaRepository<VerificationCode, Lo
     Optional<VerificationCode> findById(Long id);
     @Query("SELECT vc FROM VerificationCode vc " +
             "JOIN vc.user u " +
-            "WHERE vc.isActive = true AND " +
+            "WHERE vc.active = true AND " +
             "u.id = :id")
     Optional<VerificationCode> findByUserId(Long id);
 
     @Query("SELECT vc FROM VerificationCode vc " +
             "JOIN vc.user u " +
             "JOIN u.telegramUsers tu " +
-            "WHERE vc.isActive = true AND " +
+            "WHERE vc.active = true AND " +
             "tu.telegramUserId = :telegramUserId")
     Optional<VerificationCode> findActiveByTelegramUserId(Long telegramUserId);
     @Query("SELECT vc FROM VerificationCode vc " +
@@ -28,7 +28,7 @@ public interface VerificationCodeRepo extends JpaRepository<VerificationCode, Lo
     List<VerificationCode> findAllByUserId(Long userId);
     @Query("SELECT vc FROM VerificationCode vc " +
             "JOIN FETCH vc.user u " +
-            "WHERE vc.isActive = true AND " +
+            "WHERE vc.active = true AND " +
             "u.id = :userId")
     List<VerificationCode> findAllActiveByUserId(Long userId);
 

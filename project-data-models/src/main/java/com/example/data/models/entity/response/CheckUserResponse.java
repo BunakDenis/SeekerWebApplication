@@ -20,4 +20,8 @@ public class CheckUserResponse {
 
     private boolean active;
 
+    private long curator_id;
+
+    private long curated_by_id;
+
 }

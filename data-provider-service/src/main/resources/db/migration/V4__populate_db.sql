@@ -2,7 +2,7 @@
 -- Только наполнение данными (идемпотентно, без правки схемы)
 
 -- 1) Вставляем основных пользователей (если уже есть — не трогаем)
-INSERT INTO users (username, password, email, role, is_active)
+INSERT INTO users (username, password, email, role, active)
 VALUES
   ('dbunak', '$2a$12$7aAytGGjXfLWyZuP.82HH.vKGoOwB2/CyAIN24EB5gG6mbTnVOCj6', 'xisi926@ukr.net', 'ADMIN', TRUE),
   ('tourist', '$2a$12$nIJtokJ7mstpyw.p/dQgSuNK9NLzo8bfOdIe8cSxjJOVhAKuskfq.', 'tourist@gmail.com', 'TOURIST', TRUE),
@@ -15,6 +15,7 @@ DO $$
 DECLARE
     d_user_id BIGINT;
     tu_id BIGINT;
+    d_disciple_id BIGINT;
 BEGIN
     -- Получаем внутренний id пользователя "dbunak" по email
     SELECT id INTO d_user_id FROM users WHERE email = 'xisi926@ukr.net' LIMIT 1;
@@ -26,7 +27,7 @@ BEGIN
     -- Вставляем user_details только если для данного user_id ещё нет записи
     IF NOT EXISTS (SELECT 1 FROM user_details WHERE user_id = d_user_id) THEN
         INSERT INTO user_details (
-            user_id, first_name, last_name, birthday, phone_number, gender, location, date_start_studying_school, curator
+            user_id, first_name, last_name, birthday, phone_number, gender, location, date_start_studying_school
         ) VALUES (
             d_user_id,
             'Денис',
@@ -35,17 +36,39 @@ BEGIN
             '+380664988869',
             'MALE',
             'Украина, г. Чернигов',
-            '2020-02-11'::date,
-            'Алексей Киселёв'
+            '2020-02-11'::date
         );
+
+        -- Создаём запись в curators (если её нет)
+        IF NOT EXISTS (SELECT 1 FROM curators WHERE id = 15) THEN
+            INSERT INTO curators (id, user_id)
+            VALUES (15, d_user_id);
+        END IF;
+
+        -- Создаём запись в disciples
+        INSERT INTO disciples (user_id, curator_id)
+        VALUES (d_user_id, 15)
+        ON CONFLICT DO NOTHING;
+
+        -- Получаем внутренний id ученика "dbunak"
+        SELECT id INTO d_disciple_id FROM disciples WHERE curator_id = 15 LIMIT 1;
+
+        IF d_disciple_id IS NULL THEN
+            RAISE NOTICE 'disciples with curator_id 15 not found — skipping related inserts';
+        ELSE
+            -- 🔧 ВОТ ЗДЕСЬ БЫЛА ОШИБКА: теперь используем UPDATE
+            UPDATE curators
+            SET disciple_id = d_disciple_id
+            WHERE id = 15;
+        END IF;
+
     ELSE
-        -- Не изменяем существующую запись (чисто заполнение)
         RAISE NOTICE 'user_details for user_id % already exists — not inserting', d_user_id;
     END IF;
 
     -- Вставляем telegram_user (внешний telegram_user_id = 465963651) только если нет такой внешней записи
     IF NOT EXISTS (SELECT 1 FROM telegram_users WHERE telegram_user_id = 465963651) THEN
-        INSERT INTO telegram_users (telegram_user_id, user_id, username, is_active)
+        INSERT INTO telegram_users (telegram_user_id, user_id, username, active)
         VALUES (465963651, d_user_id, 'dbunakns', TRUE);
     ELSE
         RAISE NOTICE 'telegram_users with telegram_user_id 465963651 already exists — not inserting';
@@ -54,7 +77,6 @@ BEGIN
     -- Получаем внутренний PK telegram_users.id для внешнего telegram_user_id
     SELECT id INTO tu_id FROM telegram_users WHERE telegram_user_id = 465963651 LIMIT 1;
 
-    -- Если по какой-то причине не нашли — сообщим и выйдем
     IF tu_id IS NULL THEN
         RAISE NOTICE 'Не удалось получить internal id для telegram_user_id 465963651 — пропускаем вставку telegram_chats';
         RETURN;

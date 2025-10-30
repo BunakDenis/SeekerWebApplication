@@ -28,7 +28,6 @@ public class UserConstantsForTests {
             .gender("MALE")
             .location("Украина, г. Киев")
             .dateStartStudyingSchool(LocalDate.of(2020, Month.FEBRUARY, 11))
-            .curator("Руслан Жуковец")
             .build();
 
 
@@ -38,7 +37,7 @@ public class UserConstantsForTests {
             .password("truthseeker")
             .email("test@exemple.com")
             .role(UserRoles.ADMIN.getRole())
-            .isActive(true)
+            .active(true)
             .userDetails(USER_DETAILS_FOR_TESTS)
             .build();
 
@@ -55,7 +54,7 @@ public class UserConstantsForTests {
     public static final TelegramUser TELEGRAM_USER_FOR_TESTS = TelegramUser.builder()
             .telegramUserId(55555L)
             .username("vterk")
-            .isActive(true)
+            .active(true)
             .build();
 
     public static final TelegramSession TELEGRAM_SESSION_FOR_TESTS = TelegramSession.builder()
@@ -69,7 +68,7 @@ public class UserConstantsForTests {
                 .username(USER_FOR_TESTS.getUsername())
                 .password(USER_FOR_TESTS.getPassword())
                 .email(USER_FOR_TESTS.getEmail())
-                .isActive(USER_FOR_TESTS.getIsActive())
+                .active(USER_FOR_TESTS.getActive())
                 .userDetails(USER_DETAILS_FOR_TESTS)
                 .telegramUsers(List.of(TELEGRAM_USER_FOR_TESTS))
                 .build();

@@ -25,7 +25,7 @@ public class PageRouter {
         return route()
                 .path("", builder -> builder
                         .GET("/", pageHandler::getMainPage)
-                        .GET("/register", pageHandler::registerPage)
+                        .GET("/tg_register", pageHandler::registerPage)
                 )
                 .build();
     }

@@ -188,7 +188,7 @@ public class AuthCommandHandlerImpl implements CommandHandler {
                                                                     .flatMap(user -> {
                                                                         TelegramUser newTgUser = TelegramUser.builder()
                                                                                 .username(UpdateUtilsService.getTelegramUserFullName(update))
-                                                                                .isActive(true)
+                                                                                .active(true)
                                                                                 .user(user)
                                                                                 .build();
 
@@ -274,7 +274,7 @@ public class AuthCommandHandlerImpl implements CommandHandler {
 
                                 TransientSession transientSession = TransientSession.builder()
                                         .telegramSession(session)
-                                        .isActive(true)
+                                        .active(true)
                                         .build();
 
                                 return userService.getUserByTelegramUserId(telegramUserId)
@@ -295,7 +295,7 @@ public class AuthCommandHandlerImpl implements CommandHandler {
                                 TransientSession transientSession = tuple.getT2();
 
                                 PersistentSession persistentSession = PersistentSession.builder()
-                                        .isActive(true)
+                                        .active(true)
                                         .telegramSession(session)
                                         .build();
 

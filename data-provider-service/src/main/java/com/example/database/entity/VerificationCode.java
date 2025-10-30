@@ -27,8 +27,8 @@ public class VerificationCode {
     @Column(name = "expires_at", nullable = false)
     private LocalDateTime expiresAt;
 
-    @Column(name = "is_active", nullable = false, columnDefinition = "BOOLEAN DEFAULT true")
-    private Boolean isActive;
+    @Column(name = "active", nullable = false, columnDefinition = "BOOLEAN DEFAULT true")
+    private Boolean active;
 
     @Column(name = "attempts")
     private Integer attempts;

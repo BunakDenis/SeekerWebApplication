@@ -12,7 +12,6 @@ import com.example.database.repo.jpa.telegram.PersistentSessionRepo;
 import com.example.database.service.ModelMapperService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

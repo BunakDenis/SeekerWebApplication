@@ -13,7 +13,7 @@ public class TransientSession {
 
     private String data;
 
-    private boolean isActive;
+    private boolean active;
 
     @ToString.Exclude
     private TelegramSession telegramSession;

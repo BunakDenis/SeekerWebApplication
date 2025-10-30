@@ -15,7 +15,7 @@ public interface PersistentSessionRepo extends JpaRepository<PersistentSession, 
 
     @Query("""
             SELECT pr FROM PersistentSession pr
-            WHERE pr.isActive = true AND
+            WHERE pr.active = true AND
             pr.id = :id
             """)
     Optional<PersistentSession> findActiveById(@Param("id") Long id);
@@ -25,7 +25,7 @@ public interface PersistentSessionRepo extends JpaRepository<PersistentSession, 
             JOIN pr.telegramSession ts
             JOIN ts.telegramUser tu
             WHERE tu.telegramUserId = :telegramUserId
-            AND pr.isActive = true
+            AND pr.active = true
             """)
     Optional<PersistentSession> findActiveByTelegramUserId(@Param("telegramUserId") Long id);
 
