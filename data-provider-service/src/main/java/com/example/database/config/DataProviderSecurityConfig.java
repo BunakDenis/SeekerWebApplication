@@ -30,6 +30,7 @@ public class DataProviderSecurityConfig {
                 .securityMatcher(new PathPatternParserServerWebExchangeMatcher("/api/v1/**"))
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(exchanges -> exchanges
+                        .pathMatchers("/actuator/health/").permitAll()
                         .anyExchange().authenticated()
                 )
                 .build();

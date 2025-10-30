@@ -37,6 +37,11 @@ public class PageHandler {
 
         log.debug("Отдаю страницу успешной регистрации для пользователя с id={}", userId);
 
-        return ServerResponse.ok().render("pages/successReg", Map.of("user", "Денис Бунак"));
+        Map<String, String> mapForPage = Map.of(
+                "username", "Денис Бунак",
+                "email", "xisi926@ukr.net"
+                );
+
+        return ServerResponse.ok().render("pages/successReg", mapForPage);
     }
 }

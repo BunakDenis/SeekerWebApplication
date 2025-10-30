@@ -15,11 +15,11 @@ services:
       POSTGRES_USER: ${DB_USER_NAME}
       POSTGRES_PASSWORD: ${DB_USER_PASSWORD}
       POSTGRES_DB_HOST: ${POSTGRES_DB_HOST}
-      POSTGRES_DB_PORT: ${POSTGRES_DB_PORT}
+      POSTGRES_DB_PORT: ${POSTGRES_DB_DOCKER_PORT}
     networks:
       - app-network
     ports:
-      - ${POSTGRES_DB_PORT}:5432
+      - ${POSTGRES_DB_PORT}:${POSTGRES_DB_PORT}
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U ${DB_USER_NAME} -d ${DB_NAME}" ]
       interval: 10s
@@ -68,7 +68,7 @@ services:
       POSTGRES_USER: ${DB_USER_NAME}
       POSTGRES_PASSWORD: ${DB_USER_PASSWORD}
       POSTGRES_DB_HOST: ${POSTGRES_DB_DOCKER_HOST}
-      POSTGRES_DB_PORT: 5432
+      POSTGRES_DB_PORT: ${POSTGRES_DB_DOCKER_PORT}
       DATA_PROVIDER_SERVICE_PORT: ${DATA_PROVIDER_SERVICE_PORT}
       DATA_PROVIDER_SERVICE_API_URL: ${DATA_PROVIDER_SERVICE_API_DOCKER_URL}
     networks:
@@ -128,3 +128,19 @@ services:
         condition: service_healthy
     ports:
       - ${WEB_SERVER_SERVICE_PORT}:${WEB_SERVER_SERVICE_PORT}
+
+  tor-proxy:
+    image: dperson/torproxy
+    env_file:
+      - ./.env
+    environment:
+      LOCATION: DE
+      PROXY_TOR_PORT: ${PROXY_TOR_PORT}
+    restart: unless-stopped
+    networks:
+      - app-network
+    depends_on:
+      data-provider-service:
+        condition: service_healthy
+    ports:
+      - "${PROXY_TOR_PORT}:${PROXY_TOR_PORT}"
