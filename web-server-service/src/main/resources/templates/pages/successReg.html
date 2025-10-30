@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Успешная регистрация | Кабинет Искателя</title>
+    <link
+    rel="icon"
+    th:href="@{/images/icon/al_vadud_vector_title.svg}"
+    type="image/svg"
+  />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lobster&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orelega+One&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css"
+    />
+
+    <!-- ===== Boxicons CSS ===== -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+
+    <script defer th:src="@{/js/main.js}"></script>
+    <script type="module" th:src="@{/js/header.js}"></script>
+  </head>
+
+  <body class="page-contacts">
+
+    <div class="page-video">
+      <video
+        class="video"
+        controls
+        loop="loop"
+        autoplay
+        muted
+        th:poster="@{/images/fly_on_clouds.jpg}"
+      >
+        <source th:src="@{/video/fly_on_clouds.mp4}" type="video/mp4" />
+        <source th:src="@{/video/fly_on_clouds.webm}" type="video/webm" />
+      </video>
+    </div>
+
+    <div class="bg-image" id="body-bg-image"></div>
+
+    <div class="page-wrapper">
+      <header id="page-header"></header>
+
+      <main>
+        <!-- Основной контет -->
+        <div class="info-container success-registration-container">
+          <h3>Поздравляем с успешной регистрацией!</h3>
+          <p>
+            Для активации аккаунта Вам необходимо перейти по ссылке отправленной
+            Вам на ваш email. <br /><br />
+            Для использования всех доступных функций телеграм бота Вам будет
+            необходимо пройти процедуру авторизации в боте с данными введёнными
+            при регистрации.
+          </p>
+        </div>
+      </main>
+
+      <footer id="page-footer"></footer>
+    </div>
+
+    <!-- Форма поиска по сайту -->
+    <div class="search-container hide">
+      <div class="search-field">
+        <input id="input-search-field" type="text" placeholder="Поиск..." />
+        <i
+          class="bi bi-search"
+          id="serach-start-icon"
+          title="Поиск по сайту"
+        ></i>
+        <i class="bi bi-x hide"></i>
+      </div>
+    </div>
+    <!-- Форма входа юзера -->
+    <div class="sign-in-container" id="sign-in-container">
+      <form class="sign-in-form" action="#">
+        <h2>Авторизация</h2>
+        <i class="bi bi-x-lg sign-in-form-cancel"></i>
+        <div class="input-sign-in-field">
+          <label>Введите електронную почту</label>
+          <input type="text" id="sign-in-user-email-input" required />
+        </div>
+        <div class="input-sign-in-field">
+          <label>Введите пароль</label>
+          <input type="password" id="sign-in-password-input" required />
+          <i
+            class="fa fa-eye-slash fa-xs"
+            id="sign-in-form-password-visibility-icon"
+          ></i>
+        </div>
+        <div class="forget">
+          <div>
+            <input type="checkbox" id="remember" />
+            <span>Запомнить меня</span>
+          </div>
+          <a class="sign-in-form-link" href="#">Забыли пароль?</a>
+        </div>
+        <button class="sign-in-button" type="submit">Войти</button>
+        <div class="register">
+          <p>У вас нет аккаунта?</p>
+          <a class="sign-in-form-link" href="./userSignUp.html"
+            >Зарегистрироваться
+          </a>
+        </div>
+      </form>
+    </div>
+    <!-- Форма информации про пользователя -->
+    <div class="user-information-container" id="user-information-container">
+      <i class="bi bi-x user-information-form-cancel"></i>
+      <form class="user-information-form" id="user-information-form" action="#">
+        <h2 class="user-information-form-title">
+          Добро пожаловать,<br />
+          Имя и Фамилия Искателя!
+        </h2>
+        <p class="user-information-content">user@gmailcom</p>
+        <div class="user-information-links-container">
+          <a class="user-fw-profile-link" href="./userProfile.html">Профиль</a>
+          <a class="sign-out-link" href="#">Выйти</a>
+        </div>
+      </form>
+    </div>
+    <!-- Форма уведомлений -->
+    <div class="notification-container">
+      <i class="bi bi-x-lg notification-form-cancel"></i>
+      <form class="notification-form" action="#">
+        <h2>Уведомления</h2>
+        <div class="notification-items-wrapper">
+          <p class="notification-title">Уведомление №1</p>
+          <p class="notification-content">
+            Практика с Послания Доверие не сделана
+          </p>
+        </div>
+      </form>
+    </div>
+
+    <script
+      src="https://kit.fontawesome.com/d6a7640edd.js"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.bundle.min.js"></script>
+    
+  </body>
+
+</html>
