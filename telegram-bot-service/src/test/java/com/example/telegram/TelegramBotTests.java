@@ -513,7 +513,7 @@ public class TelegramBotTests extends TelegramTestsBaseClass {
         mockServerClient
                 .when(request()
                         .withMethod("POST")
-                        .withPath("/api/v1/otp_code/add/"))
+                        .withPath("/api/v1/verification_code/add/"))
                 .respond(response()
                         .withStatusCode(200)
                         .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
@@ -563,7 +563,7 @@ public class TelegramBotTests extends TelegramTestsBaseClass {
         mockServerClient.verify(
                 HttpRequest.request()
                         .withMethod("POST")
-                        .withPath("/api/v1/otp_code/add/"),
+                        .withPath("/api/v1/verification_code/add/"),
                 VerificationTimes.once()
         );
 
@@ -686,7 +686,7 @@ public class TelegramBotTests extends TelegramTestsBaseClass {
         mockServerClient
                 .when(request()
                         .withMethod("GET")
-                        .withPath("/api/v1/otp_code/telegram_user_id/" + TELEGRAM_USER_FOR_TESTS.getTelegramUserId()))
+                        .withPath("/api/v1/verification_code/telegram_user_id/" + TELEGRAM_USER_FOR_TESTS.getTelegramUserId()))
                 .respond(response()
                         .withStatusCode(200)
                         .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
@@ -757,7 +757,7 @@ public class TelegramBotTests extends TelegramTestsBaseClass {
         mockServerClient
                 .when(request()
                         .withMethod("GET")
-                        .withPath("/api/v1/otp_code/telegram_user_id/" + TELEGRAM_USER_FOR_TESTS.getTelegramUserId()))
+                        .withPath("/api/v1/verification_code/telegram_user_id/" + TELEGRAM_USER_FOR_TESTS.getTelegramUserId()))
                 .respond(response()
                         .withStatusCode(200)
                         .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
@@ -829,7 +829,7 @@ public class TelegramBotTests extends TelegramTestsBaseClass {
         mockServerClient
                 .when(request()
                         .withMethod("GET")
-                        .withPath("/api/v1/otp_code/telegram_user_id/" + TELEGRAM_USER_FOR_TESTS.getTelegramUserId()))
+                        .withPath("/api/v1/verification_code/telegram_user_id/" + TELEGRAM_USER_FOR_TESTS.getTelegramUserId()))
                 .respond(response()
                         .withStatusCode(200)
                         .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
