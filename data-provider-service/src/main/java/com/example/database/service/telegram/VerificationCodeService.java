@@ -110,6 +110,16 @@ public class VerificationCodeService {
 
         throw new EntityNotFoundException(ResponseMessageProvider.getEntityNotFoundMessage(new User()), new User());
     }
+    public ApiResponse<VerificationCodeDTO> getCodeByOtpHash(String otpHash) {
+
+        Optional<VerificationCode> code = verificationCodeRepo.findActiveByOtpHash(otpHash);
+
+        if (code.isPresent()) return success(
+                modelMapperService.toDTO(code, VerificationCodeDTO.class)
+        );
+
+        throw new EntityNotFoundException(ResponseMessageProvider.getEntityNotFoundMessage(new VerificationCode()), new VerificationCode());
+    }
     public ApiResponse<Object> getAllActiveByUserId(Long userId) {
 
         List<VerificationCode> all = verificationCodeRepo.findAllActiveByUserId(userId);

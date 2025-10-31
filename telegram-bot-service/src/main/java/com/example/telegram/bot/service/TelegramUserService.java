@@ -59,7 +59,7 @@ public class TelegramUserService {
                         Mono.empty()
                 );
     }
-    public Mono<TelegramUser> getByTelegramUserId(long id) {
+    public Mono<TelegramUser> getById(long id) {
         return dataProviderClient.getTelegramUserByTelegramUserId(id)
                 .flatMap(resp -> {
 
@@ -75,7 +75,7 @@ public class TelegramUserService {
                     return Mono.just(result);
                 });
     }
-    public Mono<TelegramUser> getByTelegramUserIdWithTelegramSession(long id) {
+    public Mono<TelegramUser> getByIdWithTelegramSession(long id) {
         return dataProviderClient.getTelegramUserByTelegramUserIdWithTelegramSession(id)
                 .flatMap(resp -> {
 

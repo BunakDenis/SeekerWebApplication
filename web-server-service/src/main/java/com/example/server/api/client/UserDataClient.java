@@ -31,7 +31,7 @@ public class UserDataClient extends DataProvideClientBaseClass {
 
         ApiRequest<UserDTO> request = new ApiRequest<>(dto);
 
-        return sendPostRequest(endpoint.toString(), request)
+        return sendPostRequest(endpoint.toString(), request, USER_TYPE_REF)
                 .flatMap(resp -> Mono.just(resp.getData()));
     }
     public Mono<UserDTO> update(UserDTO dto) {
@@ -39,7 +39,7 @@ public class UserDataClient extends DataProvideClientBaseClass {
 
         ApiRequest<UserDTO> request = new ApiRequest<>(dto);
 
-        return sendPostRequest(endpoint.toString(), request)
+        return sendPostRequest(endpoint.toString(), request, USER_TYPE_REF)
                 .flatMap(resp -> Mono.just(resp.getData()));
     }
     public Mono<UserDTO> getById(Long id) {

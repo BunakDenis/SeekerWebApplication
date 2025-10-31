@@ -69,7 +69,7 @@ public class UserDataController {
 
             userDetails.setUser(mapperService.toEntity(result.getData(), User.class));
 
-            UserDetails savedUserDetails = userDetailsService.create(userDetails);
+            UserDetails savedUserDetails = userDetailsService.save(userDetails);
 
             UserDetailsDTO userDetailsDTO = mapperService.toDTO(savedUserDetails, UserDetailsDTO.class);
 

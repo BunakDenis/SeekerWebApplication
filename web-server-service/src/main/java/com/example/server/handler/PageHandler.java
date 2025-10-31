@@ -6,12 +6,14 @@ import com.example.data.models.service.JWTService;
 import com.example.data.models.utils.generator.GenerationService;
 import com.example.server.provider.ThymeleafModelObjectsProvider;
 import com.example.server.service.UserService;
+import com.example.server.service.VerificationCodeService;
 import com.example.utils.datetime.DateTimeService;
 import com.example.utils.sender.EmailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.map.LinkedMap;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
@@ -31,6 +33,7 @@ public class PageHandler {
 
 
     private final UserService userService;
+    private final VerificationCodeService verificationCodeService;
     private final EmailService emailService;
     private final GenerationService generationService;
     private final JWTService jwtService;
@@ -61,6 +64,7 @@ public class PageHandler {
 
                     JwtDataProvideDataImpl jwtData = JwtDataProvideDataImpl.builder()
                             .username(user.getUsername())
+                            .subjects(Map.of("username", user.getUsername()))
                             .expirationTime(DateTimeService.convertDaysToMillis(1L))
                             .build();
 
@@ -86,7 +90,8 @@ public class PageHandler {
                     mapForPage.put("username", userService.getUserFullName(user));
                     mapForPage.put("email", user.getEmail());
 
-                    return ServerResponse.ok().render("pages/successReg", mapForPage);
+                    return verificationCodeService.save(code)
+                            .then(ServerResponse.ok().render("pages/successReg", mapForPage));
                 });
     }
 
@@ -95,6 +100,16 @@ public class PageHandler {
 
         log.debug("Activate code = {}", activateCode);
 
-        return ServerResponse.ok().render("pages/index");
+        return verificationCodeService.getByOtpHash(activateCode)
+                .flatMap(resp -> {
+                    if (resp.getOtpHash().equals(activateCode)) return Mono.just(true);
+
+                    return Mono.just(false);
+                })
+                .flatMap(isValid -> {
+                    if (isValid) return successRegPage(request);
+
+                    return ServerResponse.ok().render("pages/index");
+                });
     }
 }

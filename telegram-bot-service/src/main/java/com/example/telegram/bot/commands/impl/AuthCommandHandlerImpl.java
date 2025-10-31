@@ -260,7 +260,7 @@ public class AuthCommandHandlerImpl implements CommandHandler {
                             1. Извенить на метод getByIdWithUser
                             2. Перед сохранением сессий убрать запросы на получение User
                      */
-                    return telegramUserService.getByTelegramUserId(telegramUserId)
+                    return telegramUserService.getById(telegramUserId)
                             .flatMap(tgUser -> {
                                 TelegramSession session = TelegramSession.builder()
                                         .telegramUser(tgUser)

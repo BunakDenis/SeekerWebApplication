@@ -624,60 +624,9 @@ public class DataProviderClient {
     }
 
     //VERIFICATION CODE SECTION
-    public Mono<ApiResponse<VerificationCodeDTO>> getVerificationCodeById(Long id) {
-
-        StringBuilder endpoint = new StringBuilder(getApiOtpCodeEndpoint(Long.toString(id)));
-        endpoint.append(id);
-
-        log.debug("Отправляю запрос к Data provide service для получения VerificationCode по id {}", id);
-        log.debug("Отправка на endpoint {}", endpoint);
-
-        return webClient.get()
-                .uri(endpoint.toString())
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<>() {
-                });
-    }
-    public Mono<ApiResponse<VerificationCodeDTO>> getVerificationCodeByUserId(Long userId) {
-
-        StringBuilder endpoint = new StringBuilder(getApiOtpCodeEndpoint("user_id/"));
-        endpoint.append(userId);
-
-        log.debug(
-                "Отправляю запрос к Data provide service для получения VerificationCode по user_id {}",
-                userId
-        );
-        log.debug("Отправка на endpoint {}", endpoint);
-
-        return webClient.get()
-                .uri(endpoint.toString())
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<>() {
-                });
-    }
-    public Mono<ApiResponse<VerificationCodeDTO>> getVerificationCodeByTelegramUserId(Long telegramUserId) {
-
-        StringBuilder endpoint = new StringBuilder(getApiOtpCodeEndpoint("telegram_user_id/"));
-        endpoint.append(telegramUserId);
-
-        log.debug(
-                "Отправляю запрос к Data provide service для получения VerificationCode по user_id {}",
-                telegramUserId
-        );
-        log.debug("Отправка на endpoint {}", endpoint);
-
-        return webClient.get()
-                .uri(endpoint.toString())
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<>() {
-                });
-    }
     public Mono<ApiResponse<VerificationCodeDTO>> saveVerificationCode(ApiRequest<VerificationCodeDTO> request) {
 
-        StringBuilder endpoint = new StringBuilder(getApiOtpCodeEndpoint("add/"));
+        StringBuilder endpoint = new StringBuilder(getApiVerificationCodeEndpoint("add/"));
 
         log.debug(
                 "Отправляю запрос к Data provide service для сохранения VerificationCode {}",
@@ -696,7 +645,7 @@ public class DataProviderClient {
     }
     public Mono<ApiResponse<VerificationCodeDTO>> updateVerificationCode(ApiRequest<VerificationCodeDTO> request) {
 
-        StringBuilder endpoint = new StringBuilder(getApiOtpCodeEndpoint("update/"));
+        StringBuilder endpoint = new StringBuilder(getApiVerificationCodeEndpoint("update/"));
 
         log.debug(
                 "Отправляю запрос к Data provide service для обновления информации об VerificationCode {}",
@@ -712,9 +661,60 @@ public class DataProviderClient {
                 .bodyToMono(new ParameterizedTypeReference<>() {
                 });
     }
+    public Mono<ApiResponse<VerificationCodeDTO>> getVerificationCodeById(Long id) {
+
+        StringBuilder endpoint = new StringBuilder(getApiVerificationCodeEndpoint(Long.toString(id)));
+        endpoint.append(id);
+
+        log.debug("Отправляю запрос к Data provide service для получения VerificationCode по id {}", id);
+        log.debug("Отправка на endpoint {}", endpoint);
+
+        return webClient.get()
+                .uri(endpoint.toString())
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<>() {
+                });
+    }
+    public Mono<ApiResponse<VerificationCodeDTO>> getVerificationCodeByUserId(Long userId) {
+
+        StringBuilder endpoint = new StringBuilder(getApiVerificationCodeEndpoint("user_id/"));
+        endpoint.append(userId);
+
+        log.debug(
+                "Отправляю запрос к Data provide service для получения VerificationCode по user_id {}",
+                userId
+        );
+        log.debug("Отправка на endpoint {}", endpoint);
+
+        return webClient.get()
+                .uri(endpoint.toString())
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<>() {
+                });
+    }
+    public Mono<ApiResponse<VerificationCodeDTO>> getVerificationCodeByTelegramUserId(Long telegramUserId) {
+
+        StringBuilder endpoint = new StringBuilder(getApiVerificationCodeEndpoint("telegram_user_id/"));
+        endpoint.append(telegramUserId);
+
+        log.debug(
+                "Отправляю запрос к Data provide service для получения VerificationCode по user_id {}",
+                telegramUserId
+        );
+        log.debug("Отправка на endpoint {}", endpoint);
+
+        return webClient.get()
+                .uri(endpoint.toString())
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<>() {
+                });
+    }
     public Mono<ApiResponse<Boolean>> deleteVerificationCode(Long id) {
 
-        StringBuilder endpoint = new StringBuilder(getApiOtpCodeEndpoint("delete/"));
+        StringBuilder endpoint = new StringBuilder(getApiVerificationCodeEndpoint("delete/"));
         endpoint.append(id);
 
         log.debug(

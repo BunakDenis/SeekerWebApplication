@@ -2,6 +2,7 @@ package com.example.server.api.client;
 
 import com.example.data.models.entity.request.ApiRequest;
 import com.example.data.models.entity.response.ApiResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,21 +53,23 @@ abstract class DataProvideClientBaseClass {
                 .build();
     }
 
-    protected <K> Mono<ApiResponse<K>> sendPostRequest(String endpoint, ApiRequest<K> request) {
+    protected <K> Mono<ApiResponse<K>> sendPostRequest(
+            String endpoint,
+            ApiRequest<?> request,
+            ParameterizedTypeReference<ApiResponse<K>> responseType) {
+
         return webClient.post()
                 .uri(endpoint)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(request)
                 .retrieve()
-                .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
-                        response -> response.bodyToMono(String.class) // Можно прочитать тело ошибки
-                                .flatMap(errorBody -> {
-                                    log.debug("Получен ответ от Data provider service {}", errorBody);
-                                    return Mono.empty();
-                                }))
-                .bodyToMono(new ParameterizedTypeReference<>() {
-                });
+                .onStatus(
+                        status -> status.is4xxClientError() || status.is5xxServerError(),
+                        response -> response.bodyToMono(String.class)
+                                .flatMap(body -> Mono.error(new RuntimeException(body)))
+                )
+                .bodyToMono(responseType);
     }
 
     protected Mono<ApiResponse<Boolean>> sendPostRequestWithBooleanResponse(String endpoint) {

@@ -79,7 +79,7 @@ public class AuthService {
                                 Mono.just(userDetails))
                 )
                 .doOnError(err -> log.error("Ошибка проверки telegram session - {}", err.getMessage()))
-                .onErrorResume(err -> telegramUserService.getByTelegramUserIdWithTelegramSession(telegramUserId)
+                .onErrorResume(err -> telegramUserService.getByIdWithTelegramSession(telegramUserId)
                         .flatMap(tgUser -> {
 
                             if (Objects.nonNull(tgUser.getTelegramSessions().get(0))) {

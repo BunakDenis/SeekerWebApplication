@@ -17,7 +17,7 @@ public class UserDetailsService {
 
     private final UserService userService;
 
-    private UserDetailsRepo repo;
+    private final UserDetailsRepo repo;
 
     public UserDetails getDetails(Long id) {
         Optional<UserDetails> userDetails = repo.findById(id);
@@ -28,14 +28,14 @@ public class UserDetailsService {
         return userDetails.get();
     }
 
-    public UserDetails create(UserDetails userDetails) {
+    public UserDetails save(UserDetails userDetails) {
         UserDetails result = repo.save(userDetails);
 
         return result;
     }
 
     public UserDetails update(UserDetails userDetails) {
-        return create(userDetails);
+        return save(userDetails);
     }
 
     public boolean delete(UserDetails userDetails) {

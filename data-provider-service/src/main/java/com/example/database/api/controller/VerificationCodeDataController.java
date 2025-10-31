@@ -17,7 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/verification_code")
 @RequiredArgsConstructor
 @Slf4j
 public class VerificationCodeDataController {
@@ -28,7 +28,7 @@ public class VerificationCodeDataController {
     private final ModelMapperService mapperService;
 
 
-    @PostMapping("/otp_code/add/")
+    @PostMapping("/add/")
     public ResponseEntity<ApiResponse<VerificationCodeDTO>> saveVerificationCode(
             @RequestBody ApiRequest<VerificationCodeDTO> request
     ) {
@@ -52,7 +52,7 @@ public class VerificationCodeDataController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PostMapping("/otp_code/update/")
+    @PostMapping("/update/")
     public ResponseEntity<ApiResponse<VerificationCodeDTO>> updateVerificationCode(
             @RequestBody ApiRequest<VerificationCodeDTO> request
     ) {
@@ -65,7 +65,7 @@ public class VerificationCodeDataController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @GetMapping("/otp_code/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<VerificationCodeDTO>> getVerificationCodeById(
             @PathVariable("id") Long id
     ) {
@@ -76,7 +76,7 @@ public class VerificationCodeDataController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @GetMapping("/otp_code/user_id/{id}")
+    @GetMapping("/user_id/{id}")
     public ResponseEntity<ApiResponse<VerificationCodeDTO>> getVerificationCodeByUserId(
             @PathVariable("id") Long id
     ) {
@@ -87,7 +87,7 @@ public class VerificationCodeDataController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @GetMapping("/otp_code/telegram_user_id/{id}")
+    @GetMapping("/telegram_user_id/{id}")
     public ResponseEntity<ApiResponse<VerificationCodeDTO>> getVerificationCodeByTelegramUserId(
             @PathVariable("id") Long id
     ) {
@@ -98,7 +98,18 @@ public class VerificationCodeDataController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PostMapping("/otp_code/delete/{id}")
+    @GetMapping("/otp_hash/{hash}")
+    public ResponseEntity<ApiResponse<VerificationCodeDTO>> getVerificationCodeByOtpHash(
+            @PathVariable("hash") String hash
+    ) {
+        log.debug("Запрос на получение VerificationCode по otp hash {}", hash);
+
+        ApiResponse<VerificationCodeDTO> response = verificationCodeService.getCodeByOtpHash(hash);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PostMapping("/delete/{id}")
     public ResponseEntity<ApiResponse<Boolean>> deleteVerificationCode(
             @PathVariable("id") Long id
     ) {
