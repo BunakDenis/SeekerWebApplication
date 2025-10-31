@@ -1,5 +1,6 @@
 package com.example.telegram.bot.service;
 
+import com.example.data.models.service.ModelMapperService;
 import com.example.telegram.api.clients.DataProviderClient;
 import lombok.Builder;
 import lombok.Data;

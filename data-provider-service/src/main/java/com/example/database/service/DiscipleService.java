@@ -3,6 +3,7 @@ package com.example.database.service;
 import com.example.data.models.entity.dto.DiscipleDTO;
 import com.example.data.models.entity.response.ApiResponse;
 import com.example.data.models.exception.EntityNotFoundException;
+import com.example.data.models.service.ModelMapperService;
 import com.example.database.entity.Disciple;
 import com.example.database.repo.jpa.DiscipleRepo;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +13,6 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 import static com.example.data.models.utils.ApiResponseUtilsService.*;
-import static com.example.data.models.utils.EntityUtilsService.*;
 
 @Service
 @RequiredArgsConstructor

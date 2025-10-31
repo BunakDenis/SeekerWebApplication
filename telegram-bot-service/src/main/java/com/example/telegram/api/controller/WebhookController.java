@@ -2,10 +2,9 @@ package com.example.telegram.api.controller;
 
 import com.example.telegram.bot.TelegramBot;
 import com.example.telegram.bot.service.AuthService;
-import com.example.telegram.bot.service.ModelMapperService;
+import com.example.data.models.service.ModelMapperService;
 import com.example.telegram.bot.service.UserService;
 import jakarta.annotation.PostConstruct;
-import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,9 +14,6 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.web.bind.annotation.*;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
-
-import java.util.Objects;
 
 @RestController
 @RequestMapping("${telegram.bot.webhook-path}")

@@ -7,6 +7,7 @@ import com.example.data.models.entity.dto.telegram.TelegramSessionDTO;
 import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
 import com.example.data.models.enums.ResponseIncludeDataKeys;
 import com.example.data.models.exception.EntityNotFoundException;
+import com.example.data.models.service.ModelMapperService;
 import com.example.telegram.api.clients.DataProviderClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;

@@ -7,6 +7,7 @@ import com.example.data.models.entity.dto.VerificationCodeDTO;
 import com.example.data.models.entity.request.ApiRequest;
 import com.example.data.models.exception.ExpiredVerificationCodeException;
 import com.example.data.models.exception.NotValidVerificationCodeException;
+import com.example.data.models.service.ModelMapperService;
 import com.example.telegram.api.clients.DataProviderClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

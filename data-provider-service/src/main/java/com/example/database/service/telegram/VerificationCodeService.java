@@ -11,7 +11,7 @@ import com.example.database.entity.telegram.TelegramSession;
 import com.example.database.entity.User;
 import com.example.database.entity.VerificationCode;
 import com.example.database.repo.jpa.VerificationCodeRepo;
-import com.example.database.service.ModelMapperService;
+import com.example.data.models.service.ModelMapperService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

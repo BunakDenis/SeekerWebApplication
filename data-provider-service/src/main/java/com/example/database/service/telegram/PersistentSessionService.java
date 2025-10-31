@@ -9,7 +9,7 @@ import com.example.data.models.exception.NotActiveSessionException;
 import com.example.data.models.utils.ApiResponseUtilsService;
 import com.example.database.entity.telegram.PersistentSession;
 import com.example.database.repo.jpa.telegram.PersistentSessionRepo;
-import com.example.database.service.ModelMapperService;
+import com.example.data.models.service.ModelMapperService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

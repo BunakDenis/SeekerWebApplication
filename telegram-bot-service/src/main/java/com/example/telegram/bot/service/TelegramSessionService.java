@@ -9,6 +9,7 @@ import com.example.data.models.entity.dto.telegram.TelegramSessionDTO;
 import com.example.data.models.enums.JWTDataSubjectKeys;
 import com.example.data.models.enums.ResponseIncludeDataKeys;
 import com.example.data.models.service.JWTService;
+import com.example.data.models.service.ModelMapperService;
 import com.example.telegram.api.clients.DataProviderClient;
 import com.example.utils.datetime.DateTimeService;
 import com.fasterxml.jackson.databind.ObjectMapper;

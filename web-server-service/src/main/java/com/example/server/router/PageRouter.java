@@ -27,6 +27,7 @@ public class PageRouter {
                         .GET("/", pageHandler::getMainPage)
                         .GET("/tg_register", pageHandler::registerPage)
                         .GET("/successReg/{user_id}", pageHandler::successRegPage)
+                        .GET("/activate/{activate_code}", pageHandler::activatedUserPage)
                 )
                 .build();
     }

@@ -6,7 +6,8 @@ INSERT INTO users (username, password, email, role, active)
 VALUES
   ('dbunak', '$2a$12$7aAytGGjXfLWyZuP.82HH.vKGoOwB2/CyAIN24EB5gG6mbTnVOCj6', 'xisi926@ukr.net', 'ADMIN', TRUE),
   ('tourist', '$2a$12$nIJtokJ7mstpyw.p/dQgSuNK9NLzo8bfOdIe8cSxjJOVhAKuskfq.', 'tourist@gmail.com', 'TOURIST', TRUE),
-  ('telegram-bot-service', '$2a$12$BDBWx0rCdFlBdfoJ9XCd/OpX3m4zNnBTpFmOUMkFJPG0G/D9LBmue', 'benzzin123@gmail.com', 'ADMIN', TRUE)
+  ('telegram-bot-service', '$2a$12$BDBWx0rCdFlBdfoJ9XCd/OpX3m4zNnBTpFmOUMkFJPG0G/D9LBmue', 'benzzin123@gmail.com', 'ADMIN', TRUE),
+  ('web-server-service', '$2a$12$hBi4xmjQA6qVF9KMatwFNe.EVpf8pRwF4qHq1d22ohYe5rqynomVK', 'FOPBunakk@urt.net', 'ADMIN', TRUE)
 ON CONFLICT (email) DO NOTHING;
 
 

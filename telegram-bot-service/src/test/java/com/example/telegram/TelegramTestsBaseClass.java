@@ -4,7 +4,7 @@ package com.example.telegram;
 import com.example.data.models.service.JWTService;
 import com.example.data.models.utils.generator.GenerationService;
 import com.example.telegram.bot.message.TelegramBotMessageSender;
-import com.example.telegram.bot.service.ModelMapperService;
+import com.example.data.models.service.ModelMapperService;
 import com.example.utils.sender.EmailService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;

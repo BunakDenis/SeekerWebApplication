@@ -7,7 +7,7 @@ import com.example.database.entity.TransientSession;
 import com.example.data.models.entity.request.ApiRequest;
 import com.example.data.models.entity.response.ApiResponse;
 import com.example.data.models.entity.dto.telegram.TransientSessionDTO;
-import com.example.database.service.ModelMapperService;
+import com.example.data.models.service.ModelMapperService;
 import com.example.database.service.telegram.TransientSessionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;

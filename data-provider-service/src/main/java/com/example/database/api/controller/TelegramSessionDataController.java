@@ -8,7 +8,7 @@ import com.example.database.entity.telegram.PersistentSession;
 import com.example.database.entity.telegram.TelegramSession;
 import com.example.database.entity.telegram.TelegramUser;
 import com.example.database.entity.TransientSession;
-import com.example.database.service.ModelMapperService;
+import com.example.data.models.service.ModelMapperService;
 import com.example.database.service.telegram.TelegramSessionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;

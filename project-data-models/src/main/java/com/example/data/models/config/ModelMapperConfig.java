@@ -1,4 +1,4 @@
-package com.example.database.config;
+package com.example.data.models.config;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;

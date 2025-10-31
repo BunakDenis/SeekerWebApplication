@@ -3,15 +3,19 @@ package com.example.database.api.controller;
 
 import com.example.data.models.consts.ExceptionMessageProvider;
 import com.example.data.models.entity.dto.UserDTO;
+import com.example.data.models.entity.dto.UserDetailsDTO;
 import com.example.data.models.entity.request.ApiRequest;
 import com.example.data.models.entity.response.ApiResponse;
 import com.example.data.models.entity.response.CheckUserResponse;
+import com.example.data.models.enums.ResponseIncludeDataKeys;
 import com.example.data.models.exception.EntityNullException;
 import com.example.database.api.client.MysticSchoolClient;
 import com.example.database.entity.User;
-import com.example.database.service.ModelMapperService;
+import com.example.data.models.service.ModelMapperService;
+import com.example.database.entity.UserDetails;
+import com.example.database.service.UserDetailsService;
 import com.example.database.service.UserService;
-import jakarta.ws.rs.QueryParam;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -31,8 +35,10 @@ import static com.example.data.models.utils.EntityUtilsService.*;
 public class UserDataController {
 
     private final UserService userService;
+    private final UserDetailsService userDetailsService;
     private final MysticSchoolClient mysticSchoolClient;
     private final ModelMapperService mapperService;
+    private final ObjectMapper objectMapper;
 
     @PostMapping("/user/add/")
     public ResponseEntity<ApiResponse<UserDTO>> save(
@@ -51,6 +57,24 @@ public class UserDataController {
         ApiResponse<UserDTO> result = ApiResponse.<UserDTO>builder().build();
 
         if (Objects.nonNull(user)) result = userService.save(user);
+
+        if (Objects.nonNull(
+                request.getIncludeObject(ResponseIncludeDataKeys.USER_DETAILS.getKeyValue())
+        )
+        ) {
+            UserDetails userDetails = objectMapper.convertValue(
+                    request.getIncludeObject(ResponseIncludeDataKeys.USER_DETAILS.getKeyValue()),
+                    UserDetails.class
+            );
+
+            userDetails.setUser(mapperService.toEntity(result.getData(), User.class));
+
+            UserDetails savedUserDetails = userDetailsService.create(userDetails);
+
+            UserDetailsDTO userDetailsDTO = mapperService.toDTO(savedUserDetails, UserDetailsDTO.class);
+
+            result.addIncludeObject(ResponseIncludeDataKeys.USER_DETAILS.getKeyValue(), userDetailsDTO);
+        }
 
         return ResponseEntity.status(result.getStatus()).body(result);
     }
@@ -137,6 +161,18 @@ public class UserDataController {
         log.debug("Запрос на получение User по telegramUserId {}", id);
 
         ApiResponse<UserDTO> response = userService.getUserByTelegramUserIdWithTelegramUser(id);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/user/user_details/id/{id}")
+    public ResponseEntity<ApiResponse<UserDTO>> getUserByIdWithUserDetails(
+            @PathVariable("id") Long id
+    ) {
+
+        log.debug("Запрос на получение User with user details по id={}", id);
+
+        ApiResponse<UserDTO> response = userService.getUserByIdWithUserDetails(id);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

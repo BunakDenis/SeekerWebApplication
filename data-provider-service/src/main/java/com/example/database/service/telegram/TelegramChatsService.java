@@ -10,7 +10,7 @@ import com.example.data.models.utils.ApiResponseUtilsService;
 import com.example.database.entity.telegram.TelegramChat;
 import com.example.database.entity.telegram.TelegramUser;
 import com.example.database.repo.jpa.telegram.TelegramChatRepo;
-import com.example.database.service.ModelMapperService;
+import com.example.data.models.service.ModelMapperService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

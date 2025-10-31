@@ -6,14 +6,11 @@ import com.example.data.models.entity.response.ApiResponse;
 import com.example.data.models.exception.EntityNotFoundException;
 import com.example.database.entity.Curator;
 import com.example.database.service.CuratorService;
-import com.example.database.service.ModelMapperService;
-import io.swagger.annotations.Api;
+import com.example.data.models.service.ModelMapperService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import static com.example.data.models.utils.ApiResponseUtilsService.*;
 
 
 @RestController

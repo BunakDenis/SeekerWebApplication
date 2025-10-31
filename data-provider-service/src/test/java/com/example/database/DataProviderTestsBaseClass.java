@@ -3,7 +3,7 @@ package com.example.database;
 
 import com.example.data.models.service.JWTService;
 import com.example.database.service.CuratorService;
-import com.example.database.service.ModelMapperService;
+import com.example.data.models.service.ModelMapperService;
 import com.example.database.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;

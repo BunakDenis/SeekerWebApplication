@@ -38,6 +38,7 @@ CREATE TABLE verification_codes (
     id BIGSERIAL PRIMARY KEY,
     user_id BIGINT REFERENCES users(id) NOT NULL,
     otp_hash VARCHAR(255) NOT NULL,
+    data_attribute VARCHAR(255) NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
     active BOOLEAN NOT NULL DEFAULT TRUE,

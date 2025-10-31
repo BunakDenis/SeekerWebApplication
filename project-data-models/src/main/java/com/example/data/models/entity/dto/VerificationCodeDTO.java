@@ -17,6 +17,8 @@ public class VerificationCodeDTO {
 
     private String otpHash;
 
+    private String dataAttribute;
+
     private LocalDateTime createdAt;
 
     private LocalDateTime expiresAt;

@@ -21,6 +21,9 @@ public class VerificationCode {
     @Column(name = "otp_hash", nullable = false)
     private String otpHash;
 
+    @Column(name = "data_attribute", nullable = false)
+    private String dataAttribute;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 

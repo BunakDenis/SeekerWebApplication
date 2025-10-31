@@ -8,6 +8,7 @@ import com.example.data.models.enums.ResponseIncludeDataKeys;
 import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
 import com.example.data.models.enums.UserRoles;
 import com.example.data.models.exception.*;
+import com.example.data.models.service.ModelMapperService;
 import com.example.data.models.utils.ApiResponseUtilsService;
 import com.example.database.entity.telegram.TelegramUser;
 import com.example.database.entity.User;
@@ -154,6 +155,23 @@ public class UserService implements UserDetailsService {
 
         resp.addIncludeObject(ResponseIncludeDataKeys.USER_DETAILS.getKeyValue(), userDetailsDTO);
         resp.addIncludeObject(ResponseIncludeDataKeys.TELEGRAM_USER.getKeyValue(), telegramUserDTO);
+
+        return resp;
+    }
+    public ApiResponse<UserDTO> getUserByIdWithUserDetails(Long id) throws EntityNotFoundException {
+
+        Optional<User> optionalUser = repo.findByIdWithUserDetails(id);
+
+        if (!optionalUser.isPresent())
+            throw new EntityNotFoundException("User with id " + id + " is not found", new User());
+
+        User user = optionalUser.get();
+
+        ApiResponse<UserDTO> resp = success(mapper.toDTO(user, UserDTO.class));
+
+        UserDetailsDTO userDetailsDTO = mapper.toDTO(user.getUserDetails(), UserDetailsDTO.class);
+
+        resp.addIncludeObject(ResponseIncludeDataKeys.USER_DETAILS.getKeyValue(), userDetailsDTO);
 
         return resp;
     }

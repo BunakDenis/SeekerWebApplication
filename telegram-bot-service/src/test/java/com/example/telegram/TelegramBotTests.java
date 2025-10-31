@@ -1134,14 +1134,14 @@ public class TelegramBotTests extends TelegramTestsBaseClass {
         }
     }
 
-
+/*
     @Test
     public void testJwtService() {
 
         JwtDataProvideDataImpl jwtTelegramData = JwtDataProvideDataImpl.builder()
-                .username("telegram-bot-service")
-                .subjects(Map.of("username", "telegram-bot-service"))
-                .expirationTime(DateTimeService.convertDaysToMillis(30L))
+                .username("web-server-service")
+                .subjects(Map.of("username", "web-server-service"))
+                .expirationTime(DateTimeService.convertDaysToMillis(90L))
                 .build();
 
         String token = jwtService.generateToken(jwtTelegramData);
@@ -1149,7 +1149,7 @@ public class TelegramBotTests extends TelegramTestsBaseClass {
         log.debug(token);
 
     }
-
+ */
     /*
     @Test
         public void testSendingEmailMessage() {

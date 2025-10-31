@@ -7,7 +7,7 @@ import com.example.data.models.entity.request.ApiRequest;
 import com.example.data.models.entity.response.ApiResponse;
 import com.example.database.entity.User;
 import com.example.database.entity.VerificationCode;
-import com.example.database.service.ModelMapperService;
+import com.example.data.models.service.ModelMapperService;
 import com.example.database.service.UserService;
 import com.example.database.service.telegram.VerificationCodeService;
 import lombok.RequiredArgsConstructor;

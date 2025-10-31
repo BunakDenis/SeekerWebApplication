@@ -6,7 +6,7 @@ import com.example.data.models.entity.response.ApiResponse;
 import com.example.data.models.entity.dto.telegram.TelegramChatDTO;
 import com.example.database.entity.telegram.TelegramChat;
 import com.example.database.entity.telegram.TelegramUser;
-import com.example.database.service.ModelMapperService;
+import com.example.data.models.service.ModelMapperService;
 import com.example.database.service.telegram.TelegramChatsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

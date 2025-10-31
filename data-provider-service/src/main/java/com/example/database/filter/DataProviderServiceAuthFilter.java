@@ -68,6 +68,8 @@ public class DataProviderServiceAuthFilter implements WebFilter {
 
         String apiKey = Objects.isNull(apiKeyValue) ? "" : apiKeyValue.get(0);
 
+        //log.debug("Api key = {}", apiKey);
+
         if (StringUtils.hasText(apiKey)) {
             return Mono.just(jwtService.extractUsername(apiKey))
                     .flatMap(username -> {

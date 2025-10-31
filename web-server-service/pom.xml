@@ -14,7 +14,7 @@
     <groupId>com.example</groupId>
 
     <dependencies>
-        <!--
+
         <dependency>
             <groupId>com.example</groupId>
             <artifactId>project-data-models</artifactId>
@@ -25,7 +25,7 @@
             <artifactId>utils-service</artifactId>
             <version>${project.version}</version>
         </dependency>
-        -->
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>

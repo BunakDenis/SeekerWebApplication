@@ -27,6 +27,12 @@ public interface UserRepo extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
     @Query("""
               SELECT u FROM User u 
+              JOIN FETCH u.userDetails d 
+              WHERE u.id = :id
+    """)
+    Optional<User> findByIdWithUserDetails(@Param("id") Long id);
+    @Query("""
+              SELECT u FROM User u 
               JOIN u.telegramUsers tu 
               JOIN FETCH u.userDetails d 
               WHERE tu.telegramUserId = :telegramUserId

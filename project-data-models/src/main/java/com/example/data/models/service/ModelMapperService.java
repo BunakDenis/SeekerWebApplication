@@ -1,12 +1,16 @@
-package com.example.telegram.bot.service;
+package com.example.data.models.service;
 
-import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
 import com.example.data.models.entity.TelegramUser;
 import com.example.data.models.entity.User;
+import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 @Service
 @Data
@@ -21,6 +25,30 @@ public class ModelMapperService {
 
     public <T, K> K toDTO (T entity, Class<K> dto) {
         return mapper.map(entity, dto);
+    }
+
+    public <T, K> List<K> dtoListToEntity(List<T> dtoList, Class<K> entityClass) {
+
+        if (dtoList.isEmpty()) return Collections.emptyList();
+
+        List<K> result = new ArrayList<>();
+
+        dtoList.forEach(dto -> result.add(mapper.map(dto, entityClass)));
+
+        return List.copyOf(result);
+
+    }
+
+    public <T, K> List<K> entityListToDto(List<T> entityList, Class<K> entityClass) {
+
+        if (entityList.isEmpty()) return Collections.emptyList();
+
+        List<K> result = new ArrayList<>();
+
+        entityList.forEach(dto -> result.add(mapper.map(dto, entityClass)));
+
+        return List.copyOf(result);
+
     }
 
     public TelegramUser apiTelegramUserToEntity(org.telegram.telegrambots.meta.api.objects.User user) {

@@ -6,7 +6,7 @@ import com.example.data.models.entity.request.ApiRequest;
 import com.example.data.models.entity.response.ApiResponse;
 import com.example.data.models.entity.dto.telegram.PersistentSessionDTO;
 import com.example.database.entity.telegram.TelegramSession;
-import com.example.database.service.ModelMapperService;
+import com.example.data.models.service.ModelMapperService;
 import com.example.database.service.telegram.PersistentSessionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

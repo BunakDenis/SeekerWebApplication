@@ -7,7 +7,7 @@ import com.example.data.models.entity.dto.telegram.TelegramUserDTO;
 import com.example.data.models.enums.ResponseIncludeDataKeys;
 import com.example.database.entity.telegram.TelegramUser;
 import com.example.database.entity.User;
-import com.example.database.service.ModelMapperService;
+import com.example.data.models.service.ModelMapperService;
 import com.example.database.service.telegram.TelegramUserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;

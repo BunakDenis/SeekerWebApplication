@@ -9,7 +9,7 @@ import com.example.data.models.utils.ApiResponseUtilsService;
 import com.example.database.entity.telegram.TelegramSession;
 import com.example.database.entity.telegram.TelegramUser;
 import com.example.database.repo.jpa.telegram.TelegramUserRepo;
-import com.example.database.service.ModelMapperService;
+import com.example.data.models.service.ModelMapperService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

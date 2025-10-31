@@ -17,6 +17,10 @@ INSERT INTO users (username, password, email, role, active)
 SELECT 'telegram-bot-service', '$2a$12$BDBWx0rCdFlBdfoJ9XCd/OpX3m4zNnBTpFmOUMkFJPG0G/D9LBmue', 'benzzin123@gmail.com', 'ADMIN', TRUE
 WHERE NOT EXISTS (SELECT 1 FROM users WHERE email = 'benzzin123@gmail.com');
 
+INSERT INTO users (username, password, email, role, active)
+SELECT 'web-server-service', '$2a$12$hBi4xmjQA6qVF9KMatwFNe.EVpf8pRwF4qHq1d22ohYe5rqynomVK', 'FOPBunakk@urt.net', 'ADMIN', TRUE
+WHERE NOT EXISTS (SELECT 1 FROM users WHERE email = 'FOPBunakk@urt.net');
+
 
 -- ============================
 -- 2) Добавляем куратора (dbunak)

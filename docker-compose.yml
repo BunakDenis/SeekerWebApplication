@@ -71,6 +71,8 @@ services:
       POSTGRES_DB_PORT: ${POSTGRES_DB_DOCKER_PORT}
       DATA_PROVIDER_SERVICE_PORT: ${DATA_PROVIDER_SERVICE_PORT}
       DATA_PROVIDER_SERVICE_API_URL: ${DATA_PROVIDER_SERVICE_API_DOCKER_URL}
+      PROXY_TOR_HOST: ${PROXY_TOR_HOST_DOCKER_HOST}
+      PROXY_TOR_PORT: ${PROXY_TOR_PORT}
     networks:
       - app-network
     depends_on:
@@ -135,6 +137,7 @@ services:
       - ./.env
     environment:
       LOCATION: DE
+      PROXY_TOR_HOST: ${PROXY_TOR_HOST_DOCKER_HOST}
       PROXY_TOR_PORT: ${PROXY_TOR_PORT}
     restart: unless-stopped
     networks:

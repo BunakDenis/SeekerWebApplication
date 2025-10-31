@@ -4,7 +4,7 @@ package com.example.database.api.controller;
 import com.example.data.models.entity.mysticschool.ArticleCategory;
 import com.example.data.models.entity.response.ApiResponseWithDataList;
 import com.example.database.api.client.MysticSchoolClient;
-import com.example.database.service.ModelMapperService;
+import com.example.data.models.service.ModelMapperService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

@@ -22,13 +22,13 @@ import java.util.NoSuchElementException;
 public class RestControllerExceptionHandler {
 
 
-    private static final String LOG_EXCEPTION_HANDLE_MSG = "RestControllerExceptionHandler handle exception {}";
+    private static final String LOG_EXCEPTION_HANDLE_MSG = "RestControllerExceptionHandler handle exception {}: {}";
 
 
     @ExceptionHandler(NoResourceFoundException.class)
     protected ResponseEntity<ApiResponse<Object>> endPointNotFoundExceptionHandler(NoResourceFoundException e) {
 
-        log.error(LOG_EXCEPTION_HANDLE_MSG, e.getClass().getCanonicalName(), e.getMessage(), e);
+        log.error(LOG_EXCEPTION_HANDLE_MSG, e.getClass().getSimpleName(), e.getMessage(), e);
 
         ApiResponse response = ApiResponse.builder()
                 .status(HttpStatus.NOT_FOUND)
