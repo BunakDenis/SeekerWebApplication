@@ -39,7 +39,7 @@
 		<javax-mail.version>1.4</javax-mail.version>
 		<lombok.version>1.18.22</lombok.version>
 		<log4j.version>2.25.1</log4j.version>
-		<jib-version>3.4.6</jib-version>
+		<jib-version>3.4.3</jib-version>
 		<image>bunakdenis/${project.artifactId}:latest</image>
 	</properties>
 

@@ -31,16 +31,25 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GH_TOKEN }}
 
+      # Сборка и пуш образа data-provider-service
+      - name: Build & push data-provider-service image
+        id: build-push-data-provider
+        run: mvn -pl data-provider-service -Dimage=ghcr.io/bunakdenis/data-provider-service:latest compile jib:build
 
       # Сборка и пуш образа telegram-bot-service
       - name: Build & push telegram-bot-service image
         id: build-push-telegram-bot
         run: mvn -pl telegram-bot-service -Dimage=ghcr.io/bunakdenis/telegram-bot-service:latest compile jib:build
 
+      # Сборка и пуш образа web-server-service
+      - name: Build & push web-server-service image
+        id: build-push-web-server
+        run: mvn -pl web-server-service -Dimage=ghcr.io/bunakdenis/web-server-service:latest compile jib:build
+
       # Сборка и пуш образа useful-tools
-      - name: Build & push useful-tools image
-        id: build-push-useful-tools
-        run: mvn -pl useful-tools -Dimage=ghcr.io/bunakdenis/useful-tools:latest compile jib:build
+      #- name: Build & push useful-tools image
+      #  id: build-push-useful-tools
+      #  run: mvn -pl useful-tools -Dimage=ghcr.io/bunakdenis/useful-tools:latest compile jib:build
 
       # Загрузка секретов и переменных в окружение
       - name: Export all required env vars
